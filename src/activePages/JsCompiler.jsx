@@ -1,4 +1,5 @@
 "use client"
+
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import MonacoEditor from "@monaco-editor/react";
@@ -18,12 +19,13 @@ import {
   setCode,
   setActiveTab,
   toggleFeedback,
-  selectSelectedLanguage
+  selectSelectedLanguage,
+  setSelectedLanguage
 } from "../redux/slices/compilerSlice";
 import { useDeviceSetup, useMonacoSetup, useCompilerSelectors } from "../redux/hooks";
-import { getFileExtension } from "../Utils";
+import { getFileExtension, getMonacoLanguage } from "../Utils";
 
-const JsCompiler = () => {
+const JsCompiler = ({ defaultLanguage = "javascript" }) => {
   // Set up hooks
   const dispatch = useDispatch();
   
@@ -44,27 +46,12 @@ const JsCompiler = () => {
   // Get the selected language from the Redux store
   const selectedLanguage = useSelector(selectSelectedLanguage);
 
-  // Map the selected language to Monaco editor language
-  const getMonacoLanguage = () => {
-    switch (selectedLanguage) {
-      case 'javascript':
-        return 'javascript';
-      case 'typescript':
-        return 'typescript';
-      case 'python':
-        return 'python';
-      case 'c':
-        return 'c';
-      case 'c++':
-        return 'cpp';
-      case 'go':
-        return 'go';
-      case 'java':
-        return 'java';
-      default:
-        return 'javascript';
-    }
-  };
+  // Set the language based on the URL route when component mounts
+  useEffect(() => {
+    dispatch(setSelectedLanguage(defaultLanguage));
+  }, [defaultLanguage, dispatch]);
+
+ 
 
   const renderEditor = () => (
     <div className="w-full h-full">
@@ -72,7 +59,7 @@ const JsCompiler = () => {
         <MonacoEditor
           height="100vh"
           width="100%"
-          language={getMonacoLanguage()}
+          language={getMonacoLanguage(defaultLanguage)}
           theme="vs-dark"
           value={code}
           onChange={(value) => dispatch(setCode(value))}
@@ -102,7 +89,7 @@ const JsCompiler = () => {
         <pre 
           className="p-4 h-full w-full max-h-full overflow-y-auto font-mono text-sm"
         >
-          <h6 className="text-blue-400 mb-2 opacity-80 font-mono">// Output.{getFileExtension(selectedLanguage)}</h6>
+          <h6 className="text-blue-400 mb-2 opacity-80 font-mono">// Output.{getFileExtension(defaultLanguage)}</h6>
           {output}
         </pre>
       </div>
@@ -131,7 +118,7 @@ const JsCompiler = () => {
           <ul className="flex w-full text-sm font-medium rounded-lg overflow-hidden bg-gray-800 shadow-md">
             <li className="flex-1">
               <button 
-                className={`flex items-center justify-center w-full py-3 px-4 transition-colors ${
+                className={`flex items-center justify-center w-full py-3 px-4 transition-colors cursor-pointer ${
                   activeTab === 'editor' 
                     ? 'bg-purple-600 text-white' 
                     : 'hover:bg-gray-700 text-gray-300'
@@ -144,7 +131,7 @@ const JsCompiler = () => {
             </li>
             <li className="flex-1">
               <button 
-                className={`flex items-center justify-center w-full py-3 px-4 transition-colors ${
+                className={`flex items-center justify-center w-full py-3 px-4 transition-colors cursor-pointer ${
                   activeTab === 'output' 
                     ? 'bg-purple-600 text-white' 
                     : 'hover:bg-gray-700 text-gray-300'

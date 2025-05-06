@@ -175,7 +175,7 @@ export const snippetThemes = [
   }
 ];
 
-export const getMonacoLanguage = () => {
+export const getMonacoLanguage = (selectedLanguage) => {
   switch (selectedLanguage) {
     case 'javascript':
       return 'javascript';
@@ -196,5 +196,78 @@ export const getMonacoLanguage = () => {
   }
 };
 
+export const LanguageIcon = ({ language, selected }) => {
+  const getLanguageColor = (lang) => {
+    switch(lang) {
+      case 'javascript': return selected ? "text-white" : "text-yellow-400";
+      case 'typescript': return selected ? "text-white" : "text-blue-500";
+      case 'python': return selected ? "text-white" : "text-blue-600";
+      case 'c': return selected ? "text-white" : "text-gray-400";
+      case 'c++': return selected ? "text-white" : "text-blue-700";
+      case 'go': return selected ? "text-white" : "text-blue-400";
+      case 'java': return selected ? "text-white" : "text-orange-600";
+      default: return selected ? "text-white" : "text-gray-400";
+    }
+  };
 
+  const getLanguageSymbol = (lang) => {
+    switch(lang) {
+      case 'javascript': return "JS";
+      case 'typescript': return "TS";
+      case 'python': return "PY";
+      case 'c': return "C";
+      case 'c++': return "C++";
+      case 'go': return "GO";
+      case 'java': return "JV";
+      default: return "?";
+    }
+  };
+
+return (
+  <div className={`h-5 w-5 mr-2 font-mono font-bold ${getLanguageColor(language)}`}>
+    {getLanguageSymbol(language)}
+  </div>
+);
+};
+
+  // Language options with their display names and route paths
+export const languageOptions = [
+    { id: 'javascript', name: 'JavaScript', path: '/' },
+    { id: 'typescript', name: 'TypeScript', path: '/typescript' },
+    { id: 'python', name: 'Python', path: '/python' },
+    { id: 'c', name: 'C', path: '/c' },
+    { id: 'c++', name: 'C++', path: '/cpp' },
+    { id: 'go', name: 'Go', path: '/go' },
+    { id: 'java', name: 'Java', path: '/java' }
+  ];
+  // Map URL params to language IDs in our application
+export const languagePathMap = {
+    'typescript': 'typescript',
+    'python': 'python',
+    'c': 'c',
+    'cpp': 'c++',
+    'go': 'go',
+    'java': 'java'
+  };
+  
+export function getDefaultCodeForLanguage(language) {
+    switch(language) {
+      case 'javascript':
+        return 'console.log("Hello from JavaScript!");\n';
+      case 'typescript':
+        return 'const message: string = "Hello from TypeScript!";\nconsole.log(message);\n';
+      case 'python':
+        return 'print("Hello from Python!")\n';
+      case 'c':
+        return '#include <stdio.h>\n\nint main() {\n  printf("Hello from C!\\n");\n  return 0;\n}\n';
+      case 'c++':
+        return '#include <iostream>\n\nint main() {\n  std::cout << "Hello from C++!" << std::endl;\n  return 0;\n}\n';
+      case 'go':
+        return 'package main\n\nimport "fmt"\n\nfunc main() {\n  fmt.Println("Hello from Go!")\n}\n';
+      case 'java':
+        return 'public class Main {\n  public static void main(String[] args) {\n    System.out.println("Hello from Java!");\n  }\n}\n';
+      default:
+        return 'console.log("Hello World!");\n';
+    }
+  }
 
