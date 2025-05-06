@@ -1,0 +1,30 @@
+{
+  "javascript": {
+    "prompt_suffix":
+      "Write in JavaScript and give response in code-block. Make sure it is a coding question. If not, respond: 'Please ask me a coding question.'"
+  },
+  "typescript": {
+    "prompt_suffix":
+      "Write in TypeScript and give response in code-block. Make sure it is a coding question. If not, respond: 'Please ask me a coding question.'"
+  },
+  "python": {
+    "prompt_suffix":
+      "Write in python and give response in code-block. Make sure it is a coding question. If not, respond: 'Please ask me a coding question.'"
+  },
+  "c": {
+    "prompt_suffix":
+      "Write in c and give response in code-block. Make sure it is a coding question. If not, respond: 'Please ask me a coding question.'"
+  },
+  "c++": {
+    "prompt_suffix":
+      "Write in c++ and give response in code-block. Make sure it is a coding question. If not, respond: 'Please ask me a coding question.'"
+  },
+  "java": {
+    "prompt_suffix":
+      "Write in java and give response in code-block. Make sure it is a coding question. If not, respond: 'Please ask me a coding question.'"
+  },
+  "go": {
+    "prompt_suffix":
+     "Write in go and give response in code-block. Make sure it is a coding question. If not, respond: 'Please ask me a coding question.'"
+  }
+}
