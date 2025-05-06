@@ -1,6 +1,6 @@
 // src/redux/slices/compilerSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { DEFAULT_CODE, getFileExtension, sanitizeErrorTrace } from "../../Utils";
+import { DEFAULT_CODE, getDefaultCodeForLanguage, getFileExtension, sanitizeErrorTrace } from "../../Utils";
 import { extractCodeBlocks, generateDeviceId, getBaseUrl } from "../../Utils";
 import { encryptRequest, decryptResponse } from '../../cryptoUtils';
 import apis from "../../api";
@@ -227,32 +227,13 @@ const compilerSlice = createSlice({
     setSelectedLanguage: (state, action) => {
         state.selectedLanguage = action.payload;
         // Update code editor placeholder based on language
-        switch (action.payload) {
-            case 'javascript':
-            state.code = '// Write your JavaScript code here\nconsole.log("Hello, World!");';
-            break;
-            case 'typescript':
-            state.code = '// Write your TypeScript code here\nconst greeting: string = "Hello, World!";\nconsole.log(greeting);';
-            break;
-            case 'python':
-            state.code = '# Write your Python code here\nprint("Hello, World!")';
-            break;
-            case 'c':
-            state.code = '#include <stdio.h>\n\nint main() {\n    printf("Hello, World!\\n");\n    return 0;\n}';
-            break;
-            case 'c++':
-            state.code = '#include <iostream>\n\nint main() {\n    std::cout << "Hello, World!" << std::endl;\n    return 0;\n}';
-            break;
-            case 'go':
-            state.code = 'package main\n\nimport "fmt"\n\nfunc main() {\n    fmt.Println("Hello, World!")\n}';
-            break;
-            case 'java':
-            state.code = 'public class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello, World!");\n    }\n}';
-            break;
-            default:
-            state.code = '// Write your code here\nconsole.log("Hello, World!");';
-        }
-        },
+        state.code = getDefaultCodeForLanguage(action.payload);
+    },
+    setLanguageFromPath: (state, action) => {
+      state.selectedLanguage = action.payload;
+      // You might want to also update code template based on language
+      state.code = getDefaultCodeForLanguage(action.payload);
+    },
     setLanguageDetails: (state, action) => {
     state.languageDetails = action.payload;
     },
@@ -370,6 +351,7 @@ const compilerSlice = createSlice({
 // Export actions
 export const {
     setSelectedLanguage,
+    setLanguageFromPath,
     setCode,
     setOutput,
     setEditor,

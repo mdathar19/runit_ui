@@ -22,7 +22,7 @@ const SearchIcon = () => {
       // Create container for the search icon
       searchIconContainer = document.createElement('div');
       searchIconContainer.id = 'search-icon-floating';
-      searchIconContainer.className = 'fixed z-50 transition-all duration-300 ease-in-out';
+      searchIconContainer.className = 'fixed z-40 transition-all duration-300 ease-in-out';
       
       // Create the icon button
       const searchIconButton = document.createElement('button');
