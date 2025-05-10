@@ -1,5 +1,4 @@
-import JsCompiler from "@/activePages/JsCompiler";
-import ClientComponent from '../../components/ClientComponent';
+import JsCompiler from "@/Clients/JsCompiler";
 import { languagePathMap } from "@/Utils";
 
 // This function runs on the server during build time
@@ -32,8 +31,6 @@ export default async function LanguagePage({ params }) {
   const languageId = languagePathMap[language] || 'javascript';
   
   return (
-    <ClientComponent>
       <JsCompiler defaultLanguage={languageId} />
-    </ClientComponent>
   );
 }

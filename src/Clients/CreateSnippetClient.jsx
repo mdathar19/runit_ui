@@ -1,90 +1,17 @@
+'use client';
+
 import React, { useState, useRef } from 'react';
-import { FaDownload, FaCode, FaChevronLeft, FaChevronRight, FaCopy, FaImage, FaTimes } from 'react-icons/fa';
-import html2canvas from 'html2canvas';
-import { saveAs } from 'file-saver';
-import AppTooltip from '../global/AppTooltip';
-import CodeSnippetBox from '../global/CodeSnippetBox';
-import IconButton from '../global/IconButton';
+import { FaDownload, FaCode, FaChevronLeft, FaChevronRight, FaCopy, FaTimes } from 'react-icons/fa';
+import { useSelector } from 'react-redux';
+import dynamic from 'next/dynamic';
+import { selectCode, selectSelectedLanguage } from '@/redux/slices/compilerSlice';
+import useReduxStore from '@/hooks/useReduxStore';
 
-// Mock theme data - typically would come from a separate file
-const snippetThemes = [
-  {
-    id: 'dark',
-    name: 'Dark',
-    background: 'linear-gradient(to right, #1e1e1e, #2d2d2d)',
-    color: '#f8f8f8',
-    fontFamily: 'Consolas, Monaco, monospace',
-    dotColors: ['#ff5f56', '#ffbd2e', '#27c93f'],
-    accentColor: '#ff5f56'
-  },
-  {
-    id: 'monokai',
-    name: 'Monokai',
-    background: 'linear-gradient(to right, #272822, #3e3d32)',
-    color: '#f8f8f2',
-    fontFamily: 'Consolas, Monaco, monospace',
-    dotColors: ['#fc618d', '#fce566', '#7bd88f'],
-    accentColor: '#fce566'
-  },
-  {
-    id: 'github',
-    name: 'GitHub',
-    background: 'linear-gradient(to right, #f6f8fa, #fff)',
-    color: '#24292e',
-    fontFamily: 'Consolas, Monaco, monospace',
-    dotColors: ['#ea4a5a', '#ffdf5d', '#34d058'],
-    accentColor: '#34d058'
-  },
-  {
-    id: 'dracula',
-    name: 'Dracula',
-    background: 'linear-gradient(to right, #282a36, #44475a)',
-    color: '#f8f8f2',
-    fontFamily: 'Fira Code, monospace',
-    dotColors: ['#ff5555', '#ffb86c', '#50fa7b'],
-    accentColor: '#bd93f9'
-  },
-  {
-    id: 'nord',
-    name: 'Nord',
-    background: 'linear-gradient(to right, #2e3440, #3b4252)',
-    color: '#eceff4',
-    fontFamily: 'Fira Code, monospace',
-    dotColors: ['#bf616a', '#ebcb8b', '#a3be8c'],
-    accentColor: '#88c0d0'
-  },
-  {
-    id: 'solarized',
-    name: 'Solarized',
-    background: 'linear-gradient(to right, #002b36, #073642)',
-    color: '#839496',
-    fontFamily: 'Menlo, Monaco, monospace',
-    dotColors: ['#dc322f', '#b58900', '#859900'],
-    accentColor: '#2aa198'
-  },
-  {
-    id: 'one-dark',
-    name: 'One Dark',
-    background: 'linear-gradient(to right, #282c34, #3a404c)',
-    color: '#abb2bf',
-    fontFamily: 'Menlo, Monaco, monospace',
-    dotColors: ['#e06c75', '#e5c07b', '#98c379'],
-    accentColor: '#61afef'
-  },
-  {
-    id: 'synthwave',
-    name: 'Synthwave',
-    background: 'linear-gradient(to right, #2b213a, #444267)',
-    color: '#f9f9f9',
-    fontFamily: 'IBM Plex Mono, monospace',
-    textShadow: '0 0 5px #ff7edb',
-    dotColors: ['#f97e72', '#fdca40', '#6bffa0'],
-    accentColor: '#ff7edb'
-  }
-];
+// Dynamically import components that use browser APIs
+const CodeSnippetBox = dynamic(() => import('../components/global/CodeSnippetBox'), { ssr: false });
 
-const SnippetCreator = ({ code, language }) => {
-  const [showModal, setShowModal] = useState(false);
+const CreateSnippetClient = ({ themes }) => {
+  const [showModal, setShowModal] = useState(true);
   const [selectedTheme, setSelectedTheme] = useState(null);
   const [step, setStep] = useState('select-theme'); // 'select-theme' or 'preview'
   const [copied, setCopied] = useState(false);
@@ -92,6 +19,8 @@ const SnippetCreator = ({ code, language }) => {
   const [height, setHeight] = useState(400);
   const [width, setWidth] = useState(600);
   const previewRef = useRef(null);
+  const language = useSelector(selectSelectedLanguage);
+  const code = useSelector(selectCode);
 
   const handleClose = () => {
     setShowModal(false);
@@ -127,6 +56,12 @@ const SnippetCreator = ({ code, language }) => {
   const downloadAsImage = async () => {
     setDownloading(true);
     try {
+      // Dynamically import html2canvas and file-saver only when needed
+      const [html2canvas, { saveAs }] = await Promise.all([
+        import('html2canvas').then(module => module.default),
+        import('file-saver')
+      ]);
+      
       const element = document.getElementById('snippet-preview');
       
       // Create a temporary container to render the entire snippet
@@ -178,47 +113,27 @@ const SnippetCreator = ({ code, language }) => {
 
   return (
     <>
-      <AppTooltip position="left" icon={true} text="Create Snippet">
-        <IconButton 
-          icon={<FaImage />}
-          variant="dark" 
-          onClick={handleShow}
-        />
-      </AppTooltip>
-      
-      {showModal && (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
-          {/* Backdrop */}
-          <div className="fixed inset-0 bg-black bg-opacity-75 transition-opacity" onClick={handleClose}></div>
-          
+        <h1 className="text-3xl font-bold mb-6 flex items-center"><FaCode className="mr-2" />Create Code Snippet</h1>
+        <div>
+        <p className="text-gray-300">
+            Create beautiful, shareable code snippets with various themes and customization options. 
+            Choose from a variety of themes, customize size, and download your snippet as an image. Select a theme for your code snippet:
+        </p>
+        </div>
+        <div className="overflow-y-auto mt-4">
           {/* Modal */}
-          <div className="flex items-center justify-center min-h-screen">
-            <div className="bg-gray-900 rounded-lg shadow-xl overflow-hidden w-full max-w-6xl mx-4 border border-gray-700 relative z-50">
-              {/* Header */}
-              <div className="flex justify-between items-center p-4 border-b border-gray-700">
-                <h3 className="text-lg font-medium text-white flex items-center">
-                  <FaCode className="mr-2" />
-                  {step === 'select-theme' ? 'Select Snippet Design' : 'Customize Snippet'}
-                </h3>
-                <button 
-                  onClick={handleClose}
-                  className="text-gray-400 hover:text-white focus:outline-none"
-                >
-                  <FaTimes className="w-5 h-5" />
-                </button>
-              </div>
-              
+          <div className="flex items-center justify-center">
+            <div className="rounded-lg shadow-xl w-full">
               {/* Body */}
-              <div className="p-6">
+              <div>
                 {step === 'select-theme' ? (
                   <div>
-                    <p className="text-gray-400 mb-6">Select a theme for your code snippet:</p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                      {snippetThemes.map((theme) => (
+                    <div className="p-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                      {themes.map((theme) => (
                         <div 
                           key={theme.id}
                           onClick={() => handleThemeSelect(theme)}
-                          className={`cursor-pointer transition-all duration-300 transform hover:-translate-y-1 rounded-lg overflow-hidden border ${
+                          className={`cursor-pointer transition-all duration-300 transform hover:-translate-y-1 rounded-lg border ${
                             selectedTheme?.id === theme.id 
                               ? 'border-purple-500 shadow-lg shadow-purple-500/20' 
                               : 'border-gray-700 hover:border-gray-500'
@@ -381,9 +296,8 @@ const SnippetCreator = ({ code, language }) => {
             </div>
           </div>
         </div>
-      )}
     </>
   );
 };
 
-export default SnippetCreator;
+export default useReduxStore(CreateSnippetClient);

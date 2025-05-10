@@ -22,11 +22,11 @@ const SearchIcon = () => {
       // Create container for the search icon
       searchIconContainer = document.createElement('div');
       searchIconContainer.id = 'search-icon-floating';
-      searchIconContainer.className = 'fixed z-40 transition-all duration-300 ease-in-out';
+      searchIconContainer.className = 'fixed z-40';
       
       // Create the icon button
       const searchIconButton = document.createElement('button');
-      searchIconButton.className = 'flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-r from-purple-600 to-violet-900 text-white shadow-lg hover:shadow-purple-500/50 transition-all duration-300';
+      searchIconButton.className = 'cursor-pointer flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-r from-purple-600 to-violet-900 text-white shadow-lg hover:shadow-purple-500/50';
       searchIconButton.innerHTML = `
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="search-icon-inner">
           <circle cx="11" cy="11" r="8"></circle>
@@ -36,7 +36,7 @@ const SearchIcon = () => {
       
       // Create tooltip
       const tooltip = document.createElement('div');
-      tooltip.className = 'absolute opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 bg-black bg-opacity-80 text-white text-xs px-2 py-1 rounded whitespace-nowrap';
+      tooltip.className = 'absolute opacity-0 invisible group-hover:opacity-100 group-hover:visible bg-black bg-opacity-80 text-white text-xs px-2 py-1 rounded whitespace-nowrap';
       tooltip.innerHTML = `
         <div class="flex items-center gap-1">
           <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-purple-300">
@@ -72,10 +72,10 @@ const SearchIcon = () => {
       searchIconButton.onclick = showQuestionBox;
       
       // Add pulse animation class
-      searchIconButton.classList.add('animate-pulse');
+      /* searchIconButton.classList.add('animate-pulse');
       setTimeout(() => {
         searchIconButton.classList.remove('animate-pulse');
-      }, 1000);
+      }, 1000); */
       
       // Append elements
       searchIconContainer.appendChild(buttonGroup);

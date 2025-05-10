@@ -24,6 +24,7 @@ import {
 } from "../redux/slices/compilerSlice";
 import { useDeviceSetup, useMonacoSetup, useCompilerSelectors } from "../redux/hooks";
 import { getFileExtension, getMonacoLanguage } from "../Utils";
+import useReduxStore from "@/hooks/useReduxStore";
 
 const JsCompiler = ({ defaultLanguage = "javascript" }) => {
   // Set up hooks
@@ -207,4 +208,4 @@ const JsCompiler = ({ defaultLanguage = "javascript" }) => {
   );
 };
 
-export default JsCompiler;
+export default useReduxStore(JsCompiler);
