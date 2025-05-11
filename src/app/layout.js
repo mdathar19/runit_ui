@@ -18,11 +18,11 @@ export const metadata = {
   description: "RunIt is a fast, lightweight, and beautiful online code editor that supports multiple programming languages, instant AI code suggestions, and stunning snippet creation with themes.",
   icons:{
     icon: [
-    { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
-    { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
-    { url: '/favicon_io/android-chrome-192x192.png' },
-    { url: '/android-chrome-512x512.png', sizes: '512x512', type: 'image/png' },
-    { url: '/apple-touch-icon.png', sizes: '16x16', type: 'image/png' },
+    { url: '/favicon_io/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+    { url: '/favicon_io/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+    { url: '/favicon_io/favicon_io/android-chrome-192x192.png' },
+    { url: '/favicon_io/android-chrome-512x512.png', sizes: '512x512', type: 'image/png' },
+    { url: '/favicon_io/apple-touch-icon.png', sizes: '16x16', type: 'image/png' },
   ],
   apple:'/apple-touch-icon.png'
   }
