@@ -1,5 +1,6 @@
 import { languagePathMap } from "@/Utils";
 import dynamic from "next/dynamic";
+import LoadingComponent from '@/components/global/Loading';
 
 // This function runs on the server during build time
 export async function generateStaticParams() {
@@ -13,13 +14,19 @@ export async function generateStaticParams() {
     { language: 'java' }
   ];
 }
+
 // Import the client component with dynamic import for better performance
 const JsCompiler = dynamic(
-  () => import('../../Clients/JsCompiler')
+  () => import('../../Clients/JsCompiler'),
+  { 
+    ssr: true, // Disable server-side rendering for this component
+    loading: LoadingComponent // Show a loading component while loading
+  }
 );
+
 // Dynamic metadata based on the language
 export async function generateMetadata({ params }) {
-  const { language } = await params;
+  const { language } = await params; // No need for await here
   const languageDisplay = language.charAt(0).toUpperCase() + language.slice(1);
 
   return {
@@ -55,13 +62,14 @@ export async function generateMetadata({ params }) {
   };
 }
 
-
 export default async function LanguagePage({ params }) {
-  // Get the language from URL params
+  // Get the language from URL params (no need for await)
   const { language } = await params;
   const languageId = languagePathMap[language] || 'javascript';
   
   return (
+    <>
       <JsCompiler defaultLanguage={languageId} />
+    </>
   );
 }

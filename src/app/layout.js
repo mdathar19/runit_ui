@@ -1,7 +1,9 @@
+// This is a Server Component (no "use client" directive here)
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { HeartIcon } from "@heroicons/react/solid";
 import { FiExternalLink } from "react-icons/fi";
+import ClientLayout from '../components/client-layout';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,6 +15,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// Server component can export metadata
 export const metadata = {
   title: "RunIt - AI-Powered Online Code Editor & Snippet Creator",
   description: "RunIt is a fast, lightweight, and beautiful online code editor that supports multiple programming languages, instant AI code suggestions, and stunning snippet creation with themes.",
@@ -27,6 +30,7 @@ export const metadata = {
   apple:'/apple-touch-icon.png'
   }
 };
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
@@ -41,7 +45,7 @@ export default function RootLayout({ children }) {
             </div>
           </div>
         </div>
-        {children}
+        <ClientLayout>{children}</ClientLayout>
       </body>
     </html>
   );
