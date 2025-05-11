@@ -25,17 +25,15 @@ import {
 import { useDeviceSetup, useMonacoSetup, useCompilerSelectors } from "../redux/hooks";
 import { getFileExtension, getMonacoLanguage } from "../Utils";
 import useReduxStore from "@/hooks/useReduxStore";
+import { FiExternalLink } from "react-icons/fi";
 
 const JsCompiler = ({ defaultLanguage = "javascript" }) => {
   // Set up hooks
   const dispatch = useDispatch();
-  
   // Initialize device detection
   useDeviceSetup();
-  
   // Get the Monaco setup with editor mount handler
   const { handleEditorDidMount } = useMonacoSetup();
-  
   // Get all required selectors from Redux store
   const {
     code,
@@ -43,10 +41,6 @@ const JsCompiler = ({ defaultLanguage = "javascript" }) => {
     activeTab,
     isMobileView
   } = useCompilerSelectors();
-
-  // Get the selected language from the Redux store
-  const selectedLanguage = useSelector(selectSelectedLanguage);
-
   // Set the language based on the URL route when component mounts
   useEffect(() => {
     dispatch(setSelectedLanguage(defaultLanguage));
@@ -100,13 +94,14 @@ const JsCompiler = ({ defaultLanguage = "javascript" }) => {
   return (
     <div className="flex flex-col h-screen w-full bg-gray-900 overflow-hidden">
       {/* Heading */}
-      <div className="bg-gradient-to-r from-purple-600 to-violet-900 p-2 text-white shadow-lg">
+    {/*   <div className="bg-gradient-to-r from-gray-900 to-purple-900 p-1 text-white shadow-lg rounded-lg">
         <div className="container mx-auto">
           <div className="font-light text-sm tracking-wide text-center">
-            Made with <HeartIcon className="h-4 w-4 text-red-400 inline-block mx-1 animate-pulse" /> by <strong><a href="#" target="_blank" rel="noopener noreferrer" className="font-medium hover:underline transition-all">RunIt team</a></strong>
+            Made with <HeartIcon className="h-4 w-4 text-red-400 inline-block mx-1 animate-pulse" /> by <strong><a href="https://www.linkedin.com/in/md-athar-alam-a5067b18b/" target="_blank" rel="noopener noreferrer" className="font-medium hover:underline transition-all">Athar</a>
+            <FiExternalLink className="h-3 w-3 ml-1 inline-block" /></strong>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Navbar */}
       <div className="py-2">

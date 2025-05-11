@@ -213,7 +213,7 @@ const downloadAsImage = async () => {
           <div className="flex border-b border-gray-700 mb-4">
             <button
               onClick={() => setActiveTab('editor')}
-              className={`flex items-center px-4 py-2 font-medium text-sm transition-colors ${
+              className={`flex items-center px-4 py-2 font-medium text-sm transition-colors cursor-pointer ${
                 activeTab === 'editor' 
                   ? 'text-purple-400 border-b-2 border-purple-400' 
                   : 'text-gray-400 hover:text-gray-300'
@@ -223,7 +223,7 @@ const downloadAsImage = async () => {
             </button>
             <button
               onClick={() => setActiveTab('preview')}
-              className={`flex items-center px-4 py-2 font-medium text-sm transition-colors ${
+              className={`flex items-center px-4 py-2 font-medium text-sm transition-colors cursor-pointer ${
                 activeTab === 'preview' 
                   ? 'text-purple-400 border-b-2 border-purple-400' 
                   : 'text-gray-400 hover:text-gray-300'

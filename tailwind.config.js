@@ -8,6 +8,11 @@ module.exports = {
   darkMode: 'class',
   theme: {
     extend: {
+      fontFamily: {
+        luxury: ['"Playfair Display"', 'serif'],
+        geist: ['var(--font-geist-sans)'],
+        mono: ['var(--font-geist-mono)'],
+      },
       colors: {
         purple: {
           50: '#f5f3ff',
@@ -65,5 +70,14 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    function({ addComponents, theme }) {
+      const components = {
+        '.bg-primary': {
+          background: `linear-gradient(to right, ${theme('colors.gray.900')}, ${theme('colors.purple.900')})`,
+        },
+      }
+      addComponents(components)
+    }
+  ],
 }

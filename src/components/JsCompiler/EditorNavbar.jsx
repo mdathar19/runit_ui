@@ -7,7 +7,6 @@ import {
   selectIsLoading,
   selectSelectedLanguage
 } from '../../redux/slices/compilerSlice';
-import SnippetCreator from './SnippetCreator';
 import { useDeviceSetup } from '../../redux/hooks';
 import GradientButton from '../global/GradientButton';
 import { LanguageIcon, languageOptions } from '@/Utils';
@@ -27,8 +26,6 @@ const EditorNavbar = () => {
   // Language selection state
   const [showLangDropdown, setShowLangDropdown] = useState(false);
   const dropdownRef = useRef(null);
-  // Get the code from the Redux store
-  const code = useSelector(state => state.compiler.code);
 
   // Find the currently selected language object
   const selectedLangObj = languageOptions.find(lang => lang.id === selectedLanguage) || languageOptions[0];
@@ -79,7 +76,7 @@ const EditorNavbar = () => {
     router.push('/create-snippet');
   }
   return (
-    <div className="w-full mb-3">
+    <div className="w-full mb-1">
       <div className="flex justify-between items-center p-3 bg-gradient-to-r from-gray-900 to-purple-900 rounded-lg shadow-lg">
         {/* Language selector - Desktop uses tabs, Mobile uses dropdown */}
         {isMobileView ? (
