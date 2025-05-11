@@ -3,7 +3,7 @@ import { FaDownload, FaCode, FaChevronLeft, FaChevronRight, FaCopy, FaImage, FaT
 import html2canvas from 'html2canvas';
 import { saveAs } from 'file-saver';
 import AppTooltip from '../global/AppTooltip';
-import CodeSnippetBox from '../global/CodeSnippetBox';
+import CodeSnippetBox from '../Snippet-creator/CodeSnippetBox';
 import IconButton from '../global/IconButton';
 
 // Mock theme data - typically would come from a separate file

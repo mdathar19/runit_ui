@@ -1,301 +1,328 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
-import { FaDownload, FaCode, FaChevronLeft, FaChevronRight, FaCopy, FaTimes } from 'react-icons/fa';
-import { useSelector } from 'react-redux';
-import dynamic from 'next/dynamic';
-import { selectCode, selectSelectedLanguage } from '@/redux/slices/compilerSlice';
+import React, { useState, useRef, useEffect, useMemo, Suspense } from 'react';
+import { FaDownload, FaCode, FaCopy, FaUndo, FaRedo, FaEye, FaKeyboard } from 'react-icons/fa';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectCode, selectSelectedLanguage, setCode } from '@/redux/slices/compilerSlice';
 import useReduxStore from '@/hooks/useReduxStore';
-
-// Dynamically import components that use browser APIs
-const CodeSnippetBox = dynamic(() => import('../components/global/CodeSnippetBox'), { ssr: false });
+import { debounce } from 'lodash';
+import { CodeEditor, CodeSnippetBox, SnippetControlPanel, LanguageSelector } from '@/components';
 
 const CreateSnippetClient = ({ themes }) => {
-  const [showModal, setShowModal] = useState(true);
-  const [selectedTheme, setSelectedTheme] = useState(null);
-  const [step, setStep] = useState('select-theme'); // 'select-theme' or 'preview'
+  // Redux state
+  const language = useSelector(selectSelectedLanguage);
+  const reduxCode = useSelector(selectCode);
+  const dispatch = useDispatch();
+  
+  // Local state for theme customization and UI
+  const [selectedTheme, setSelectedTheme] = useState(themes[0]);
+  const [customTheme, setCustomTheme] = useState(null);
   const [copied, setCopied] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [height, setHeight] = useState(400);
   const [width, setWidth] = useState(600);
+  const [localCode, setLocalCode] = useState(reduxCode || 'console.log("Hello, world!");');
+  const [activeTab, setActiveTab] = useState('preview'); // 'preview' or 'editor'
   const previewRef = useRef(null);
-  const language = useSelector(selectSelectedLanguage);
-  const code = useSelector(selectCode);
+  
+  // History for undo/redo
+  const [history, setHistory] = useState([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
 
-  const handleClose = () => {
-    setShowModal(false);
-    setStep('select-theme');
-    setSelectedTheme(null);
-    setCopied(false);
-    setHeight(400);
-    setWidth(600);
+  // Effect to set localCode when reduxCode changes
+  useEffect(() => {
+    if (reduxCode) {
+      setLocalCode(reduxCode);
+    }
+  }, [reduxCode]);
+
+  // Update history when code changes
+  const updateHistory = useMemo(() => debounce((code) => {
+    setHistory(prev => {
+      const newHistory = [...prev.slice(0, historyIndex + 1), code];
+      if (newHistory.length > 50) newHistory.shift(); // Limit history size
+      return newHistory;
+    });
+    setHistoryIndex(prev => Math.min(prev + 1, 49)); // Update index
+  }, 500), [historyIndex]);
+
+  // Apply theme and customizations
+  const currentTheme = useMemo(() => {
+    if (!selectedTheme) return themes[0];
+    if (!customTheme) return selectedTheme;
+    
+    return {
+      ...selectedTheme,
+      ...customTheme
+    };
+  }, [selectedTheme, customTheme, themes]);
+
+  // Update code in Redux store with debounce
+  const debouncedUpdateReduxCode = useMemo(() => 
+    debounce((code) => {
+      dispatch(setCode(code));
+    }, 300)
+  , [dispatch]);
+
+  // Handle code change
+  const handleCodeChange = (newCode) => {
+    setLocalCode(newCode);
+    debouncedUpdateReduxCode(newCode);
+    updateHistory(newCode);
   };
 
-  const handleShow = () => setShowModal(true);
-
+  // Handle theme select
   const handleThemeSelect = (theme) => {
     setSelectedTheme(theme);
+    setCustomTheme(null); // Reset customizations
   };
-
-  const goToPreview = () => {
-    if (selectedTheme) {
-      setStep('preview');
-    }
-  };
-
-  const goBackToThemes = () => {
-    setStep('select-theme');
-  };
-
+  
+  // Handle copy to clipboard
   const handleCopy = () => {
-    navigator.clipboard.writeText(code);
+    navigator.clipboard.writeText(localCode);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const downloadAsImage = async () => {
-    setDownloading(true);
-    try {
-      // Dynamically import html2canvas and file-saver only when needed
-      const [html2canvas, { saveAs }] = await Promise.all([
-        import('html2canvas').then(module => module.default),
-        import('file-saver')
-      ]);
-      
-      const element = document.getElementById('snippet-preview');
-      
-      // Create a temporary container to render the entire snippet
-      const tempContainer = document.createElement('div');
-      tempContainer.style.position = 'absolute';
-      tempContainer.style.left = '-9999px';
-      tempContainer.style.top = '-9999px';
-      tempContainer.style.width = `${width}px`;
-      document.body.appendChild(tempContainer);
-      
-      // Clone the element to the temporary container
-      const clone = element.cloneNode(true);
-      clone.style.width = `${width}px`;
-      clone.style.height = 'auto'; // Let it expand to show all content
-      clone.style.maxHeight = 'none'; // Remove max-height restriction
-      tempContainer.appendChild(clone);
-      
-      // Generate canvas from the cloned element
-      const canvas = await html2canvas(clone, {
-        backgroundColor: null,
-        scale: 2,
-        logging: false,
-        useCORS: true,
-        width: width,
-        height: clone.offsetHeight,
-        windowWidth: width,
-        onclone: (clonedDoc) => {
-          const clonedElement = clonedDoc.getElementById('snippet-preview');
-          if (clonedElement) {
-            clonedElement.style.maxHeight = 'none';
-            clonedElement.style.height = 'auto';
-            clonedElement.style.overflow = 'visible';
-            clonedElement.style.background = selectedTheme?.background || '#1e1e1e';
-          }
-        }
-      });
-      
-      canvas.toBlob((blob) => {
-        saveAs(blob, `code-snippet-${language}-${Date.now()}.png`);
-        // Clean up
-        document.body.removeChild(tempContainer);
-        setDownloading(false);
-      });
-    } catch (error) {
-      console.error("Error generating image:", error);
-      setDownloading(false);
+  // Handle undo/redo
+  const handleUndo = () => {
+    if (historyIndex > 0) {
+      const newIndex = historyIndex - 1;
+      setHistoryIndex(newIndex);
+      const prevCode = history[newIndex];
+      setLocalCode(prevCode);
+      dispatch(setCode(prevCode));
     }
   };
 
+  const handleRedo = () => {
+    if (historyIndex < history.length - 1) {
+      const newIndex = historyIndex + 1;
+      setHistoryIndex(newIndex);
+      const nextCode = history[newIndex];
+      setLocalCode(nextCode);
+      dispatch(setCode(nextCode));
+    }
+  };
+
+  // Download as image function
+const downloadAsImage = async () => {
+  setDownloading(true);
+  try {
+    const [html2canvas, fileSaver] = await Promise.all([
+      import('html2canvas').then(module => module.default),
+      import('file-saver').then(module => module.default),
+    ]);
+
+    const saveAs = fileSaver.saveAs;
+    const element = document.getElementById('snippet-preview');
+
+    // Create a temporary container with position absolute
+    const tempContainer = document.createElement('div');
+    tempContainer.style.position = 'absolute';
+    tempContainer.style.left = '-9999px';
+    tempContainer.style.top = '-9999px';
+    tempContainer.style.width = `${width}px`;
+    tempContainer.style.visibility = 'hidden';
+    document.body.appendChild(tempContainer);
+
+    // Clone the element and modify its styles for proper rendering
+    const clone = element.cloneNode(true);
+    clone.style.width = `${width}px`;
+    clone.style.maxHeight = 'none';
+    clone.style.height = 'auto';
+    clone.style.paddingBottom = '40px'; // Increased padding at bottom
+    clone.style.overflow = 'visible';
+    clone.style.visibility = 'visible';
+    clone.style.boxSizing = 'border-box';
+    
+    // Find the code content element inside the clone and add extra padding
+    const codeElement = clone.querySelector('pre') || clone.querySelector('code');
+    if (codeElement) {
+      codeElement.style.paddingBottom = '10px'; // Add extra padding to code element
+    }
+    
+    tempContainer.appendChild(clone);
+
+    // Force browser recalculation of styles and trigger a repaint
+    clone.offsetHeight;
+    
+    // Wait longer for rendering to complete
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // Calculate actual required height and add extra buffer
+    const actualHeight = clone.scrollHeight;
+    const renderHeight = actualHeight + 10; // Add extra buffer height
+    clone.style.height = `${renderHeight}px`;
+
+    // Wait again after height adjustment
+    await new Promise(resolve => setTimeout(resolve, 200));
+
+    const canvas = await html2canvas(clone, {
+      backgroundColor: null,
+      scale: 2,
+      logging: false,
+      useCORS: true,
+      width: width,
+      height: renderHeight,
+      onclone: (clonedDoc) => {
+        const clonedElement = clonedDoc.getElementById('snippet-preview');
+        if (clonedElement) {
+          clonedElement.style.width = `${width}px`;
+          clonedElement.style.maxHeight = 'none';
+          clonedElement.style.height = `${renderHeight}px`;
+          clonedElement.style.overflow = 'visible';
+          clonedElement.style.background = currentTheme?.background || '#1e1e1e';
+          
+          // Ensure text is fully visible
+          const textElements = clonedElement.querySelectorAll('span, code, pre');
+          textElements.forEach(el => {
+            el.style.overflow = 'visible';
+            el.style.textOverflow = 'clip';
+          });
+        }
+      }
+    });
+
+    canvas.toBlob((blob) => {
+      if (blob) {
+        saveAs(blob, `runit-snippet-${language}.png`);
+      }
+      document.body.removeChild(tempContainer);
+      setDownloading(false);
+    });
+  } catch (error) {
+    console.error("Error generating image:", error);
+    setDownloading(false);
+  }
+};
+
   return (
     <>
-        <h1 className="text-3xl font-bold mb-6 flex items-center"><FaCode className="mr-2" />Create Code Snippet</h1>
-        <div>
-        <p className="text-gray-300">
-            Create beautiful, shareable code snippets with various themes and customization options. 
-            Choose from a variety of themes, customize size, and download your snippet as an image. Select a theme for your code snippet:
+      <h1 className="text-3xl font-bold mb-6 flex items-center"><FaCode className="mr-2" />Create Code Snippet</h1>
+      <div>
+        <p className="text-gray-300 mb-6">
+          Create beautiful, shareable code snippets with various themes and customization options. 
+          Choose from a variety of themes, customize size and colors, then download your snippet as an image.
         </p>
-        </div>
-        <div className="overflow-y-auto mt-4">
-          {/* Modal */}
-          <div className="flex items-center justify-center">
-            <div className="rounded-lg shadow-xl w-full">
-              {/* Body */}
-              <div>
-                {step === 'select-theme' ? (
-                  <div>
-                    <div className="p-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                      {themes.map((theme) => (
-                        <div 
-                          key={theme.id}
-                          onClick={() => handleThemeSelect(theme)}
-                          className={`cursor-pointer transition-all duration-300 transform hover:-translate-y-1 rounded-lg border ${
-                            selectedTheme?.id === theme.id 
-                              ? 'border-purple-500 shadow-lg shadow-purple-500/20' 
-                              : 'border-gray-700 hover:border-gray-500'
-                          }`}
-                        >
-                          <div 
-                            style={{ 
-                              background: theme.background,
-                              color: theme.color
-                            }}
-                            className="p-4 h-32 flex flex-col"
-                          >
-                            <div className="flex mb-2">
-                              <div className="flex space-x-2">
-                                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: theme.dotColors[0] }}></div>
-                                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: theme.dotColors[1] }}></div>
-                                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: theme.dotColors[2] }}></div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="bg-gray-800 py-2 px-3 text-center text-sm font-medium text-white">
-                            {theme.name}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex flex-col md:flex-row gap-6">
-                    {/* Preview */}
-                    <div className="w-full">
-                      <div className="flex justify-between items-center mb-4">
-                        <h4 className="text-white font-medium">Preview</h4>
-                        <div className="flex space-x-2">
-                          <button
-                            onClick={handleCopy}
-                            className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded flex items-center transition-colors"
-                          >
-                            <FaCopy className="mr-2" />
-                            {copied ? 'Copied!' : 'Copy'}
-                          </button>
-                          <button
-                            onClick={downloadAsImage}
-                            disabled={downloading}
-                            className="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white text-sm rounded flex items-center transition-colors disabled:bg-purple-800 disabled:opacity-70"
-                          >
-                            <FaDownload className="mr-2" />
-                            {downloading ? 'Generating...' : 'Save as Image'}
-                          </button>
-                        </div>
-                      </div>
-                      
-                      <CodeSnippetBox 
-                        previewRef={previewRef}
-                        selectedTheme={selectedTheme}
-                        language={language}
-                        code={code}
-                        width={width}
-                        height={height}
-                      />
-                    </div>
-                    
-                    {/* Controls */}
-                    <div className="w-full md:w-64 bg-gray-800 rounded-lg p-4 flex-shrink-0">
-                      <h4 className="text-white font-medium mb-4">Customize Size</h4>
-                      
-                      <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-300 mb-1">
-                          Width (px)
-                        </label>
-                        <div className="flex items-center">
-                          <input
-                            type="number"
-                            value={width}
-                            min={300}
-                            max={1200}
-                            step={10}
-                            onChange={(e) => setWidth(Number(e.target.value))}
-                            className="block w-full bg-gray-700 border border-gray-600 rounded-md py-1.5 px-3 text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                          />
-                          <span className="ml-2 text-gray-400">px</span>
-                        </div>
-                        <input
-                          type="range"
-                          value={width}
-                          min={300}
-                          max={1200}
-                          step={10}
-                          onChange={(e) => setWidth(Number(e.target.value))}
-                          className="w-full mt-2 accent-purple-500"
-                        />
-                      </div>
-                      
-                      <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-300 mb-1">
-                          Max Height (px)
-                        </label>
-                        <div className="flex items-center">
-                          <input
-                            type="number"
-                            value={height}
-                            min={200}
-                            max={800}
-                            step={10}
-                            onChange={(e) => setHeight(Number(e.target.value))}
-                            className="block w-full bg-gray-700 border border-gray-600 rounded-md py-1.5 px-3 text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                          />
-                          <span className="ml-2 text-gray-400">px</span>
-                        </div>
-                        <input
-                          type="range"
-                          value={height}
-                          min={200}
-                          max={800}
-                          step={10}
-                          onChange={(e) => setHeight(Number(e.target.value))}
-                          className="w-full mt-2 accent-purple-500"
-                        />
-                      </div>
-                      
-                      <div className="mt-6">
-                        <h5 className="text-white font-medium mb-2">Note</h5>
-                        <p className="text-sm text-gray-400">
-                          When saving as image, the entire content will be captured regardless of the preview height.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          {/* Tabs Navigation */}
+          <div className="flex border-b border-gray-700 mb-4">
+            <button
+              onClick={() => setActiveTab('editor')}
+              className={`flex items-center px-4 py-2 font-medium text-sm transition-colors ${
+                activeTab === 'editor' 
+                  ? 'text-purple-400 border-b-2 border-purple-400' 
+                  : 'text-gray-400 hover:text-gray-300'
+              }`}
+            >
+              <FaKeyboard className="mr-2" /> Code Editor
+            </button>
+            <button
+              onClick={() => setActiveTab('preview')}
+              className={`flex items-center px-4 py-2 font-medium text-sm transition-colors ${
+                activeTab === 'preview' 
+                  ? 'text-purple-400 border-b-2 border-purple-400' 
+                  : 'text-gray-400 hover:text-gray-300'
+              }`}
+            >
+              <FaEye className="mr-2" /> Preview
+            </button>
+            
+            {activeTab === 'preview' && (
+              <div className="ml-auto">
+                <button
+                  onClick={downloadAsImage}
+                  disabled={downloading}
+                  className="px-4 py-1.5 bg-purple-600 hover:bg-purple-700 text-white text-sm rounded flex items-center transition-colors disabled:bg-purple-800 disabled:opacity-70"
+                >
+                  <FaDownload className="mr-2" />
+                  {downloading ? 'Generating...' : 'Save as Image'}
+                </button>
               </div>
-              
-              {/* Footer */}
-              <div className="flex justify-end items-center p-4 border-t border-gray-700">
-                {step === 'select-theme' ? (
-                  <button 
-                    onClick={goToPreview}
-                    disabled={!selectedTheme}
-                    className="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md flex items-center transition-colors disabled:bg-gray-700 disabled:text-gray-400"
-                  >
-                    Next <FaChevronRight className="ml-2" />
-                  </button>
-                ) : (
-                  <>
-                    <button 
-                      onClick={goBackToThemes}
-                      className="px-4 py-2 mr-2 border border-gray-600 hover:border-gray-500 text-gray-300 hover:text-white rounded-md flex items-center transition-colors"
-                    >
-                      <FaChevronLeft className="mr-2" /> Back to Themes
-                    </button>
-                    <button 
-                      onClick={downloadAsImage}
-                      disabled={downloading}
-                      className="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md flex items-center transition-colors disabled:bg-purple-800 disabled:opacity-70"
-                    >
-                      {downloading ? 'Generating...' : 'Save as Image'}
-                    </button>
-                  </>
-                )}
+            )}
+            
+            {activeTab === 'editor' && (
+              <div className="ml-auto flex gap-2">
+                <button
+                  onClick={handleUndo}
+                  disabled={historyIndex <= 0}
+                  className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded flex items-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <FaUndo className="mr-1" /> Undo
+                </button>
+                <button
+                  onClick={handleRedo}
+                  disabled={historyIndex >= history.length - 1}
+                  className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded flex items-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <FaRedo className="mr-1" /> Redo
+                </button>
+                <button
+                  onClick={handleCopy}
+                  className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded flex items-center transition-colors"
+                >
+                  <FaCopy className="mr-1" /> {copied ? 'Copied!' : 'Copy'}
+                </button>
               </div>
-            </div>
+            )}
           </div>
+
+          {/* Preview Tab Content */}
+          {activeTab === 'preview' && (
+            <Suspense fallback={<div className="animate-pulse bg-gray-800 rounded-lg w-full h-64"></div>}>
+              <CodeSnippetBox 
+                previewRef={previewRef}
+                selectedTheme={currentTheme}
+                language={language}
+                code={localCode}
+                width={width}
+                height={height}
+              />
+            </Suspense>
+          )}
+
+          {/* Editor Tab Content */}
+          {activeTab === 'editor' && (
+            <>
+              <div className="mb-4">
+                <LanguageSelector 
+                  selectedLanguage={language} 
+                  // Language selector component will connect to redux
+                />
+              </div>
+              <Suspense fallback={<div className="animate-pulse bg-gray-800 rounded-lg w-full h-64"></div>}>
+                <div className="border border-gray-700 rounded-lg overflow-hidden">
+                  <CodeEditor
+                    language={language}
+                    value={localCode}
+                    onChange={handleCodeChange}
+                    theme={currentTheme}
+                    height="400px"
+                  />
+                </div>
+              </Suspense>
+            </>
+          )}
         </div>
+        
+        {/* Controls Panel */}
+        <SnippetControlPanel 
+          setCustomTheme={setCustomTheme}
+          customTheme={customTheme}
+          currentTheme={currentTheme}
+          setWidth={setWidth}
+          width={width}
+          setHeight={setHeight}
+          height={height}
+          themes={themes}
+          handleThemeSelect={handleThemeSelect}
+          selectedTheme={selectedTheme}
+        />
+      </div>
     </>
   );
 };

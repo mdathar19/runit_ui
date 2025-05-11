@@ -3,26 +3,22 @@ import React from 'react'
 function ThreeDot({theme}) {
   return (
     <>
-      <span style={{ 
-        height: '12px', 
-        width: '12px', 
-        borderRadius: '50%', 
-        backgroundColor: theme.accentColor,
-        marginRight: '8px'
-        }}></span>
-        <span style={{ 
-        height: '12px', 
-        width: '12px', 
-        borderRadius: '50%', 
-        backgroundColor: theme.secondaryColor,
-        marginRight: '8px'
-        }}></span>
-        <span style={{ 
-        height: '12px', 
-        width: '12px', 
-        borderRadius: '50%', 
-        backgroundColor: theme.tertiaryColor
-        }}></span>
+      <div className="flex items-center mb-4">
+        <div className="flex space-x-2">
+          <div 
+            className="w-3 h-3 rounded-full" 
+            style={{ backgroundColor: theme?.dotColors?.[0] || '#ff5f56' }}
+          ></div>
+          <div 
+            className="w-3 h-3 rounded-full" 
+            style={{ backgroundColor: theme?.dotColors?.[1] || '#ffbd2e' }}
+          ></div>
+          <div 
+            className="w-3 h-3 rounded-full" 
+            style={{ backgroundColor: theme?.dotColors?.[2] || '#27c93f' }}
+          ></div>
+        </div>
+      </div>
     </>
   )
 }
