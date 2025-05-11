@@ -1,5 +1,5 @@
 "use client"
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import { 
@@ -13,8 +13,7 @@ import { LanguageIcon, languageOptions } from '@/Utils';
 import AppTooltip from '../global/AppTooltip';
 import IconButton from '../global/IconButton';
 import { FaExpand, FaImage } from 'react-icons/fa';
-
-
+import Link from 'next/link';
 
 const EditorNavbar = () => {
   // Redux hooks
@@ -23,8 +22,10 @@ const EditorNavbar = () => {
   const isLoading = useSelector(selectIsLoading);
   const { isMobileView } = useDeviceSetup();
   const selectedLanguage = useSelector(selectSelectedLanguage);
+  
   // Language selection state
   const [showLangDropdown, setShowLangDropdown] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const dropdownRef = useRef(null);
 
   // Find the currently selected language object
@@ -38,8 +39,15 @@ const EditorNavbar = () => {
   // Handle language selection
   const handleLanguageSelect = (language) => {
     setShowLangDropdown(false);
-    // Navigate to the language route
+    setIsTransitioning(true);
+    
+    // This will trigger actual navigation, but UI state is updated immediately
     router.push(language.path);
+    
+    // Reset transitioning state after navigation should be complete
+    setTimeout(() => {
+      setIsTransitioning(false);
+    }, 500);
   };
   
   // Toggle language dropdown
@@ -53,7 +61,7 @@ const EditorNavbar = () => {
   };
   
   // Setup click outside listener
-  React.useEffect(() => {
+  useEffect(() => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
@@ -72,18 +80,26 @@ const EditorNavbar = () => {
     }
   };
 
-  const handleNavigateSnippetPage = () =>{
+  // Navigate to snippet page
+  const handleNavigateSnippetPage = () => {
+    setIsTransitioning(true);
+    router.prefetch('/create-snippet'); // Prefetch the page
     router.push('/create-snippet');
-  }
+  };
+
+  // Disable UI during transitions to prevent multiple clicks
+  const isDisabled = isLoading || isTransitioning;
+
   return (
-    <div className="w-full mb-1">
+    <div className={`w-full mb-1 ${isTransitioning ? 'opacity-70 pointer-events-none' : ''}`}>
       <div className="flex justify-between items-center p-3 bg-gradient-to-r from-gray-900 to-purple-900 rounded-lg shadow-lg">
         {/* Language selector - Desktop uses tabs, Mobile uses dropdown */}
         {isMobileView ? (
           <div className="relative" ref={dropdownRef}>
             <button 
               onClick={toggleLangDropdown}
-              className="relative flex items-center px-4 py-2 text-sm font-medium bg-black bg-opacity-30 text-white rounded-md hover:bg-opacity-40 transition-colors cursor-pointer"
+              disabled={isDisabled}
+              className="relative flex items-center px-4 py-2 text-sm font-medium bg-black bg-opacity-30 text-white rounded-md hover:bg-opacity-40 transition-colors cursor-pointer disabled:opacity-70"
             >
               <LanguageIcon language={selectedLangObj.id} selected={true} />
               <span className="mr-2">{selectedLangObj.name}</span>
@@ -107,6 +123,7 @@ const EditorNavbar = () => {
                             : 'text-gray-200 hover:bg-gray-700'
                         }`}
                         onClick={() => handleLanguageSelect(lang)}
+                        disabled={isDisabled}
                       >
                         <LanguageIcon language={lang.id} selected={isSelected} />
                         <span>{lang.name}</span>
@@ -125,18 +142,25 @@ const EditorNavbar = () => {
         ) : (
           <nav className="flex space-x-1">
             {languageOptions.map((lang) => (
-              <button
+              <Link
                 key={lang.id}
-                onClick={() => handleLanguageSelect(lang)}
-                className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-all cursor-pointer ${
+                href={lang.path}
+                className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-all ${
                   selectedLanguage === lang.id
                     ? 'bg-gradient-to-r from-purple-600 to-violet-800 text-white shadow-lg'
                     : 'text-gray-200 hover:bg-black hover:bg-opacity-25'
                 }`}
+                onClick={(e) => {
+                  if (isDisabled) {
+                    e.preventDefault();
+                    return;
+                  }
+                  setIsTransitioning(true);
+                }}
               >
                 <LanguageIcon language={lang.id} selected={selectedLanguage === lang.id} />
                 <span>{lang.name}</span>
-              </button>
+              </Link>
             ))}
           </nav>
         )}
@@ -144,13 +168,14 @@ const EditorNavbar = () => {
         {/* Action buttons */}
         <div className="flex items-center space-x-2">
           {/* Snippet Creator Button */}
-            <AppTooltip position="left" icon={true} text="Create Snippet">
-              <IconButton 
-                icon={<FaImage />}
-                variant="dark" 
-                onClick={handleNavigateSnippetPage}
-              />
-            </AppTooltip>
+          <AppTooltip position="left" icon={true} text="Create Snippet">
+            <IconButton 
+              icon={<FaImage />}
+              variant="dark" 
+              onClick={handleNavigateSnippetPage}
+              disabled={isDisabled}
+            />
+          </AppTooltip>
           
           {!isMobileView && (
             <AppTooltip text='Full Screen'>
@@ -158,13 +183,14 @@ const EditorNavbar = () => {
                 icon={<FaExpand/> }
                 variant="dark" 
                 onClick={toggleFullscreen}
+                disabled={isDisabled}
               />
             </AppTooltip>
           )}
           
           <GradientButton
             onClick={handleRunCode} 
-            disabled={isLoading}
+            disabled={isDisabled}
             isLoading={isLoading}
           >
             Run

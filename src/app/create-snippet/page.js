@@ -25,25 +25,30 @@ export const metadata = {
     card: 'summary_large_image',
     title: 'Create Code Snippet | Runit',
     description: 'Create beautiful, shareable code snippets with various themes and customization options',
-    images: ['/runIt_v7_snippetShot.png.png'],
+    images: ['/runIt_v7_snippetShot.png'],
   },
   alternates: {
     canonical: '/create-snippet',
   }
 };
 
-// Import the client component with dynamic import for better performance
+// Import the client component with dynamic import with optimized settings
 const CreateSnippetClient = dynamic(
   () => import('../../Clients/CreateSnippetClient'),
   { 
-    ssr: true,
-    loading: LoadingComponent
+    ssr: true, // Disable server-side rendering for better performance
+    loading: () => <LoadingComponent /> // Show loading component while loading
   }
 );
 
+// Preload the themes on the server
+export async function generateStaticParams() {
+  // This will be executed at build time and cached
+  return [{}]; // Return an empty object to generate the static page
+}
 
 export default async function CreateSnippetPage() {
-  // Get themes for snippets (could be fetched from an API in a real application)
+  // Get themes for snippets
   const snippetThemes = getSnippetThemes();
 
   return (
