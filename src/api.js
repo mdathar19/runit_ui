@@ -4,7 +4,7 @@ const getBaseUrl = () => {
       if (window.location.hostname === 'localhost') {
         return 'http://localhost:3000';
       } else {
-        return 'https://runit.in'; // Empty base URL, use relative path in production
+        return 'https://api.runit.in'; // Empty base URL, use relative path in production
       }
     } else {
       // Running in server-side rendering (optional handling)
