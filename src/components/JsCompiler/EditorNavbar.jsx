@@ -12,6 +12,8 @@ import { useDeviceSetup } from '../../redux/hooks';
 import GradientButton from '../global/GradientButton';
 import { LanguageIcon, languageOptions } from '@/Utils';
 import AppTooltip from '../global/AppTooltip';
+import IconButton from '../global/IconButton';
+import { FaExpand, FaImage } from 'react-icons/fa';
 
 
 
@@ -73,6 +75,9 @@ const EditorNavbar = () => {
     }
   };
 
+  const handleNavigateSnippetPage = () =>{
+    router.push('/create-snippet');
+  }
   return (
     <div className="w-full mb-3">
       <div className="flex justify-between items-center p-3 bg-gradient-to-r from-gray-900 to-purple-900 rounded-lg shadow-lg">
@@ -142,23 +147,21 @@ const EditorNavbar = () => {
         {/* Action buttons */}
         <div className="flex items-center space-x-2">
           {/* Snippet Creator Button */}
-          <div>
-            <SnippetCreator 
-              code={code}
-              language={selectedLanguage}
-            />
-          </div>
+            <AppTooltip position="left" icon={true} text="Create Snippet">
+              <IconButton 
+                icon={<FaImage />}
+                variant="dark" 
+                onClick={handleNavigateSnippetPage}
+              />
+            </AppTooltip>
           
           {!isMobileView && (
             <AppTooltip text='Full Screen'>
-              <button 
-                onClick={toggleFullscreen} 
-                className="p-2 text-gray-300 hover:text-white bg-black bg-opacity-30 rounded-md hover:bg-opacity-50 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 cursor-pointer"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5" />
-                </svg>
-              </button>
+              <IconButton
+                icon={<FaExpand/> }
+                variant="dark" 
+                onClick={toggleFullscreen}
+              />
             </AppTooltip>
           )}
           

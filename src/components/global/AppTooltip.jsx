@@ -52,7 +52,7 @@ const AppTooltip = ({
           position === 'left' ? 'right-full mr-2 top-1/2 transform -translate-y-1/2' :
           'left-full ml-2 top-1/2 transform -translate-y-1/2'
         }`}>
-          <div className="bg-gray-900 text-white text-xs rounded py-1 px-2 shadow-lg border border-gray-700">
+          <div className="bg-gray-900 text-white text-xs rounded py-1 px-2 shadow-lg border border-gray-700 whitespace-nowrap">
             {icon && (
               <span className="inline-block mr-1">
                 <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

@@ -3,7 +3,8 @@ import { FaDownload, FaCode, FaChevronLeft, FaChevronRight, FaCopy, FaImage, FaT
 import html2canvas from 'html2canvas';
 import { saveAs } from 'file-saver';
 import AppTooltip from '../global/AppTooltip';
-import CodeSnippetBox from '../global/CodeSnippetBox';
+import CodeSnippetBox from '../Snippet-creator/CodeSnippetBox';
+import IconButton from '../global/IconButton';
 
 // Mock theme data - typically would come from a separate file
 const snippetThemes = [
@@ -177,13 +178,12 @@ const SnippetCreator = ({ code, language }) => {
 
   return (
     <>
-      <AppTooltip icon={true} text="Create Snippet">
-        <button 
-          className="p-2 text-gray-300 hover:text-white bg-black bg-opacity-30 rounded-md hover:bg-opacity-50 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+      <AppTooltip position="left" icon={true} text="Create Snippet">
+        <IconButton 
+          icon={<FaImage />}
+          variant="dark" 
           onClick={handleShow}
-        >
-          <FaImage />
-        </button>
+        />
       </AppTooltip>
       
       {showModal && (

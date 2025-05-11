@@ -15,12 +15,13 @@ import {
   selectCodeAnswer,
   selectAnswer,
   selectAnswerPosition,
-  selectEditorInstance,
   getEditorInstance,
   selectSelectedLanguage
 } from '../../redux/slices/compilerSlice';
 import { insertCodeIntoEditor } from '../../redux/hooks';
 import { KEYBOARD_SHORTCUTS } from '../../Utils';
+import SpinnerLoading from '../global/SpinnerLoading';
+import CrossButton from '../global/CrossButton';
 
 const QuestionAnswerBox = () => {
   // Redux hooks
@@ -130,80 +131,105 @@ const QuestionAnswerBox = () => {
   return (
     <div
       ref={boxRef}
-      className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-2/5 max-h-[80vh] bg-white dark:bg-gray-800 rounded-xl shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700"
-      style={isMobileView ? { width: '90%' } : {}}
+      className="fixed inset-0 z-50 flex items-center justify-center"
     >
-      {/* Question Input - Only shown when asking */}
-      {isQuestionInputVisible && (
-        <div className="flex flex-col p-4 space-y-4">
-          <textarea
-            id="ai_question_box1"
-            name="ai_question_box"
-            ref={questionInputRef}
-            value={question}
-            onChange={(e) => dispatch(setQuestion(e.target.value))}
-            className="w-full h-32 px-4 py-2 text-gray-700 dark:text-gray-200 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-            placeholder={`Ask your ${selectedLanguage} question...`}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && e.ctrlKey) {
-                e.preventDefault();
-                handleAskQuestion();
-              }
-            }}
-          />
-          <button
-            onClick={handleAskQuestion}
-            disabled={isLoading}
-            className="w-full flex items-center justify-center py-2 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg shadow-md hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            {isLoading ? (
-              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-            ) : (
-              <>
-                Ask Question 
-                <span className="ml-2 py-0.5 px-1.5 text-xs bg-white bg-opacity-20 rounded">
-                  {KEYBOARD_SHORTCUTS.SUBMIT_QUESTION}
-                </span>
-              </>
-            )}
-          </button>
+      <div className={`bg-gray-800 w-full max-w-md rounded-lg shadow-xl overflow-hidden border border-gray-700 ${isMobileView ? 'mx-4' : ''}`}>
+        {/* Modal Header */}
+        <div className="bg-gradient-to-r from-purple-600 to-violet-900 px-4 py-3 flex justify-between items-center">
+          <h3 className="text-lg font-medium text-white">
+            {isQuestionInputVisible ? `Ask ${selectedLanguage} Question` : 'Code Solution'}
+          </h3>
+          <CrossButton onClick={() => isQuestionInputVisible ? dispatch(toggleQuestionInput(false)) : dispatch(toggleAnswer(false))}/>
         </div>
-      )}
-      
-      {/* Answer Section - Shown when answer is available */}
-      {showAnswer && (
-        <div className={isQuestionInputVisible ? "mt-3" : ""}>
-          <div className="bg-gray-900 text-gray-100 overflow-auto max-h-[50vh]">
-            <pre className="p-4 font-mono text-sm whitespace-pre-wrap">
-              {codeAnswer !== answer ? codeAnswer : answer}
-            </pre>
+        
+        {/* Question Input - Only shown when asking */}
+        {isQuestionInputVisible && (
+          <div className="p-4 text-white">
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1" htmlFor="ai_question_box1">
+                Your Question
+              </label>
+              <textarea
+                id="ai_question_box1"
+                name="ai_question_box"
+                ref={questionInputRef}
+                value={question}
+                onChange={(e) => dispatch(setQuestion(e.target.value))}
+                className="w-full h-32 px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+                placeholder={`Ask your ${selectedLanguage} question...`}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && e.ctrlKey) {
+                    e.preventDefault();
+                    handleAskQuestion();
+                  }
+                }}
+              />
+            </div>
+            
+            <div className="px-0 py-0 flex justify-end space-x-3">
+              <button 
+                type="button"
+                onClick={() => dispatch(toggleQuestionInput(false))}
+                className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-md transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAskQuestion}
+                disabled={isLoading || !question.trim()}
+                className={`px-4 py-2 rounded-md flex items-center justify-center ${
+                  isLoading || !question.trim()
+                    ? 'bg-purple-500 opacity-50 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-purple-600 to-violet-900 hover:from-purple-700 hover:to-violet-800'
+                } text-white transition-colors cursor-pointer`}
+              >
+                {isLoading ? (
+                  <SpinnerLoading />
+                ) : (
+                  <>
+                    Ask Question 
+                    <span className="ml-2 text-xs bg-opacity-20 rounded px-1.5 py-0.5">
+                      {KEYBOARD_SHORTCUTS.SUBMIT_QUESTION}
+                    </span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
-          
-          <div className="flex p-4 space-x-2 bg-gray-100 dark:bg-gray-800">
-            <button 
-              onClick={handleInsertCodeIntoEditor}
-              className="flex-grow py-2 px-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-sm font-medium rounded-lg shadow-md hover:from-green-600 hover:to-emerald-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500"
-            >
-              Insert Code at Cursor
-            </button>
-            <button 
-              onClick={() => dispatch(toggleAnswer(false))}
-              className="py-2 px-4 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 text-sm font-medium rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500"
-            >
-              Close
-            </button>
-            <button 
-              onClick={handleShowQuestionBox}
-              className="py-2 px-4 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 text-sm font-medium rounded-lg hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              New Question
-            </button>
-          </div>
-        </div>
-      )}
+        )}
+        
+        {/* Answer Section - Shown when answer is available */}
+        {showAnswer && (
+          <>
+            <div className="text-white max-h-[50vh] overflow-auto">
+              <pre className="p-4 font-mono text-sm whitespace-pre-wrap bg-gray-900 text-gray-100">
+                {codeAnswer !== answer ? codeAnswer : answer}
+              </pre>
+            </div>
+            
+            <div className="px-4 py-3 bg-gray-900 flex justify-end space-x-3">
+              <button 
+                onClick={() => dispatch(toggleAnswer(false))}
+                className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-md transition-colors"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleShowQuestionBox}
+                className="px-4 py-2 bg-purple-700 hover:bg-purple-600 text-white rounded-md transition-colors"
+              >
+                New Question
+              </button>
+              <button 
+                onClick={handleInsertCodeIntoEditor}
+                className="px-4 py-2 rounded-md flex items-center justify-center bg-gradient-to-r from-purple-600 to-violet-900 hover:from-purple-700 hover:to-violet-800 text-white transition-colors"
+              >
+                Insert Code
+              </button>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 };

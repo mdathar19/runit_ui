@@ -1,5 +1,4 @@
-import JsCompiler from "@/activePages/JsCompiler";
-import ClientComponent from '../components/ClientComponent';
+import JsCompiler from "@/Clients/JsCompiler";
 
 // SEO metadata
 export const metadata = {
@@ -9,8 +8,6 @@ export const metadata = {
 
 export default function Home() {
   return (
-    <ClientComponent>
       <JsCompiler defaultLanguage="javascript" />
-    </ClientComponent>
   );
 }
