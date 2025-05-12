@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import dynamic from 'next/dynamic';
-import { getSnippetThemes } from '@/common/service';
 import LoadingComponent from '@/components/global/Loading';
+import { getSnippetThemes } from '@/Utils';
 
 // Define metadata for SEO
 export const metadata = {

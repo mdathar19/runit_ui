@@ -9,9 +9,9 @@ export const metadata = {
     'online code editor, code snippet generator, AI code assistant, multi-language compiler, JavaScript compiler, Python compiler, code formatter, beautiful code snippets, runit editor',
 
   openGraph: {
-    title: 'RunIt - Create & Share Beautiful Code Snippets Instantly',
+    title: 'RunIt - AI-Powered Online Code Editor & Snippet Creator',
     description:
-      'Design stunning code snippets with customizable themes and compile code in multiple languages. Perfect for developers who value aesthetics and speed.',
+      'RunIt is a fast, lightweight, and beautiful online code editor that supports multiple programming languages, instant AI code suggestions, and stunning snippet creation with themes.',
     images: [
       {
         url: '/runit-home1.png',
@@ -32,7 +32,7 @@ export const metadata = {
 
   twitter: {
     card: 'summary_large_image',
-    title: 'RunIt - AI-Powered Snippet Creator & Code Compiler',
+    title: 'RunIt - AI-Powered Online Code Editor & Snippet Creator',
     description:
       'Write and compile code in multiple languages. Generate beautiful, shareable snippets effortlessly with RunIt.',
     images: ['/runit-home1.png'],

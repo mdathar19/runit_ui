@@ -19,10 +19,9 @@ import {
   setCode,
   setActiveTab,
   toggleFeedback,
-  selectSelectedLanguage,
   setSelectedLanguage
 } from "../redux/slices/compilerSlice";
-import { useDeviceSetup, useMonacoSetup, useCompilerSelectors } from "../redux/hooks";
+import { useMonacoSetup, useCompilerSelectors } from "../redux/hooks";
 import { getFileExtension, getMonacoLanguage } from "../Utils";
 import useReduxStore from "@/hooks/useReduxStore";
 import { FiExternalLink } from "react-icons/fi";
@@ -30,8 +29,6 @@ import { FiExternalLink } from "react-icons/fi";
 const JsCompiler = ({ defaultLanguage = "javascript" }) => {
   // Set up hooks
   const dispatch = useDispatch();
-  // Initialize device detection
-  useDeviceSetup();
   // Get the Monaco setup with editor mount handler
   const { handleEditorDidMount } = useMonacoSetup();
   // Get all required selectors from Redux store

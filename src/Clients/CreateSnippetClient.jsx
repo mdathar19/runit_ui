@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect, useMemo, Suspense } from 'react';
 import { FaDownload, FaCode, FaCopy, FaUndo, FaRedo, FaEye, FaKeyboard } from 'react-icons/fa';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectCode, selectSelectedLanguage, setCode } from '@/redux/slices/compilerSlice';
+import { selectCode, selectIsMobileView, selectSelectedLanguage, setCode } from '@/redux/slices/compilerSlice';
 import useReduxStore from '@/hooks/useReduxStore';
 import { debounce } from 'lodash';
 import { CodeEditor, CodeSnippetBox, SnippetControlPanel, LanguageSelector } from '@/components';
@@ -13,7 +13,7 @@ const CreateSnippetClient = ({ themes }) => {
   const language = useSelector(selectSelectedLanguage);
   const reduxCode = useSelector(selectCode);
   const dispatch = useDispatch();
-  
+  const isMobileView = useSelector(selectIsMobileView);
   // Local state for theme customization and UI
   const [selectedTheme, setSelectedTheme] = useState(themes[0]);
   const [customTheme, setCustomTheme] = useState(null);
@@ -219,7 +219,7 @@ const downloadAsImage = async () => {
                   : 'text-gray-400 hover:text-gray-300'
               }`}
             >
-              <FaKeyboard className="mr-2" /> Code Editor
+              {!isMobileView && <span className='mr-2'> Code Editor </span>}<FaKeyboard className="mr-2" />
             </button>
             <button
               onClick={() => setActiveTab('preview')}
@@ -229,7 +229,7 @@ const downloadAsImage = async () => {
                   : 'text-gray-400 hover:text-gray-300'
               }`}
             >
-              <FaEye className="mr-2" /> Preview
+              {!isMobileView && <span className='mr-2'> Preview </span>}<FaEye className="mr-2" />
             </button>
             
             {activeTab === 'preview' && (
@@ -239,8 +239,7 @@ const downloadAsImage = async () => {
                   disabled={downloading}
                   className="px-4 py-1.5 bg-purple-600 hover:bg-purple-700 text-white text-sm rounded flex items-center transition-colors disabled:bg-purple-800 disabled:opacity-70"
                 >
-                  <FaDownload className="mr-2" />
-                  {downloading ? 'Generating...' : 'Save as Image'}
+                  {!isMobileView && <span className='mr-2'> Save as Image </span>}<FaDownload className="mr-2" />
                 </button>
               </div>
             )}
@@ -252,20 +251,20 @@ const downloadAsImage = async () => {
                   disabled={historyIndex <= 0}
                   className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded flex items-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <FaUndo className="mr-1" /> Undo
+                  {!isMobileView && <span className='mr-2'> Undo </span>}<FaUndo className="mr-1" />
                 </button>
                 <button
                   onClick={handleRedo}
                   disabled={historyIndex >= history.length - 1}
                   className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded flex items-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <FaRedo className="mr-1" /> Redo
+                  {!isMobileView && <span className='mr-2'> Redo </span>}<FaRedo className="mr-1" />
                 </button>
                 <button
                   onClick={handleCopy}
                   className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded flex items-center transition-colors"
                 >
-                  <FaCopy className="mr-1" /> {copied ? 'Copied!' : 'Copy'}
+                  {!isMobileView && <span className='mr-2'> Copy </span>}<FaCopy className="mr-1" />
                 </button>
               </div>
             )}

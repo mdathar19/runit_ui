@@ -121,59 +121,137 @@ export const sanitizeErrorTrace = (errorOutput) => {
   return cleanedOutput;
 };
 
-export const snippetThemes = [
-  {
-    id: 'dark-terminal',
-    name: 'Dark Terminal',
-    background: '#1e1e1e',
-    color: '#f8f8f8',
-    accentColor: '#ff5f56',
-    secondaryColor: '#ffbd2e',
-    tertiaryColor: '#27c93f',
-    fontFamily: 'monospace'
-  },
-  {
-    id: 'gradient-purple',
-    name: 'Gradient Purple',
-    background: 'linear-gradient(135deg, #4a0083 0%, #7928ca 100%)',
-    color: '#ffffff',
-    accentColor: '#ff6b6b',
-    secondaryColor: '#fbff00',
-    tertiaryColor: '#00ff95',
-    fontFamily: '"Fira Code", monospace'
-  },
-  {
-    id: 'light-minimal',
-    name: 'Light Minimal',
-    background: '#f7f7f7',
-    color: '#333333',
-    accentColor: '#4285f4',
-    secondaryColor: '#ea4335',
-    tertiaryColor: '#34a853',
-    fontFamily: '"Roboto Mono", monospace'
-  },
-  {
-    id: 'neon-glow',
-    name: 'Neon Glow',
-    background: '#000000',
-    color: '#00ff95',
-    accentColor: '#ff00ff',
-    secondaryColor: '#00ffff',
-    tertiaryColor: '#ffff00',
-    fontFamily: '"Source Code Pro", monospace',
-    textShadow: '0 0 5px #00ff95, 0 0 10px #00ff95'
-  },
-  {
-    id: 'vintage-code',
-    name: 'Vintage Code',
-    background: '#2b2b2b',
-    color: '#f8f8f2',
-    accentColor: '#ff5555',
-    secondaryColor: '#f1fa8c',
-    tertiaryColor: '#50fa7b',
-    fontFamily: '"IBM Plex Mono", monospace'
-  }
-];
+export const getSnippetThemes = () => {
+  return [
+    {
+      id: 'dark-terminal',
+      name: 'Dark Terminal',
+      background: '#1e1e1e',
+      color: '#f8f8f8',
+      accentColor: '#ff5f56',
+      secondaryColor: '#ffbd2e',
+      tertiaryColor: '#27c93f',
+      fontFamily: 'monospace'
+    },
+    {
+      id: 'gradient-purple',
+      name: 'Gradient Purple',
+      background: 'linear-gradient(135deg, #4a0083 0%, #7928ca 100%)',
+      color: '#ffffff',
+      accentColor: '#ff6b6b',
+      secondaryColor: '#fbff00',
+      tertiaryColor: '#00ff95',
+      fontFamily: '"Fira Code", monospace'
+    },
+    {
+      id: 'light-minimal',
+      name: 'Light Minimal',
+      background: '#f7f7f7',
+      color: '#333333',
+      accentColor: '#4285f4',
+      secondaryColor: '#ea4335',
+      tertiaryColor: '#34a853',
+      fontFamily: '"Roboto Mono", monospace'
+    },
+    {
+      id: 'neon-glow',
+      name: 'Neon Glow',
+      background: '#000000',
+      color: '#00ff95',
+      accentColor: '#ff00ff',
+      secondaryColor: '#00ffff',
+      tertiaryColor: '#ffff00',
+      fontFamily: '"Source Code Pro", monospace',
+      textShadow: '0 0 5px #00ff95, 0 0 10pxrgb(23, 26, 25)'
+    },
+    {
+      id: 'vintage-code',
+      name: 'Vintage Code',
+      background: '#2b2b2b',
+      color: '#f8f8f2',
+      accentColor: '#ff5555',
+      secondaryColor: '#f1fa8c',
+      tertiaryColor: '#50fa7b',
+      fontFamily: '"IBM Plex Mono", monospace'
+    },
+    {
+      id: 'sunset-vibes',
+      name: 'Sunset Vibes',
+      background: 'linear-gradient(90deg,rgba(131, 58, 180, 1) 0%, rgba(253, 29, 29, 1) 100%, rgba(252, 176, 69, 1) 100%)',
+      color: 'white',
+      accentColor: '#7159c1',
+      secondaryColor: '#ff6b6b',
+      tertiaryColor: '#48dbfb',
+      fontFamily: '"Roboto Mono", monospace'
+    },
+    {
+      id: 'ocean-breeze',
+      name: 'Ocean Breeze',
+      background: 'linear-gradient(90deg,rgba(2, 0, 36, 1) 0%, rgba(9, 9, 121, 1) 35%, rgba(0, 212, 255, 1) 100%)',
+      color: '#ffffff',
+      accentColor: '#ff9ff3',
+      secondaryColor: '#feca57',
+      tertiaryColor: '#1dd1a1',
+      fontFamily: '"Fira Code", monospace'
+    },
+    {
+      id: 'aurora-borealis',
+      name: 'Aurora Borealis',
+      background: 'linear-gradient(135deg, #43cea2 0%, #185a9d 100%)',
+      color: '#ffffff',
+      accentColor: '#ff6b6b',
+      secondaryColor: '#feca57',
+      tertiaryColor: '#ff9ff3',
+      fontFamily: '"Source Code Pro", monospace'
+    },
+    {
+      id: 'royal-raspberry',
+      name: 'Royal Raspberry',
+      background: 'linear-gradient(to right, #753a88, #cc2b5e)',
+      color: '#ffffff',
+      accentColor: '#f39c12',
+      secondaryColor: '#3498db',
+      tertiaryColor: '#2ecc71',
+      fontFamily: '"Fira Code", monospace'
+    },
+    {
+      id: 'crimson-night',
+      name: 'Crimson Night',
+      background: 'linear-gradient(to right, #240b36, #c31432)',
+      color: '#ffffff',
+      accentColor: '#f1c40f',
+      secondaryColor: '#3498db',
+      tertiaryColor: '#2ecc71',
+      fontFamily: '"Roboto Mono", monospace'
+    },
+    {
+      id: 'ember',
+      name: 'Ember',
+      background: 'linear-gradient(to right, #dd1818, #333333)',
+      color: '#ffffff',
+      accentColor: '#f1c40f',
+      secondaryColor: '#3498db',
+      tertiaryColor: '#2ecc71',
+      fontFamily: '"Fira Code", monospace'
+    }
+  ];
+};
+
+export function getContrastColor(hexColor) {
+  // For gradients or non-hex colors, return white
+  if (!hexColor.startsWith('#')) return '#ffffff';
+  
+  // Convert hex to RGB
+  const r = parseInt(hexColor.slice(1, 3), 16);
+  const g = parseInt(hexColor.slice(3, 5), 16);
+  const b = parseInt(hexColor.slice(5, 7), 16);
+  
+  // Calculate relative luminance
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  
+  // Return white for dark colors and black for light colors
+  return luminance > 0.5 ? '#000000' : '#ffffff';
+}
 
 export const getMonacoLanguage = (selectedLanguage) => {
   switch (selectedLanguage) {
