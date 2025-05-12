@@ -7,6 +7,7 @@ import { selectCode, selectIsMobileView, selectSelectedLanguage, setCode } from 
 import useReduxStore from '@/hooks/useReduxStore';
 import { debounce } from 'lodash';
 import { CodeEditor, CodeSnippetBox, SnippetControlPanel, LanguageSelector } from '@/components';
+import { useDeviceSetup } from '@/redux/hooks';
 
 const CreateSnippetClient = ({ themes }) => {
   // Redux state
@@ -24,7 +25,7 @@ const CreateSnippetClient = ({ themes }) => {
   const [localCode, setLocalCode] = useState(reduxCode || 'console.log("Hello, world!");');
   const [activeTab, setActiveTab] = useState('preview'); // 'preview' or 'editor'
   const previewRef = useRef(null);
-  
+  useDeviceSetup()
   // History for undo/redo
   const [history, setHistory] = useState([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
