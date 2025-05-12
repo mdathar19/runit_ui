@@ -2,7 +2,7 @@ const getBaseUrl = () => {
     if (typeof window !== 'undefined') {
       // Running in browser
       if (window.location.hostname === 'localhost') {
-        return 'http://localhost:3000';
+        return 'https://api.runit.in';
       } else {
         return 'https://api.runit.in'; // Empty base URL, use relative path in production
       }

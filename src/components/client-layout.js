@@ -3,16 +3,18 @@
 import { Suspense, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import NextTopLoader from 'nextjs-toploader';
-
+import { useDeviceSetup } from '@/redux/hooks';
+import useReduxStore from '@/hooks/useReduxStore';
 // Loading fallback component
 const LoadingFallback = () => (
   <div className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-blue-500 animate-pulse"></div>
 );
 
 // Client-side layout component with navigation optimizations
-export default function ClientLayout({ children }) {
+function ClientLayout({ children }) {
   const pathname = usePathname();
   
+  useDeviceSetup()
   // Add prefetching for common routes
   useEffect(() => {
     // Prefetch critical pages that users might navigate to
@@ -63,3 +65,5 @@ export default function ClientLayout({ children }) {
     </>
   );
 }
+
+export default useReduxStore(ClientLayout)

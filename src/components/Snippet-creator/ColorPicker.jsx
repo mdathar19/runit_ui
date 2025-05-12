@@ -1,7 +1,8 @@
 'use client'
-import { getContrastColor } from '@/common/service';
+
 import React, { useRef, useEffect } from 'react'
 import SnippetThemeBox from './SnippetThemeBox';
+import { getContrastColor } from '@/Utils';
 
 const ColorPicker = ({ 
   color, 
@@ -47,7 +48,7 @@ const ColorPicker = ({
       </div>
       
       {showPicker && (
-        <div className="absolute z-50 mt-2 bg-gray-800 p-3 rounded-lg shadow-lg border border-gray-700 w-100 md:w-100 max-h-96 overflow-y-auto">
+        <div className="absolute z-50 mt-2 bg-gray-800 p-3 rounded-lg shadow-lg border border-gray-700 w-80 md:w-80 lg:w-70 xl:w-80 max-h-96 overflow-y-auto">
           {showThemes && themes ? (
             <SnippetThemeBox 
               themes={themes}
