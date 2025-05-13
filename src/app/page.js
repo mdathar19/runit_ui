@@ -1,4 +1,5 @@
 import JsCompiler from "@/Clients/JsCompiler";
+import MadeByAthar from "@/components/global/MadeByAthar";
 
 // SEO metadata
 export const metadata = {
@@ -46,6 +47,9 @@ export const metadata = {
 
 export default function Home() {
   return (
-      <JsCompiler defaultLanguage="javascript" />
+    <>
+    <MadeByAthar />
+    <JsCompiler defaultLanguage="javascript" />
+    </>
   );
 }
