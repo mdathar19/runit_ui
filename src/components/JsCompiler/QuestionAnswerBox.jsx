@@ -150,16 +150,13 @@ const QuestionAnswerBox = () => {
         {isQuestionInputVisible && (
           <div className="p-4 text-white">
             <div className="mb-4">
-              <label className="block text-sm font-medium mb-1" htmlFor="ai_question_box1">
-                Your Question
-              </label>
               <textarea
                 id="ai_question_box1"
                 name="ai_question_box"
                 ref={questionInputRef}
                 value={question}
                 onChange={(e) => dispatch(setQuestion(e.target.value))}
-                className="w-full h-32 px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+                className="w-full h-64 px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
                 placeholder={`Ask your ${selectedLanguage} question...`}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && e.ctrlKey) {

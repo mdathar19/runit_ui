@@ -1,6 +1,7 @@
 import { languagePathMap } from "@/Utils";
 import dynamic from "next/dynamic";
 import LoadingComponent from '@/components/global/Loading';
+import MadeByAthar from "@/components/global/MadeByAthar";
 
 // This function runs on the server during build time
 export async function generateStaticParams() {
@@ -69,6 +70,7 @@ export default async function LanguagePage({ params }) {
   
   return (
     <>
+      <MadeByAthar />
       <JsCompiler defaultLanguage={languageId} />
     </>
   );

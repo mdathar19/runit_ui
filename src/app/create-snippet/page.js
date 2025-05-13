@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import dynamic from 'next/dynamic';
 import LoadingComponent from '@/components/global/Loading';
 import { getSnippetThemes } from '@/Utils';
+import MadeByAthar from '@/components/global/MadeByAthar';
 
 // Define metadata for SEO
 export const metadata = {
@@ -52,10 +53,13 @@ export default async function CreateSnippetPage() {
   const snippetThemes = getSnippetThemes();
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white p-2 sm:p-4">
-      <div className="container mx-auto">
-        <CreateSnippetClient themes={snippetThemes} />
+    <>
+    <MadeByAthar />
+      <div className="min-h-screen bg-gray-950 text-white p-2 sm:p-4">
+        <div className="container mx-auto">
+          <CreateSnippetClient themes={snippetThemes} />
+        </div>
       </div>
-    </div>
+    </>
   );
 }
