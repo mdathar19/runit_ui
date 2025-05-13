@@ -48,7 +48,8 @@ export const calculateEditorPosition = (editor, position) => {
 export const KEYBOARD_SHORTCUTS = {
   TOGGLE_QUESTION: "Ctrl+Space",
   SUBMIT_QUESTION: "Ctrl+Enter",
-  CLOSE_QUESTION: "Escape"
+  CLOSE_QUESTION: "Escape",
+  INSERT_CODE_AT_CURSOR: "Ctrl+Enter"
 };
 
 export const getBaseUrl = () => {

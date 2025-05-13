@@ -10,7 +10,6 @@ import { HeartIcon } from "@heroicons/react/solid";
 // Component imports
 import EditorNavbar from "../components/JsCompiler/EditorNavbar";
 import QuestionAnswerBox from "../components/JsCompiler/QuestionAnswerBox";
-import SearchIcon from "../components/JsCompiler/SearchIcon";
 import FeedbackButton from "../components/JsCompiler/FeedbackButton";
 import FeedbackForm from "../components/JsCompiler/FeedbackForm";
 
@@ -24,7 +23,6 @@ import {
 import { useMonacoSetup, useCompilerSelectors } from "../redux/hooks";
 import { getFileExtension, getMonacoLanguage } from "../Utils";
 import useReduxStore from "@/hooks/useReduxStore";
-import { FiExternalLink } from "react-icons/fi";
 
 const JsCompiler = ({ defaultLanguage = "javascript" }) => {
   // Set up hooks
@@ -50,7 +48,6 @@ const JsCompiler = ({ defaultLanguage = "javascript" }) => {
       <div className="h-full">
         <MonacoEditor
           height="100vh"
-          width="100%"
           language={getMonacoLanguage(defaultLanguage)}
           theme="vs-dark"
           value={code}
@@ -59,6 +56,7 @@ const JsCompiler = ({ defaultLanguage = "javascript" }) => {
           options={{
             selectOnLineNumbers: true,
             minimap: { enabled: false },
+            wordWrap: "on",
             fontSize: 16,
             automaticLayout: true,
             suggestOnTriggerCharacters: true,
@@ -91,14 +89,6 @@ const JsCompiler = ({ defaultLanguage = "javascript" }) => {
   return (
     <div className="flex flex-col h-screen w-full bg-gray-900 overflow-hidden">
       {/* Heading */}
-    {/*   <div className="bg-gradient-to-r from-gray-900 to-purple-900 p-1 text-white shadow-lg rounded-lg">
-        <div className="container mx-auto">
-          <div className="font-light text-sm tracking-wide text-center">
-            Made with <HeartIcon className="h-4 w-4 text-red-400 inline-block mx-1 animate-pulse" /> by <strong><a href="https://www.linkedin.com/in/md-athar-alam-a5067b18b/" target="_blank" rel="noopener noreferrer" className="font-medium hover:underline transition-all">Athar</a>
-            <FiExternalLink className="h-3 w-3 ml-1 inline-block" /></strong>
-          </div>
-        </div>
-      </div> */}
 
       {/* Navbar */}
       <div className="py-2">
@@ -150,7 +140,7 @@ const JsCompiler = ({ defaultLanguage = "javascript" }) => {
             >
               {renderEditor()}
               <QuestionAnswerBox />
-              <SearchIcon />
+              {/* <SearchIcon /> */}
             </div>
             <div 
               className="h-full"
@@ -181,7 +171,7 @@ const JsCompiler = ({ defaultLanguage = "javascript" }) => {
               <div className="h-full relative">
                 {renderEditor()}
                 <QuestionAnswerBox />
-                <SearchIcon />
+                {/* <SearchIcon /> */}
               </div>
               <div className="h-full">
                 {renderOutput()}

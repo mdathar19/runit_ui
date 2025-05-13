@@ -1,7 +1,8 @@
 import React from 'react';
+import { FaSpinner } from 'react-icons/fa';
 
 /**
- * Reusable button component with purple-black gradient theme
+ * Reusable button component with multiple theme variants
  * 
  * @param {Object} props - Component props
  * @param {React.ReactNode} props.children - Button content
@@ -10,6 +11,7 @@ import React from 'react';
  * @param {boolean} props.disabled - Disabled state
  * @param {boolean} props.isLoading - Loading state
  * @param {string} props.type - Button type (button, submit, reset)
+ * @param {string} props.variant - Button style variant ('purple', 'dark', 'gray')
  * @param {Object} props.rest - Any other props to pass to the button element
  */
 const GradientButton = ({
@@ -19,8 +21,27 @@ const GradientButton = ({
   disabled = false,
   isLoading = false,
   type = 'button',
+  variant = 'purple',
   ...rest
 }) => {
+  // Define button style variants
+  const getVariantClasses = () => {
+    if (disabled || isLoading) {
+      return 'bg-gray-600 cursor-not-allowed opacity-70';
+    }
+    
+    switch (variant) {
+      case 'purple':
+        return 'bg-gradient-to-r from-purple-600 to-violet-800 hover:from-purple-700 hover:to-violet-900';
+      case 'dark':
+        return 'bg-gradient-to-r from-gray-800 to-gray-900 hover:from-gray-900 hover:to-black';
+      case 'gray':
+        return 'bg-gray-700 hover:bg-gray-600';
+      default:
+        return 'bg-gradient-to-r from-purple-600 to-violet-800 hover:from-purple-700 hover:to-violet-900';
+    }
+  };
+
   return (
     <button
       type={type}
@@ -29,10 +50,7 @@ const GradientButton = ({
       className={`
         flex items-center justify-center px-6 py-2 text-sm font-medium text-white
         cursor-pointer
-        ${disabled || isLoading
-          ? 'bg-gray-600 cursor-not-allowed opacity-70'
-          : 'bg-gradient-to-r from-purple-600 to-violet-800 hover:from-purple-700 hover:to-violet-900'
-        }
+        ${getVariantClasses()}
         rounded-md shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all
         ${className}
       `}
@@ -40,11 +58,7 @@ const GradientButton = ({
     >
       {isLoading ? (
         <>
-          <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-          Loading...
+          <FaSpinner className="animate-spin h-4 w-4 text-white" />
         </>
       ) : children}
     </button>
