@@ -22,7 +22,11 @@ import { insertCodeIntoEditor } from '../../redux/hooks';
 import { KEYBOARD_SHORTCUTS } from '../../Utils';
 import SpinnerLoading from '../global/SpinnerLoading';
 import CrossButton from '../global/CrossButton';
-
+import CodeViewerByLAnguage from '../Snippet-creator/codeViewerByLAnguage';
+import GradientButton from '../global/GradientButton';
+import { FaArrowUp } from 'react-icons/fa';
+import IconButton from '../global/IconButton';
+import AppTooltip from '../global/AppTooltip';
 const QuestionAnswerBox = () => {
   // Redux hooks
   const dispatch = useDispatch();
@@ -124,7 +128,7 @@ const QuestionAnswerBox = () => {
   }, [isQuestionInputVisible, showAnswer, dispatch]);
   
   // Don't render if no position or not visible
-  if ((!isQuestionInputVisible && !showAnswer) || !cursorPosition) {
+  if ((!isQuestionInputVisible && !showAnswer)) {
     return null;
   }
 
@@ -167,33 +171,23 @@ const QuestionAnswerBox = () => {
             </div>
             
             <div className="px-0 py-0 flex justify-end space-x-3">
-              <button 
-                type="button"
+              <GradientButton
+                variant="dark"
                 onClick={() => dispatch(toggleQuestionInput(false))}
-                className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-md transition-colors"
               >
                 Cancel
-              </button>
-              <button
+              </GradientButton> 
+              <GradientButton
+                variant="purple"
                 onClick={handleAskQuestion}
+                isLoading={isLoading}
                 disabled={isLoading || !question.trim()}
-                className={`px-4 py-2 rounded-md flex items-center justify-center ${
-                  isLoading || !question.trim()
-                    ? 'bg-purple-500 opacity-50 cursor-not-allowed'
-                    : 'bg-gradient-to-r from-purple-600 to-violet-900 hover:from-purple-700 hover:to-violet-800'
-                } text-white transition-colors cursor-pointer`}
               >
-                {isLoading ? (
-                  <SpinnerLoading />
-                ) : (
-                  <>
-                    Ask Question 
-                    <span className="ml-2 text-xs bg-opacity-20 rounded px-1.5 py-0.5">
-                      {KEYBOARD_SHORTCUTS.SUBMIT_QUESTION}
-                    </span>
-                  </>
-                )}
-              </button>
+                Ask Question 
+                <code className="ml-2 text-xs bg-opacity-20 rounded px-1.5 py-0.5">
+                  {KEYBOARD_SHORTCUTS.SUBMIT_QUESTION}
+                </code>
+              </GradientButton>
             </div>
           </div>
         )}
@@ -202,30 +196,24 @@ const QuestionAnswerBox = () => {
         {showAnswer && (
           <>
             <div className="text-white max-h-[50vh] overflow-auto">
-              <pre className="p-4 font-mono text-sm whitespace-pre-wrap bg-gray-900 text-gray-100">
-                {codeAnswer !== answer ? codeAnswer : answer}
-              </pre>
+              <CodeViewerByLAnguage content={codeAnswer !== answer ? codeAnswer : answer} language={selectedLanguage} />
             </div>
             
             <div className="px-4 py-3 bg-gray-900 flex justify-end space-x-3">
-              <button 
+              <GradientButton
+                variant="dark"
                 onClick={() => dispatch(toggleAnswer(false))}
-                className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-md transition-colors"
               >
                 Cancel
-              </button>
-              <button 
-                onClick={handleShowQuestionBox}
-                className="px-4 py-2 bg-purple-700 hover:bg-purple-600 text-white rounded-md transition-colors"
-              >
-                New Question
-              </button>
-              <button 
-                onClick={handleInsertCodeIntoEditor}
-                className="px-4 py-2 rounded-md flex items-center justify-center bg-gradient-to-r from-purple-600 to-violet-900 hover:from-purple-700 hover:to-violet-800 text-white transition-colors"
-              >
-                Insert Code
-              </button>
+              </GradientButton>
+              <AppTooltip position="top" icon={true} text={KEYBOARD_SHORTCUTS.INSERT_CODE_AT_CURSOR}>
+                <IconButton
+                  text="Insert Code"
+                icon={<FaArrowUp/>}
+                variant="purple"
+                  onClick={handleInsertCodeIntoEditor}
+                />
+              </AppTooltip>
             </div>
           </>
         )}

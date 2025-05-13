@@ -18,6 +18,7 @@ import GradientButton from './GradientButton';
 const IconButton = ({ 
   icon,
   variant = 'dark',
+  text="",
   onClick,
   size,
   title,
@@ -36,7 +37,8 @@ const IconButton = ({
       aria-label={title}
       {...rest}
     >
-      {icon}
+      {icon && <span className="text-xs bg-opacity-20 rounded px-1 py-0.5">{icon}</span>}
+      {text && <span className="text-xs bg-opacity-20 rounded px-2">{text}</span>}
     </GradientButton>
   );
 };

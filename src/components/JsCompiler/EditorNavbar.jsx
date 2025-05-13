@@ -5,14 +5,16 @@ import { useRouter } from 'next/navigation';
 import { 
   runCode, 
   selectIsLoading,
-  selectSelectedLanguage
+  selectIsQuestionInputVisible,
+  selectSelectedLanguage,
+  toggleQuestionInput
 } from '../../redux/slices/compilerSlice';
 import { useDeviceSetup } from '../../redux/hooks';
 import GradientButton from '../global/GradientButton';
 import { LanguageIcon, languageOptions } from '@/Utils';
 import AppTooltip from '../global/AppTooltip';
 import IconButton from '../global/IconButton';
-import { FaExpand, FaImage } from 'react-icons/fa';
+import { FaExpand, FaImage, FaSearch } from 'react-icons/fa';
 import Link from 'next/link';
 
 const EditorNavbar = () => {
@@ -22,7 +24,6 @@ const EditorNavbar = () => {
   const isLoading = useSelector(selectIsLoading);
   const { isMobileView } = useDeviceSetup();
   const selectedLanguage = useSelector(selectSelectedLanguage);
-  
   // Language selection state
   const [showLangDropdown, setShowLangDropdown] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -52,7 +53,6 @@ const EditorNavbar = () => {
   
   // Toggle language dropdown
   const toggleLangDropdown = () => setShowLangDropdown(!showLangDropdown);
-  
   // Close dropdown if clicked outside
   const handleClickOutside = (event) => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -89,7 +89,10 @@ const EditorNavbar = () => {
 
   // Disable UI during transitions to prevent multiple clicks
   const isDisabled = isLoading || isTransitioning;
-
+  const showQuestionBox = () => {
+    dispatch(toggleQuestionInput(true));
+  };
+  
   return (
     <div className={`w-full mb-1 ${isTransitioning ? 'opacity-70 pointer-events-none' : ''}`}>
       <div className="flex justify-between items-center p-3 bg-gradient-to-r from-gray-900 to-purple-900 rounded-lg shadow-lg">
@@ -168,6 +171,14 @@ const EditorNavbar = () => {
         {/* Action buttons */}
         <div className="flex items-center space-x-2">
           {/* Snippet Creator Button */}
+          <AppTooltip position="left" icon={true} text="Ask Question Ctrl+Space">
+            <IconButton
+              icon={<FaSearch />}
+              variant="dark" 
+              onClick={showQuestionBox}
+              disabled={isDisabled}
+            />
+          </AppTooltip>
           <AppTooltip position="left" icon={true} text="Create Snippet">
             <IconButton 
               icon={<FaImage />}
@@ -178,7 +189,7 @@ const EditorNavbar = () => {
           </AppTooltip>
           
           {!isMobileView && (
-            <AppTooltip text='Full Screen'>
+            <AppTooltip text='Full Screen' position="left">
               <IconButton
                 icon={<FaExpand/> }
                 variant="dark" 
@@ -187,14 +198,13 @@ const EditorNavbar = () => {
               />
             </AppTooltip>
           )}
-          
-          <GradientButton
-            onClick={handleRunCode} 
-            disabled={isDisabled}
-            isLoading={isLoading}
-          >
-            Run
-          </GradientButton>
+          <IconButton 
+              text="Run"
+              variant="dark" 
+              onClick={handleRunCode}
+              disabled={isDisabled}
+              isLoading={isLoading}
+            />
         </div>
       </div>
     </div>
