@@ -1,6 +1,6 @@
 // src/redux/middleware/socketMiddleware.js
 import { io } from "socket.io-client";
-import { getBaseUrl } from "../../Utils";
+import { getBaseUrl } from "../../utils/Utils";
 import { appendOutput, setSocketId } from "../slices/compilerSlice";
 
 // Socket.io middleware for Redux

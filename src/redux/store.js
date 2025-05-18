@@ -3,16 +3,18 @@ import { persistStore, persistReducer } from 'redux-persist';
 import customStorage from './customStorage';
 
 import compilerReducer from './slices/compilerSlice';
+import editorReducer from './slices/editorSlice';
 import socketMiddleware from './middleware/socketMiddleware';
 
 const persistConfig = {
   key: 'root',
   storage: customStorage,
-  whitelist: ['code', 'deviceInfo', 'activeTab'],
+  whitelist: ['code', 'deviceInfo', 'activeTab', 'editor'],
 };
 
 const rootReducer = combineReducers({
   compiler: compilerReducer,
+  editor: editorReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

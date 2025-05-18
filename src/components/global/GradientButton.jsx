@@ -12,6 +12,7 @@ import { FaSpinner } from 'react-icons/fa';
  * @param {boolean} props.isLoading - Loading state
  * @param {string} props.type - Button type (button, submit, reset)
  * @param {string} props.variant - Button style variant ('purple', 'dark', 'gray')
+ * @param {Array} props.colors - Custom gradient colors, e.g. ['from-green-500', 'to-blue-500']
  * @param {Object} props.rest - Any other props to pass to the button element
  */
 const GradientButton = ({
@@ -22,12 +23,18 @@ const GradientButton = ({
   isLoading = false,
   type = 'button',
   variant = 'purple',
+  colors = null,
   ...rest
 }) => {
   // Define button style variants
   const getVariantClasses = () => {
     if (disabled || isLoading) {
       return 'bg-gray-600 cursor-not-allowed opacity-70';
+    }
+    
+    // If custom colors are provided, use those instead of variant presets
+    if (colors && Array.isArray(colors) && colors.length >= 2) {
+      return `bg-gradient-to-r ${colors[0]} ${colors[1]}`;
     }
     
     switch (variant) {

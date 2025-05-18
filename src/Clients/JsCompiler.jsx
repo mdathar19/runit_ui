@@ -21,7 +21,7 @@ import {
   setSelectedLanguage
 } from "../redux/slices/compilerSlice";
 import { useMonacoSetup, useCompilerSelectors } from "../redux/hooks";
-import { getFileExtension, getMonacoLanguage } from "../Utils";
+import { getFileExtension, getMonacoLanguage } from "../utils/Utils";
 import useReduxStore from "@/hooks/useReduxStore";
 
 const JsCompiler = ({ defaultLanguage = "javascript" }) => {

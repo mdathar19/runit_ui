@@ -1,4 +1,4 @@
-import { languagePathMap } from "@/Utils";
+import { languagePathMap } from "@/utils/Utils";
 import dynamic from "next/dynamic";
 import LoadingComponent from '@/components/global/Loading';
 import MadeByAthar from "@/components/global/MadeByAthar";

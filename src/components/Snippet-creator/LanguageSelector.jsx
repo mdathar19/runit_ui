@@ -4,7 +4,7 @@ import React from 'react';
 import { useDispatch } from 'react-redux';
 import { setSelectedLanguage } from '@/redux/slices/compilerSlice';
 import ReusableSelector from '../global/ReusableSelector';
-import { languages } from '@/Utils';
+import { languages } from '@/utils/Utils';
 
 
 const LanguageSelector = ({ selectedLanguage }) => {

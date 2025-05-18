@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import ThreeDot from '../global/ThreeDot';
-import { prismLanguageMap } from '@/Utils';
+import { prismLanguageMap } from '@/utils/Utils';
 
 // Create a component that manually applies syntax highlighting to code
 const CodeSnippetBox = ({ previewRef, selectedTheme, language, code, width, height }) => {

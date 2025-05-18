@@ -2,7 +2,7 @@
 
 import React, { useRef, useEffect } from 'react'
 import SnippetThemeBox from './SnippetThemeBox';
-import { getContrastColor } from '@/Utils';
+import { getContrastColor } from '@/utils/Utils';
 
 const ColorPicker = ({ 
   color, 

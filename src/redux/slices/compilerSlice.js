@@ -1,7 +1,7 @@
 // src/redux/slices/compilerSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { DEFAULT_CODE, getDefaultCodeForLanguage, getFileExtension, sanitizeErrorTrace } from "../../Utils";
-import { extractCodeBlocks, generateDeviceId, getBaseUrl } from "../../Utils";
+import { DEFAULT_CODE, getDefaultCodeForLanguage, getFileExtension, sanitizeErrorTrace } from "../../utils/Utils";
+import { extractCodeBlocks, generateDeviceId, getBaseUrl } from "../../utils/Utils";
 import { encryptRequest, decryptResponse } from '../../cryptoUtils';
 import apis from "../../api";
 import { codeExecuteService } from '../../common/service';
