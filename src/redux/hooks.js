@@ -26,7 +26,7 @@ import {
   toggleQuestionInput,
   fetchRuntimes
 } from './slices/compilerSlice';
-import { calculateEditorPosition } from '../Utils';
+import { calculateEditorPosition } from '../utils/Utils';
 
 
 // Custom hook for device information and mobile view detection

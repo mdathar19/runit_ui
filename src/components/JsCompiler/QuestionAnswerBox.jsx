@@ -19,7 +19,7 @@ import {
   selectSelectedLanguage
 } from '../../redux/slices/compilerSlice';
 import { insertCodeIntoEditor } from '../../redux/hooks';
-import { KEYBOARD_SHORTCUTS } from '../../Utils';
+import { KEYBOARD_SHORTCUTS } from '../../utils/Utils';
 import SpinnerLoading from '../global/SpinnerLoading';
 import CrossButton from '../global/CrossButton';
 import CodeViewerByLAnguage from '../Snippet-creator/codeViewerByLAnguage';

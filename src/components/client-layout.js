@@ -22,7 +22,9 @@ function ClientLayout({ children }) {
       '/cpp',
       '/go',
       '/java',
-      '/create-snippet'
+      '/create-snippet',
+      '/portfolio',
+      '/portfolio/templates-list',
     ];
     
     const link = document.createElement('link');

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import ThreeDot from '../global/ThreeDot';
-import { prismLanguageMap } from '@/Utils';
+import { prismLanguageMap } from '@/utils/Utils';
 
 /**
  * Reusable component that displays syntax-highlighted code based on the language

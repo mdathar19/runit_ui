@@ -402,3 +402,44 @@ export const languages = [
   { id: 'xml', name: 'XML', icon: 'xml' },
   { id: 'yaml', name: 'YAML', icon: 'yaml' },
 ];
+
+// Editor panel tabs
+export const TABS = {
+  ELEMENTS: 'elements',
+  STYLE: 'style',
+  SETTINGS: 'settings'
+};
+
+// Editable element types
+export const ELEMENT_TYPES = {
+  TEXT: 'text',
+  IMAGE: 'image',
+  LINK: 'link',
+  BUTTON: 'button',
+  SECTION: 'section',
+  PROGRESS: 'progress',
+  BACKGROUND: 'background',
+  INPUT: 'input',
+  FORM: 'form'
+};
+
+// Responsive preview modes
+export const PREVIEW_MODES = {
+  DESKTOP: 'desktop',
+  TABLET: 'tablet',
+  MOBILE: 'mobile'
+};
+
+  // Get saving status indicator
+  export const getSavingStatusIndicator = (savingStatus) => {
+    switch(savingStatus) {
+      case 'saving':
+        return <span className="text-yellow-400 text-sm">Saving...</span>;
+      case 'saved':
+        return <span className="text-green-400 text-sm">Saved</span>;
+      case 'error':
+        return <span className="text-red-400 text-sm">Error saving</span>;
+      default:
+        return null;
+    }
+  };

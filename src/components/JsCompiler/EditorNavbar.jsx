@@ -11,7 +11,7 @@ import {
 } from '../../redux/slices/compilerSlice';
 import { useDeviceSetup } from '../../redux/hooks';
 import GradientButton from '../global/GradientButton';
-import { LanguageIcon, languageOptions } from '@/Utils';
+import { LanguageIcon, languageOptions } from '@/utils/Utils';
 import AppTooltip from '../global/AppTooltip';
 import IconButton from '../global/IconButton';
 import { FaExpand, FaImage, FaSearch } from 'react-icons/fa';
