@@ -17,5 +17,6 @@ const EditorClientWrapper = dynamic(() => import('@/components/EditorClientWrapp
 });
 
 export default function EditorPage({ params }) {
-  return <EditorClientWrapper templateId={params.templateId} />;
+  const { templateId } = React.use(params);
+  return <EditorClientWrapper templateId={templateId} />;
 }

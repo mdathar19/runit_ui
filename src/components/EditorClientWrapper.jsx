@@ -7,10 +7,13 @@ import LoadingComponent from '@/components/global/Loading';
 import useReduxStore from '@/hooks/useReduxStore';
 
 // Client component wrapper for the Editor
-function EditorClientWrapper() {
+function EditorClientWrapper({ templateId: propTemplateId }) {
   const params = useParams();
   const [EditorComponent, setEditorComponent] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Use provided templateId from props or fall back to params
+  const templateId = propTemplateId || params?.templateId;
 
   useEffect(() => {
     // Dynamically import the Editor component with ssr: false
@@ -28,7 +31,7 @@ function EditorClientWrapper() {
   }
 
   // Render the Editor component once loaded
-  return EditorComponent ? <EditorComponent templateId={params.templateId} /> : null;
+  return EditorComponent ? <EditorComponent templateId={templateId} /> : null;
 } 
 
 export default useReduxStore(EditorClientWrapper);

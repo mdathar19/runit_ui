@@ -1,12 +1,14 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
 import { motion } from 'framer-motion';
 import { FaSave, FaUndo, FaRedo, FaDesktop, FaTabletAlt, FaMobileAlt, FaEye, FaCode, FaCog, FaLayerGroup, FaFont, FaTrash, FaDownload, FaUpload } from 'react-icons/fa';
 import GradientButton from '@/components/global/GradientButton';
 import RenderTab from '@/components/editor/RenderTab';
+import Login from '@/components/Login';
+import CheckWebsite from '@/components/editor/CheckWebsite';
 import { TABS, PREVIEW_MODES, ELEMENT_TYPES } from '@/utils/Utils';
 import { 
   setActiveTab, 
@@ -22,6 +24,8 @@ import {
   deleteSelectedElement,
   selectSelectedElement
 } from '@/redux/slices/editorSlice';
+import { checkSession } from '@/redux/slices/authSlice';
+import { publishPortfolio, getUserPortfolios } from '@/redux/slices/portfolioSlice';
 
 function Editor({ templateId: propTemplateId }) {
   const router = useRouter();
@@ -41,16 +45,49 @@ function Editor({ templateId: propTemplateId }) {
     templateId
   } = useSelector((state) => state.editor);
   
+  // Get auth state from Redux
+  const {
+    isAuthenticated,
+    token,
+    isSessionChecked
+  } = useSelector((state) => state.auth);
+  
+  // Get portfolio state from Redux
+  const {
+    portfolios
+  } = useSelector((state) => state.portfolio);
+  
   const iframeRef = useRef(null);
+  
+  // Authentication modal state
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  
+  // Website name modal state
+  const [showWebsiteNameModal, setShowWebsiteNameModal] = useState(false);
+  const [templateZipBlob, setTemplateZipBlob] = useState(null);
+  
+  // Check if user is authenticated on mount
+  useEffect(() => {
+    dispatch(checkSession());
+  }, [dispatch]);
+  
+  // Fetch user portfolios on mount if authenticated
+  useEffect(() => {
+    if (isAuthenticated && token) {
+      dispatch(getUserPortfolios());
+    }
+  }, [isAuthenticated, token, dispatch]);
   
   // Set template ID on mount
   useEffect(() => {
-    const id = propTemplateId || params?.templateId || 'engineer-atif';
-    dispatch(setTemplateId(id));
+    if (propTemplateId || params?.templateId) {
+      const id = propTemplateId || params?.templateId || 'engineer-atif';
+      dispatch(setTemplateId(id));
+    }
   }, [propTemplateId, params, dispatch]);
   
   // Template path based on ID
-  const templatePath = `/templates/${templateId.split('-').join('/')}`; 
+  const templatePath = `/templates/${templateId?.split('-').join('/')}` || '';
 
   // Handle iframe load
   const handleIframeLoad = () => {
@@ -578,6 +615,10 @@ function Editor({ templateId: propTemplateId }) {
         return <span className="text-yellow-400 text-sm">Preparing ZIP file...</span>;
       case 'exported':
         return <span className="text-green-400 text-sm">Template exported!</span>;
+      case 'publishing':
+        return <span className="text-yellow-400 text-sm">Publishing website...</span>;
+      case 'published':
+        return <span className="text-green-400 text-sm">Website published!</span>;
       case 'error':
         return <span className="text-red-400 text-sm">Error saving</span>;
       default:
@@ -609,14 +650,63 @@ function Editor({ templateId: propTemplateId }) {
     }
   };
 
+  // Handle website name confirmation
+  const handleWebsiteNameConfirmed = (websiteName) => {
+    setShowWebsiteNameModal(false);
+    
+    if (!templateZipBlob) {
+      console.error('No template ZIP available');
+      dispatch(setSavingStatus('error'));
+      setTimeout(() => dispatch(setSavingStatus('')), 3000);
+      return;
+    }
+    
+    // Proceed with publishing
+    publishWithName(websiteName || (portfolios.length > 0 ? portfolios[0].name : 'untitled-portfolio'));
+  };
+  
+  // Function to publish with confirmed name
+  const publishWithName = async (websiteName) => {
+    try {
+      dispatch(setSavingStatus('publishing'));
+      
+      // Create form data with the template zip and website name
+      const formData = new FormData();
+      formData.append('zipFile', templateZipBlob, 'template.zip');
+      formData.append('websiteName', websiteName);
+      
+      // Dispatch the publish action
+      const resultAction = await dispatch(publishPortfolio(formData));
+      
+      if (publishPortfolio.fulfilled.match(resultAction)) {
+        dispatch(setSavingStatus('published'));
+        setTimeout(() => dispatch(setSavingStatus('')), 2000);
+      } else {
+        return;
+      }
+    } catch (error) {
+      console.error('Error publishing portfolio:', error);
+      dispatch(setSavingStatus('error'));
+      setTimeout(() => dispatch(setSavingStatus('')), 3000);
+    } finally {
+      // Clear the stored blob
+      setTemplateZipBlob(null);
+    }
+  };
+
   // Handle export/publish template as ZIP
   const handleExport = async () => {
+    if (!isAuthenticated) {
+      // Show login modal
+      setShowLoginModal(true);
+      return;
+    }
     const iframe = iframeRef.current;
     if (!iframe) return;
 
     try {
-      // Set status to saving
-      dispatch(setSavingStatus('publishing...'));
+      // Set status to exporting
+      dispatch(setSavingStatus('exporting'));
       
       const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
       
@@ -654,26 +744,41 @@ function Editor({ templateId: propTemplateId }) {
       // Create a new ZIP file
       const zip = new window.JSZip();
       
+      // Portfolio prefix to use for all assets (if available)
+      const portfolioPrefix = portfolios.length > 0 ? `${portfolios[0].name}/` : '';
+      
       // Get references to all assets (CSS, JS, images)
       const cssLinks = Array.from(iframeDocument.querySelectorAll('link[rel="stylesheet"]'))
-        .map(link => ({
-          href: link.getAttribute('href'),
-          element: templateContent.querySelector(`link[href="${link.getAttribute('href')}"]`)
-        }))
+        .map(link => {
+          const href = link.getAttribute('href');
+          return {
+            href: href,
+            element: templateContent.querySelector(`link[href="${href}"]`),
+            originalPath: href
+          };
+        })
         .filter(item => item.href && !item.href.startsWith('http') && !item.href.startsWith('//'));
       
       const jsScripts = Array.from(iframeDocument.querySelectorAll('script'))
-        .map(script => ({
-          src: script.getAttribute('src'),
-          element: templateContent.querySelector(`script[src="${script.getAttribute('src')}"]`)
-        }))
+        .map(script => {
+          const src = script.getAttribute('src');
+          return {
+            src: src,
+            element: templateContent.querySelector(`script[src="${src}"]`),
+            originalPath: src
+          };
+        })
         .filter(item => item.src && !item.src.startsWith('http') && !item.src.startsWith('//'));
       
       const imgSources = Array.from(iframeDocument.querySelectorAll('img'))
-        .map(img => ({
-          src: img.getAttribute('src'),
-          element: templateContent.querySelector(`img[src="${img.getAttribute('src')}"]`)
-        }))
+        .map(img => {
+          const src = img.getAttribute('src');
+          return {
+            src: src,
+            element: templateContent.querySelector(`img[src="${src}"]`),
+            originalPath: src
+          };
+        })
         .filter(item => item.src && !item.src.startsWith('http') && !item.src.startsWith('//'));
       
       // Background images in CSS
@@ -689,9 +794,11 @@ function Editor({ templateId: propTemplateId }) {
           const style = getComputedStyle(el);
           const bgImage = style.backgroundImage;
           const urlMatch = bgImage.match(/url\(['"]?(.*?)['"]?\)/);
+          const src = urlMatch ? urlMatch[1] : null;
           return {
-            src: urlMatch ? urlMatch[1] : null,
-            element: templateContent.querySelector(`*[style*="${urlMatch ? urlMatch[1] : ''}"]`)
+            src: src,
+            element: templateContent.querySelector(`*[style*="${src}"]`),
+            originalPath: src
           };
         })
         .filter(item => item.src);
@@ -702,8 +809,10 @@ function Editor({ templateId: propTemplateId }) {
       // Helper function to fetch file and add to zip
       const addFileToZip = async (path, zipPath) => {
         try {
-          const response = await fetch(path);
-          if (!response.ok) throw new Error(`Failed to fetch ${path}`);
+          // Only add absolute path prefix if the path doesn't already have a protocol
+          const fetchPath = path.startsWith('http') ? path : (path.startsWith('/') ? path : `/${path}`);
+          const response = await fetch(fetchPath);
+          if (!response.ok) throw new Error(`Failed to fetch ${fetchPath}`);
           const blob = await response.blob();
           zip.file(zipPath, blob);
           return true;
@@ -716,42 +825,50 @@ function Editor({ templateId: propTemplateId }) {
       // Process CSS files
       for (const cssItem of cssLinks) {
         const path = cssItem.href;
-        const filename = path.split('/').pop();
-        const zipPath = `css/${filename}`;
+        // Extract filename from path, handling both relative and absolute paths
+        const pathParts = path.split('/').filter(part => part);
+        const filename = pathParts[pathParts.length - 1];
+        // Create a consistent path structure
+        const zipPath = `${portfolioPrefix}css/${filename}`;
         
-        await addFileToZip(path, zipPath);
+        await addFileToZip(cssItem.originalPath, zipPath);
         
         // Update the path in the HTML
         if (cssItem.element) {
-          cssItem.element.setAttribute('href', zipPath);
+          cssItem.element.setAttribute('href', `/${zipPath}`);
         }
       }
       
       // Process JS files
       for (const jsItem of jsScripts) {
         const path = jsItem.src;
-        const filename = path.split('/').pop();
-        const zipPath = `js/${filename}`;
+        // Extract filename from path, handling both relative and absolute paths
+        const pathParts = path.split('/').filter(part => part);
+        const filename = pathParts[pathParts.length - 1];
+        // Create a consistent path structure
+        const zipPath = `${portfolioPrefix}js/${filename}`;
         
-        await addFileToZip(path, zipPath);
+        await addFileToZip(jsItem.originalPath, zipPath);
         
         // Update the path in the HTML
         if (jsItem.element) {
-          jsItem.element.setAttribute('src', zipPath);
+          jsItem.element.setAttribute('src', `/${zipPath}`);
         }
       }
       
       // Process images
       for (const imgItem of imgSources) {
         const path = imgItem.src;
-        const filename = path.split('/').pop();
-        const zipPath = `img/${filename}`;
-        
-        await addFileToZip(path, zipPath);
+        // Extract filename from path, handling both relative and absolute paths
+        const pathParts = path.split('/').filter(part => part);
+        const filename = pathParts[pathParts.length - 1];
+        // Create a consistent path structure
+        const zipPath = `${portfolioPrefix}img/${filename}`;
+        await addFileToZip(imgItem.originalPath, zipPath);
         
         // Update the path in the HTML
         if (imgItem.element) {
-          imgItem.element.setAttribute('src', zipPath);
+          imgItem.element.setAttribute('src', `/${zipPath}`);
         }
       }
       
@@ -760,16 +877,36 @@ function Editor({ templateId: propTemplateId }) {
         if (!bgItem.src) continue;
         
         const path = bgItem.src;
-        const filename = path.split('/').pop();
-        const zipPath = `img/${filename}`;
+        // Extract filename from path, handling both relative and absolute paths
+        const pathParts = path.split('/').filter(part => part);
+        const filename = pathParts[pathParts.length - 1];
+        // Create a consistent path structure
+        const zipPath = `${portfolioPrefix}img/${filename}`;
         
-        await addFileToZip(path, zipPath);
+        // Only add absolute path prefix if the path doesn't already have a protocol
+        const fetchPath = path.startsWith('http') ? path : (path.startsWith('/') ? path : `/${path}`);
         
-        // Update the path in the HTML
-        if (bgItem.element) {
-          const currentStyle = bgItem.element.getAttribute('style') || '';
-          const updatedStyle = currentStyle.replace(path, zipPath);
-          bgItem.element.setAttribute('style', updatedStyle);
+        try {
+          const response = await fetch(fetchPath);
+          if (response.ok) {
+            const blob = await response.blob();
+            zip.file(zipPath, blob);
+            
+            // Update the path in the HTML
+            if (bgItem.element) {
+              const currentStyle = bgItem.element.getAttribute('style') || '';
+              // Replace the URL correctly, handling different formats of url() references
+              const updatedStyle = currentStyle.replace(
+                new RegExp(`url\\(['"]?${path.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}['"]?\\)`, 'g'), 
+                `url('/${zipPath}')`
+              );
+              bgItem.element.setAttribute('style', updatedStyle);
+            }
+          } else {
+            console.error(`Failed to fetch ${fetchPath}`);
+          }
+        } catch (error) {
+          console.error(`Error processing background image ${path}:`, error);
         }
       }
       
@@ -782,24 +919,38 @@ function Editor({ templateId: propTemplateId }) {
       // Generate the ZIP file
       const content = await zip.generateAsync({ type: 'blob' });
       
-      // Create a download link and trigger download
-      const downloadLink = document.createElement('a');
-      downloadLink.href = URL.createObjectURL(content);
-      downloadLink.download = `template-${templateId}.zip`;
-      downloadLink.click();
+      // Store the ZIP blob for later use
+      setTemplateZipBlob(content);
+      setShowWebsiteNameModal(true);
       
-      // Clean up
-      URL.revokeObjectURL(downloadLink.href);
-      
-      // Update status
-      dispatch(setSavingStatus('Published'));
-      setTimeout(() => dispatch(setSavingStatus('')), 2000);
     } catch (error) {
       console.error('Error exporting template:', error);
       dispatch(setSavingStatus('error'));
       setTimeout(() => dispatch(setSavingStatus('')), 3000);
     }
   };
+
+  // Handle successful login
+  const handleLoginSuccess = (token) => {
+    setShowLoginModal(false);
+    // No need to manually set auth state as it's handled in the redux slice
+    // Continue with export if that's what user was trying to do
+    if (token) {
+      handleExport();
+    }
+  };
+
+  // If template ID is not set, show loading
+  if (!templateId) {
+    return (
+      <div className="h-screen w-full flex items-center justify-center bg-gray-900">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-gray-400 border-t-purple-500 rounded-full animate-spin mb-4 mx-auto"></div>
+          <p className="text-white">Loading editor...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen w-full bg-gray-900 flex flex-col">
@@ -966,6 +1117,21 @@ function Editor({ templateId: propTemplateId }) {
           </div>
         </div>
       </div>
+      
+      {/* Login Modal */}
+      <Login
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        onLoginSuccess={handleLoginSuccess}
+      />
+      
+      {/* Website Name Check Modal */}
+      {showWebsiteNameModal && (
+        <CheckWebsite
+        initialName={templateId?.split('-').join('-')}
+        onWebsiteNameConfirmed={handleWebsiteNameConfirmed}
+      />
+      )}
     </div>
   );
 }

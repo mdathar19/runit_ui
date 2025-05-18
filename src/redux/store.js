@@ -4,17 +4,21 @@ import customStorage from './customStorage';
 
 import compilerReducer from './slices/compilerSlice';
 import editorReducer from './slices/editorSlice';
+import authReducer from './slices/authSlice';
 import socketMiddleware from './middleware/socketMiddleware';
+import portfolioReducer from './slices/portfolioSlice';
 
 const persistConfig = {
   key: 'root',
   storage: customStorage,
-  whitelist: ['code', 'deviceInfo', 'activeTab', 'editor'],
+  whitelist: ['code', 'deviceInfo', 'activeTab', 'editor', 'auth'],
 };
 
 const rootReducer = combineReducers({
   compiler: compilerReducer,
   editor: editorReducer,
+  auth: authReducer,
+  portfolio: portfolioReducer
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

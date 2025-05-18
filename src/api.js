@@ -2,7 +2,7 @@ const getBaseUrl = () => {
     if (typeof window !== 'undefined') {
       // Running in browser
       if (window.location.hostname === 'localhost') {
-        return 'https://api.runit.in';
+        return 'http://localhost:3000';
       } else {
         return 'https://api.runit.in'; // Empty base URL, use relative path in production
       }
@@ -18,6 +18,14 @@ const getBaseUrl = () => {
     postFeedBack: `${baseUrl}/feedback`,
     codeExecute: `${baseUrl}/execute`,
     askGPT: `${baseUrl}/ask`,
+    askGPT: `${baseUrl}/ask`,
+    askGPT: `${baseUrl}/ask`,
+    verifyOtp: `${baseUrl}/v1/verify-otp`,
+    login: `${baseUrl}/v1/login`,
+    signup: `${baseUrl}/v1/signup`,
+    publishPortfolio: `${baseUrl}/v1/publish-portfolio`,
+    getUserPortfolios: `${baseUrl}/v1/user-portfolios`,
+    checkWebsiteName: `${baseUrl}/v1/check-website-name`,
   };
   
   export default apis;
