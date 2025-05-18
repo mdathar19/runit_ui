@@ -9,7 +9,7 @@ import GradientButton from '@/components/global/GradientButton';
 import RenderTab from '@/components/editor/RenderTab';
 import Login from '@/components/Login';
 import CheckWebsite from '@/components/editor/CheckWebsite';
-import { TABS, PREVIEW_MODES, ELEMENT_TYPES } from '@/utils/Utils';
+import { TABS, PREVIEW_MODES, ELEMENT_TYPES, getSavingStatusIndicator } from '@/utils/Utils';
 import { 
   setActiveTab, 
   setPreviewMode, 
@@ -26,6 +26,8 @@ import {
 } from '@/redux/slices/editorSlice';
 import { checkSession } from '@/redux/slices/authSlice';
 import { publishPortfolio, getUserPortfolios } from '@/redux/slices/portfolioSlice';
+import { setPopupConfig } from '@/redux/slices/messagePopSlice';
+import { portfolioUrl, publishedPortfolioUrl } from '@/api';
 
 function Editor({ templateId: propTemplateId }) {
   const router = useRouter();
@@ -602,29 +604,7 @@ function Editor({ templateId: propTemplateId }) {
     previewWindow.document.close();
   };
 
-  // Get saving status indicator
-  const getSavingStatusIndicator = () => {
-    switch(savingStatus) {
-      case 'saving':
-        return <span className="text-yellow-400 text-sm">Saving...</span>;
-      case 'saved':
-        return <span className="text-green-400 text-sm">Saved</span>;
-      case 'exporting':
-        return <span className="text-yellow-400 text-sm">Exporting template...</span>;
-      case 'preparing':
-        return <span className="text-yellow-400 text-sm">Preparing ZIP file...</span>;
-      case 'exported':
-        return <span className="text-green-400 text-sm">Template exported!</span>;
-      case 'publishing':
-        return <span className="text-yellow-400 text-sm">Publishing website...</span>;
-      case 'published':
-        return <span className="text-green-400 text-sm">Website published!</span>;
-      case 'error':
-        return <span className="text-red-400 text-sm">Error saving</span>;
-      default:
-        return null;
-    }
-  };
+
 
   // Add this function to handle delete of selected element
   const handleDeleteElement = () => {
@@ -681,6 +661,13 @@ function Editor({ templateId: propTemplateId }) {
       if (publishPortfolio.fulfilled.match(resultAction)) {
         dispatch(setSavingStatus('published'));
         setTimeout(() => dispatch(setSavingStatus('')), 2000);
+        dispatch(setPopupConfig({
+          message: "Your portfolio has been published successfully!",
+          imageUrl: "/favicon_io/android-chrome-192x192.png",
+          linkText: "View Portfolio",
+          linkUrl: publishedPortfolioUrl+'/'+websiteName,
+          duration: 5000,
+        }));
       } else {
         return;
       }
@@ -825,12 +812,13 @@ function Editor({ templateId: propTemplateId }) {
       // Process CSS files
       for (const cssItem of cssLinks) {
         const path = cssItem.href;
+        console.log("cssItem.href", cssItem.href);
         // Extract filename from path, handling both relative and absolute paths
         const pathParts = path.split('/').filter(part => part);
         const filename = pathParts[pathParts.length - 1];
         // Create a consistent path structure
         const zipPath = `${portfolioPrefix}css/${filename}`;
-        
+        console.log("zipPath", zipPath);
         await addFileToZip(cssItem.originalPath, zipPath);
         
         // Update the path in the HTML
@@ -1082,7 +1070,7 @@ function Editor({ templateId: propTemplateId }) {
               Template ID: {templateId}
             </div>
             <div>
-              {getSavingStatusIndicator()}
+              {getSavingStatusIndicator(savingStatus)}
             </div>
           </div>
         </div>

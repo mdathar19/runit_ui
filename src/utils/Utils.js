@@ -431,12 +431,22 @@ export const PREVIEW_MODES = {
 };
 
   // Get saving status indicator
-  export const getSavingStatusIndicator = (savingStatus) => {
+export const getSavingStatusIndicator = (savingStatus) => {
     switch(savingStatus) {
       case 'saving':
         return <span className="text-yellow-400 text-sm">Saving...</span>;
       case 'saved':
         return <span className="text-green-400 text-sm">Saved</span>;
+      case 'exporting':
+        return <span className="text-yellow-400 text-sm">Exporting template...</span>;
+      case 'preparing':
+        return <span className="text-yellow-400 text-sm">Preparing ZIP file...</span>;
+      case 'exported':
+        return <span className="text-green-400 text-sm">Template exported!</span>;
+      case 'publishing':
+        return <span className="text-yellow-400 text-sm">Publishing website...</span>;
+      case 'published':
+        return <span className="text-green-400 text-sm">Website published!</span>;
       case 'error':
         return <span className="text-red-400 text-sm">Error saving</span>;
       default:

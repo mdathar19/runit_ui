@@ -23,6 +23,8 @@ import {
 import { useMonacoSetup, useCompilerSelectors } from "../redux/hooks";
 import { getFileExtension, getMonacoLanguage } from "../utils/Utils";
 import useReduxStore from "@/hooks/useReduxStore";
+import { portfolioUrl } from "@/api";
+import { setPopupConfig } from "@/redux/slices/messagePopSlice";
 
 const JsCompiler = ({ defaultLanguage = "javascript" }) => {
   // Set up hooks
@@ -39,8 +41,14 @@ const JsCompiler = ({ defaultLanguage = "javascript" }) => {
   // Set the language based on the URL route when component mounts
   useEffect(() => {
     dispatch(setSelectedLanguage(defaultLanguage));
+    dispatch(setPopupConfig({
+      message: "Create your own portfolio (beta version)",
+      imageUrl: "/favicon_io/android-chrome-192x192.png",
+      linkText: "Create Portfolio",
+      linkUrl: portfolioUrl,
+    }));
   }, [defaultLanguage, dispatch]);
-
+  
  
 
   const renderEditor = () => (
