@@ -11,7 +11,21 @@ const getBaseUrl = () => {
       return '';
     }
   };
-  
+  const getUIBaseUrl = () => {
+    if (typeof window !== 'undefined') {
+      // Running in browser
+      if (window.location.hostname === 'localhost') {
+        return 'http://localhost:3001';
+      } else {
+        return 'https://runit.in'; // Empty base URL, use relative path in production
+      }
+    } else {
+      // Running in server-side rendering (optional handling)
+      return '';
+    }
+  };
+export const portfolioUrl = `${getUIBaseUrl()}/portfolio/create`;
+export const publishedPortfolioUrl = `${getBaseUrl()}`;
   const baseUrl = getBaseUrl();
   
   const apis = {

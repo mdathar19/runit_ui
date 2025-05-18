@@ -70,7 +70,15 @@ function Templates() {
 
   // Handle template selection
   const handleSelectTemplate = (templateId) => {
-    router.push(`/portfolio/editor/${templateId}`);
+    const width = 1024;
+    const height = 768;
+    const left = (window.screen.width - width) / 2;
+    const top = (window.screen.height - height) / 2;
+    window.open(
+      `/portfolio/editor/${templateId}`, 
+      "template_editor",
+      `width=${width},height=${height},top=${top},left=${left},resizable=yes,scrollbars=yes,status=no,location=no,menubar=no,toolbar=no`
+    );
   };
 
   return (

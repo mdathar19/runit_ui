@@ -12,7 +12,7 @@ export const metadata = {
     description: 'Build a stunning professional portfolio website in just 5 minutes. Choose a design, fill your details, and publish.',
     images: [
       {
-        url: '/portfolio_preview.png', // Make sure this image exists or replace with an actual preview image
+        url: '/portfolio-image.png', // Make sure this image exists or replace with an actual preview image
         width: 1200,
         height: 630,
         alt: 'Portfolio Creator Preview',
@@ -24,7 +24,7 @@ export const metadata = {
     card: 'summary_large_image',
     title: 'Create Your Professional Portfolio in Minutes | RunIt',
     description: 'Build a stunning professional portfolio website in just 5 minutes.',
-    images: ['/portfolio_preview.png'], // Make sure this image exists or replace with an actual preview image
+    images: ['/portfolio-image.png'], // Make sure this image exists or replace with an actual preview image
   },
   alternates: {
     canonical: '/user',

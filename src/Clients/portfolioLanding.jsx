@@ -92,31 +92,6 @@ const features = [
     description: 'Easily customize colors, fonts, sections and content to match your personal brand',
   },
 ];
-
-const PortfolioLanding = () => {
-  const router = useRouter();
-  const [activeTemplate, setActiveTemplate] = useState(0);
-  const [isVisible, setIsVisible] = useState(false);
-  const templateSliderRef = useRef(null);
-  
-  // Handle navigation to template selection page
-  const handleGetStarted = () => {
-    router.push('/portfolio/choose-design');
-  };
-  
-  // Auto-rotate templates
-  useEffect(() => {
-    setIsVisible(true);
-    
-    // Debug image paths
-    console.log("Portfolio template paths:", portfolioTemplates.map(t => t.preview));
-    
-    const interval = setInterval(() => {
-      setActiveTemplate((prev) => (prev + 1) % portfolioTemplates.length);
-    }, 5000);
-    
-    return () => clearInterval(interval);
-  }, []);
   
   // Animation variants
   const containerVariants = {
@@ -138,6 +113,35 @@ const PortfolioLanding = () => {
       transition: { duration: 0.5 }
     }
   };
+const PortfolioLanding = () => {
+  const router = useRouter();
+  const [activeTemplate, setActiveTemplate] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
+  const templateSliderRef = useRef(null);
+  
+  // Handle navigation to template selection page
+  const handleGetStarted = () => {
+    router.push('/portfolio/templates-list');
+  };
+  const handleViewSamples = () => {
+    router.push('/templates/eventmanagement/athar/index.html');
+  };
+  
+
+  // Auto-rotate templates
+  useEffect(() => {
+    setIsVisible(true);
+    
+    // Debug image paths
+    /* console.log("Portfolio template paths:", portfolioTemplates.map(t => t.preview)); */
+    
+    const interval = setInterval(() => {
+      setActiveTemplate((prev) => (prev + 1) % portfolioTemplates.length);
+    }, 5000);
+    
+    return () => clearInterval(interval);
+  }, []);
+
   
   return (
     <div className="min-h-screen bg-gradient-to-b from-black to-gray-900 text-white">
@@ -174,6 +178,7 @@ const PortfolioLanding = () => {
                 <GradientButton
                   variant="dark"
                   className="text-lg px-8 py-3"
+                  onClick={handleViewSamples}
                 >
                   View Examples <FaDownload className="ml-2 inline" />
                 </GradientButton>
