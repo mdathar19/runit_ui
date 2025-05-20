@@ -8,6 +8,7 @@ import authReducer from './slices/authSlice';
 import socketMiddleware from './middleware/socketMiddleware';
 import portfolioReducer from './slices/portfolioSlice';
 import messagePopReducer from './slices/messagePopSlice';
+import resumeReducer from './slices/resumeSlice';
 
 const persistConfig = {
   key: 'root',
@@ -20,7 +21,8 @@ const rootReducer = combineReducers({
   editor: editorReducer,
   auth: authReducer,
   portfolio: portfolioReducer,
-  messagePop: messagePopReducer
+  messagePop: messagePopReducer,
+  resume: resumeReducer
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

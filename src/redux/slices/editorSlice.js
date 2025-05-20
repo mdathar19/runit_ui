@@ -167,5 +167,8 @@ export const selectIframeLoaded = (state) => state.editor.iframeLoaded;
 export const selectEditableElements = (state) => state.editor.editableElements;
 export const selectSavingStatus = (state) => state.editor.savingStatus;
 export const selectTemplateId = (state) => state.editor.templateId;
+export const selectHistoryIndex = (state) => state.editor.historyIndex;
+export const selectEditorHistory = (state) => state.editor.editorHistory;
+export const selectTemplateHtml = (state) => state.editor.templateHtml;
 
 export default editorSlice.reducer;

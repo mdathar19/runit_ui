@@ -40,6 +40,7 @@ export const publishedPortfolioUrl = `${getBaseUrl()}`;
     publishPortfolio: `${baseUrl}/v1/publish-portfolio`,
     getUserPortfolios: `${baseUrl}/v1/user-portfolios`,
     checkWebsiteName: `${baseUrl}/v1/check-website-name`,
+    extractResume: `${baseUrl}/v1/parse-resume`,
   };
   
   export default apis;

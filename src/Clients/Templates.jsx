@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { FaEdit, FaEye, FaCode } from 'react-icons/fa';
 import GradientButton from '@/components/global/GradientButton';
+import ResumeUploader from '@/components/global/ResumeUploader';
 
 // Template data structure
 const availableTemplates = [
