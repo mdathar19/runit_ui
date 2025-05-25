@@ -40,9 +40,6 @@ export const enhanceHtml = createAsyncThunk(
   'resume/enhanceHtml',
   async (data, { rejectWithValue, getState, dispatch }) => {
     try {
-      console.log("templateHtml", data.templateHtml);
-      console.log("resumeJson", data.resumeJson);
-      
       const { auth } = getState();
       const token = auth.token;
       
@@ -51,8 +48,6 @@ export const enhanceHtml = createAsyncThunk(
         resumeJson: data.resumeJson,
         clientId: data.clientId // Pass socket client ID for progress updates
       };
-      
-      console.log("body", body);
       
       const encryptedPayload = encryptRequest(body);
       
@@ -71,7 +66,7 @@ export const enhanceHtml = createAsyncThunk(
       const responseData = await response.json();
       
       // Decrypt response if needed
-      const decrypted = typeof decryptResponse === 'function' ? decryptResponse(responseData) : responseData;
+      const decrypted = responseData;
       
       if (!response.ok) {
         return rejectWithValue(decrypted.message || 'Resume enhancement failed');
@@ -85,14 +80,109 @@ export const enhanceHtml = createAsyncThunk(
       
       return decrypted;
     } catch (error) {
-      console.error('enhanceHtml error:', error);
       return rejectWithValue('Network error, please try again');
     }
   }
 );
 
 const initialState = {
-  data: null,
+  data: {
+    "fullName": "MD ATHAR ALAM",
+    "email": "mdathar19@gmail.com",
+    "phone": "+91-8617852693",
+    "summary": "Over 4.2 years of experience in the developing User Interface Applications and professional Web Applications using REACT JS, REDUX, JAVASCRIPT, NODE JS, HTML & CSS.",
+    "skills": [
+        "JAVASCRIPT",
+        "ES6",
+        "REACT JS",
+        "NODE JS",
+        "MVC",
+        "GIT",
+        "AGILE",
+        "JSON",
+        "HTML",
+        "BOOTSTRAP",
+        "MATERIAL UI",
+        "TAILWIND",
+        "REST API",
+        "NPM",
+        "CSS",
+        "POSTMAN",
+        "REDUX",
+        "Express JS",
+        "Grape JS"
+    ],
+    "education": [
+        {
+            "institution": "MAKAUT",
+            "degree": "B.TECH - EE",
+            "fieldOfStudy": null,
+            "startYear": "2017",
+            "endYear": "21",
+            "description": null
+        }
+    ],
+    "experience": [
+        {
+            "company": "HASHCASH CONSULTANTS PVT. LTD.",
+            "position": "FULL STACK DEVELOPER- (MERN)",
+            "startDate": "JAN 2024",
+            "endDate": "Present",
+            "description": "Developed and designed highly responsive single-page applications (SPAs) using React.js.",
+            "location": null
+        },
+        {
+            "company": "IGLOBAL IMAPCT ITES PVT. LTD.",
+            "position": "REACT JS DEVELOPER",
+            "startDate": "OCT-2023",
+            "endDate": "JAN-2024",
+            "description": "Developed responsive pages using HTML, CSS, and JavaScript.",
+            "location": null
+        },
+        {
+            "company": "STEP TO SOFT PVT. LTD.",
+            "position": "FULL STACK DEVELOPER",
+            "startDate": "FEB-2021",
+            "endDate": "JULY-2023",
+            "description": "Created reusable components, Project initialization with React.js.",
+            "location": null
+        }
+    ],
+    "projects": [
+        {
+            "name": "Dynamic Financial Generation (DFG) Application",
+            "description": "A custom-built financial system for managing multi-company financial statements, projections, cash flow, balance sheets, and financial metrics.",
+            "technologies": [],
+            "url": null
+        },
+        {
+            "name": "Customer Relationship Management (CRM) Application",
+            "description": "Developed a comprehensive CRM application for sales management, facilitating lead generation, lifecycle tracking, and history management.",
+            "technologies": [],
+            "url": null
+        },
+        {
+            "name": "Website Builder Application",
+            "description": "Lead a team of 4 members to develop a dynamic website builder using React.js and GrapesJS, enabling users to create, modify and Make it Live websites quickly.",
+            "technologies": [],
+            "url": null
+        },
+        {
+            "name": "MeBookMeta",
+            "description": "Developed MeBook Meta, a platform connecting content creators with their audiences, allowing users to sell their work directly.",
+            "technologies": [],
+            "url": null
+        }
+    ],
+    "certifications": [],
+    "languages": [],
+    "socialLinks": {
+        "linkedin": null,
+        "github": null,
+        "website": null,
+        "others": []
+    }
+  },
   isLoading: false,
   error: null,
   fileName: null,

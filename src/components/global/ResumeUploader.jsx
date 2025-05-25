@@ -14,6 +14,7 @@ import {
 } from 'react-icons/fa';
 import { parseResume, resetResumeState, clearResumeData, setFileName } from '@/redux/slices/resumeSlice';
 import useReduxStore from '@/hooks/useReduxStore';
+import { publishedPortfolioUrl } from '@/api';
 
 const ResumeUploader = ({ isOpen, onClose, onUploadSuccess }) => {
   const dispatch = useDispatch();
@@ -72,7 +73,9 @@ const ResumeUploader = ({ isOpen, onClose, onUploadSuccess }) => {
     
     // Store file name and upload
     dispatch(setFileName(file.name));
-    dispatch(parseResume(file));
+    if(publishedPortfolioUrl !== 'http://localhost:3000'){
+      dispatch(parseResume(file));
+    }
   };
 
   // Handle click on upload button
