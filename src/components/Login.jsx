@@ -271,11 +271,6 @@ const Login = ({ isOpen, onClose, onLoginSuccess, nextAction }) => {
               
               <button
                 type="submit"
-                disabled={isLoading || 
-                  (step === 'email' && (!email || errors.email)) ||
-                  (step === 'password' && (!password || errors.password)) ||
-                  (step === 'otp' && (!otp || errors.otp))
-                }
                 className={`w-full flex items-center justify-center bg-gradient-to-r from-purple-600 to-violet-800 hover:from-purple-700 hover:to-violet-900 text-white font-medium py-3 px-4 rounded-lg transition-colors ${
                   isLoading || 
                   (step === 'email' && (!email || errors.email)) ||
