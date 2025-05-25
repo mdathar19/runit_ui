@@ -561,14 +561,14 @@ function EditorHeaders({
             </div>
             
             <div className="flex items-center space-x-2">
-            <GradientButton
+            {/* <GradientButton
                 className="flex items-center"
                 onClick={handleAIEnhance}
                 disabled={!socketId}
                 colors={['from-red-600', 'to-purple-500']}
               >
                 <FaCode className="mr-1.5" /> Enhance with AI
-              </GradientButton>
+              </GradientButton> */}
               <button 
                 className="bg-gray-800 hover:bg-gray-700 text-white rounded-md px-3 py-1.5 text-sm flex items-center"
                 onClick={handlePreview}
