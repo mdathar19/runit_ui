@@ -13,7 +13,7 @@ import {
   resetAuth 
 } from '@/redux/slices/authSlice';
 
-const Login = ({ isOpen, onClose, onLoginSuccess }) => {
+const Login = ({ isOpen, onClose, onLoginSuccess, nextAction }) => {
   const dispatch = useDispatch();
   const { 
     step, 
@@ -134,7 +134,7 @@ const Login = ({ isOpen, onClose, onLoginSuccess }) => {
             </div>
             
             <h2 className="text-2xl font-bold text-white mb-1">
-              {step === 'email' && 'Sign in to publish'}
+              {step === 'email' && `Sign in to ${nextAction}`}
               {step === 'password' && 'Enter your password'}
               {step === 'otp' && 'Verify your email'}
             </h2>

@@ -29,7 +29,8 @@ import { publishPortfolio, getUserPortfolios } from '@/redux/slices/portfolioSli
 import { setPopupConfig } from '@/redux/slices/messagePopSlice';
 import { portfolioUrl, publishedPortfolioUrl } from '@/api';
 import EditorHeaders from '@/components/editor/EditorHeaders';
-
+import HtmlEnhancementProgress from '@/components/editor/HtmlEnhancementProgress';
+import { updateIframeDOM } from '@/utils/Utils';
 function Editor({ templateId: propTemplateId }) {
   const router = useRouter();
   const params = useParams();
@@ -56,7 +57,10 @@ function Editor({ templateId: propTemplateId }) {
   } = useSelector((state) => state.auth);
   
   const iframeRef = useRef(null);
-
+  const [isIframeInitialized, setIsIframeInitialized] = useState(false);
+  const [lastTemplateHtml, setLastTemplateHtml] = useState('');
+  const updateTimeoutRef = useRef(null);
+  
   // Check if user is authenticated on mount
   useEffect(() => {
     dispatch(checkSession());
@@ -475,30 +479,6 @@ function Editor({ templateId: propTemplateId }) {
     }
   };
 
-  // Add this function to handle delete of selected element
-  const handleDeleteElement = () => {
-    const iframe = iframeRef.current;
-    if (!iframe || !selectedElement) return;
-    
-    const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
-    const element = iframeDocument.querySelector(`[data-editable="${selectedElement.id}"]`);
-    
-    if (element) {
-      // Visually remove the element
-      element.style.display = 'none';
-      
-      // Remove from Redux store
-      dispatch(deleteSelectedElement());
-      
-      // Show feedback
-      dispatch(setSavingStatus('saving'));
-      setTimeout(() => {
-        dispatch(setSavingStatus('saved'));
-        setTimeout(() => dispatch(setSavingStatus('')), 2000);
-      }, 1000);
-    }
-  };
-
   // If template ID is not set, show loading
   if (!templateId) {
     return (
@@ -510,7 +490,70 @@ function Editor({ templateId: propTemplateId }) {
       </div>
     );
   }
+  updateIframeDOM(templateHtml, iframeRef);
+// Main useEffect for handling template updates
+  useEffect(() => {
+    // Clear any pending updates
+    if (updateTimeoutRef.current) {
+      clearTimeout(updateTimeoutRef.current);
+    }
 
+    // Only proceed if we have valid HTML content
+    if (!templateHtml || templateHtml.length < 50) return;
+    
+    // If iframe isn't initialized yet, do initial load
+    if (!isIframeInitialized && iframeRef.current) {
+      const iframe = iframeRef.current;
+      const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+      
+      if (iframeDocument) {
+        // Initial load
+        iframeDocument.open();
+        iframeDocument.write(templateHtml);
+        iframeDocument.close();
+        
+        setLastTemplateHtml(templateHtml);
+        setIsIframeInitialized(true);
+        
+        // Initialize editor after a short delay
+        setTimeout(() => {
+          handleIframeLoad();
+        }, 200);
+      }
+      return;
+    }
+
+    // For subsequent updates, use DOM diffing
+    if (isIframeInitialized && templateHtml !== lastTemplateHtml) {
+      // Debounce updates to avoid too frequent DOM manipulations
+      updateTimeoutRef.current = setTimeout(() => {
+        const updatedHtml = updateIframeDOM(templateHtml, iframeRef);
+        const iframe = iframeRef.current;
+        const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+        
+        if (iframeDocument) {
+          iframeDocument.open();
+          iframeDocument.write(updatedHtml);
+          iframeDocument.close();
+          setLastTemplateHtml(updatedHtml);
+          
+          // Initialize editor after update
+          setTimeout(() => {
+            handleIframeLoad();
+          }, 200);
+        }
+      }, 100); // 100ms debounce
+    }
+  }, [templateHtml, isIframeInitialized]);
+
+    // Cleanup timeout on unmount
+    useEffect(() => {
+      return () => {
+        if (updateTimeoutRef.current) {
+          clearTimeout(updateTimeoutRef.current);
+        }
+      };
+    }, []);
   return (
     <div className="h-screen w-full bg-gray-900 flex flex-col">
       {/* Editor Toolbar */}
@@ -530,13 +573,22 @@ function Editor({ templateId: propTemplateId }) {
                 maxHeight: 'calc(100vh - 120px)'
               }}
             >
-              {templateHtml && (
+              {templateHtml?.length > 50 ? (
                 <iframe
                   ref={iframeRef}
-                  src={templateHtml}
+                  className="w-full h-full border-0"
+                  title="Template Preview"
+                  sandbox="allow-scripts allow-same-origin"
+                  // No src or srcdoc - content will be injected via DOM
+                />
+              ) : (
+                <iframe
+                  ref={iframeRef}
+                  src={templateHtml} // Keep src for URLs
                   className="w-full h-full border-0"
                   onLoad={handleIframeLoad}
                   title="Template Preview"
+                  sandbox="allow-scripts allow-same-origin"
                 />
               )}
               
@@ -592,7 +644,7 @@ function Editor({ templateId: propTemplateId }) {
           </div>
         </div>
       </div>
-      
+      <HtmlEnhancementProgress />
       
     </div>
   );

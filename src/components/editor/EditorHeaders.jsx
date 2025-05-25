@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation';
 import { FaDesktop, FaTabletAlt, FaMobileAlt, FaUndo, FaRedo, FaCode, FaEye, FaSave, FaUpload } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
@@ -13,6 +13,9 @@ import { publishPortfolio } from '@/redux/slices/portfolioSlice';
 import { setPopupConfig } from '@/redux/slices/messagePopSlice';
 import { publishedPortfolioUrl } from '@/api';
 import Login from '../Login';
+import ResumeUploader from '../global/ResumeUploader';
+import { enhanceHtml } from '@/redux/slices/resumeSlice';
+import { selectSocketId } from '@/redux/slices/compilerSlice';
 
 function EditorHeaders({ 
     iframeRef
@@ -32,15 +35,22 @@ function EditorHeaders({
   const {
         isAuthenticated
     } = useSelector((state) => state.auth);
+    const {
+      data
+    } = useSelector(state => state.resume);
+    const socketId = useSelector(selectSocketId);
     const [showLoginModal, setShowLoginModal] = useState(false);
     const [templateZipBlob, setTemplateZipBlob] = useState(null);
     const [showWebsiteNameModal, setShowWebsiteNameModal] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-  
+    const [showResumeUploaderModal, setShowResumeUploaderModal] = useState(false);
+    const [nextAction, setNextAction] = useState(null);
+
     // Handle export/publish template as ZIP
     const handleExport = async () => {
         if (!isAuthenticated) {
           // Show login modal
+          setNextAction('Publish');
           setShowLoginModal(true);
           return;
         }
@@ -271,29 +281,32 @@ function EditorHeaders({
           setTimeout(() => dispatch(setSavingStatus('')), 3000);
         }
       };
+    const extractHtmlContent = () => {
+      const iframe = iframeRef.current;
+      if (!iframe) return;
+      
+      const iframeWindow = iframe.contentWindow;
+      const iframeDocument = iframe.contentDocument || iframeWindow.document;
+      
+      // Clone the document to remove editor-specific elements/styles
+      const previewContent = iframeDocument.documentElement.cloneNode(true);
+      
+      // Remove editor-specific attributes and styles
+      previewContent.querySelectorAll('[data-editable]').forEach(el => {
+      el.removeAttribute('data-editable');
+      el.removeAttribute('data-editable-type');
+      el.classList.remove('selected');
+      });
+      return previewContent;
+    }
     // Preview in new tab
     const handlePreview = () => {
-        const iframe = iframeRef.current;
-        if (!iframe) return;
-        
-        const iframeWindow = iframe.contentWindow;
-        const iframeDocument = iframe.contentDocument || iframeWindow.document;
-        
-        // Clone the document to remove editor-specific elements/styles
-        const previewContent = iframeDocument.documentElement.cloneNode(true);
-        
-        // Remove editor-specific attributes and styles
-        previewContent.querySelectorAll('[data-editable]').forEach(el => {
-        el.removeAttribute('data-editable');
-        el.removeAttribute('data-editable-type');
-        el.classList.remove('selected');
-        });
-        
-        // Create a new window with the cleaned content
-        const previewWindow = window.open('', '_blank');
-        previewWindow.document.write('<!DOCTYPE html>');
-        previewWindow.document.write(previewContent.outerHTML);
-        previewWindow.document.close();
+      const previewContent = extractHtmlContent();
+      // Create a new window with the cleaned content
+      const previewWindow = window.open('', '_blank');
+      previewWindow.document.write('<!DOCTYPE html>');
+      previewWindow.document.write(previewContent.outerHTML);
+      previewWindow.document.close();
     };
 
     // Handle undo/redo
@@ -438,16 +451,56 @@ function EditorHeaders({
         setTemplateZipBlob(null);
         }
     };
-
+    const handleAIEnhance = () => {
+      if(isAuthenticated) {
+        setShowResumeUploaderModal(true);
+      } else {
+        setNextAction('Enhance with AI');
+        setShowLoginModal(true);
+        return;
+      }
+    };
     // Handle successful login
     const handleLoginSuccess = (token) => {
         setShowLoginModal(false);
         // No need to manually set auth state as it's handled in the redux slice
         // Continue with export if that's what user was trying to do
         if (token) {
-        handleExport();
+          if(nextAction === 'Enhance with AI') {
+            handleAIEnhance();
+          } else {
+            handleExport();
+          }
         }
     };
+
+    const handleResumeUploaded = (resume) => {
+      console.log('resume--->', resume);
+      const previewContent = extractHtmlContent();
+      if (previewContent && resume && socketId) {
+        setShowResumeUploaderModal(false)
+        dispatch(enhanceHtml({
+          templateHtml: previewContent.outerHTML,
+          resumeJson: resume,
+          clientId: socketId, // Pass socket ID for progress updates
+          useSocketProgress: true // Flag to use Socket.IO for progress
+        }));
+      }
+    }; 
+  /*   useEffect(() => {
+      const previewContent = extractHtmlContent();
+      dispatch(enhanceHtml({
+        resumeJson: data,
+        templateHtml: previewContent.outerHTML
+      }))
+      .unwrap() // This will help catch any errors
+      .then((result) => {
+        console.log('Enhancement successful:', result);
+      })
+      .catch((error) => {
+        console.error('Enhancement failed:', error);
+      });
+    }, []); */
   return (
         <header className="bg-gray-900 border-b border-gray-800 px-4 py-2">
         <div className="flex items-center justify-between">
@@ -508,9 +561,14 @@ function EditorHeaders({
             </div>
             
             <div className="flex items-center space-x-2">
-              <button className="bg-gray-800 hover:bg-gray-700 text-white rounded-md px-3 py-1.5 text-sm flex items-center">
-                <FaCode className="mr-1.5" /> Code
-              </button>
+            <GradientButton
+                className="flex items-center"
+                onClick={handleAIEnhance}
+                disabled={!socketId}
+                colors={['from-red-600', 'to-purple-500']}
+              >
+                <FaCode className="mr-1.5" /> Enhance with AI
+              </GradientButton>
               <button 
                 className="bg-gray-800 hover:bg-gray-700 text-white rounded-md px-3 py-1.5 text-sm flex items-center"
                 onClick={handlePreview}
@@ -545,6 +603,13 @@ function EditorHeaders({
             isOpen={showLoginModal}
             onClose={() => setShowLoginModal(false)}
             onLoginSuccess={handleLoginSuccess}
+            nextAction={nextAction}
+        />
+        {/* Enhance with AI Modal */}
+        <ResumeUploader
+            isOpen={showResumeUploaderModal}
+            onClose={() => setShowResumeUploaderModal(false)}
+            onUploadSuccess={handleResumeUploaded}
         />
         </header>
   )

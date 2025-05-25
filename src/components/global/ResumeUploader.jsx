@@ -43,7 +43,7 @@ const ResumeUploader = ({ isOpen, onClose, onUploadSuccess }) => {
     if (isOpen && data) {
       onUploadSuccess(data);
     }
-  }, [isOpen, data, onUploadSuccess]);
+  }, [isOpen, data]);
 
   // Handle file validation and upload
   const handleFileChange = (event) => {
