@@ -6,34 +6,55 @@ import { FaLayerGroup, FaImage } from 'react-icons/fa';
 import { ELEMENT_TYPES } from '@/utils/Utils';
 import GradientButton from '@/components/global/GradientButton';
 import { updateElementContent, setSavingStatus, selectSelectedElement, deleteSelectedElement } from '@/redux/slices/editorSlice';
+import api, { publishedPortfolioUrl }  from '@/api';
 
 const RenderElementEditor = ({ iframeRef }) => {
   const dispatch = useDispatch();
   const selectedElement = useSelector(selectSelectedElement);
-  
+  const {
+    token
+  } = useSelector((state) => state.auth);
   // Handle image upload
   const handleImageUpload = (callback) => {
     // Create a file input element
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
     fileInput.accept = 'image/*';
-    
+
     // When a file is selected
-    fileInput.onchange = (e) => {
+    fileInput.onchange = async (e) => {
       const file = e.target.files[0];
       if (!file) return;
       
-      // In a real implementation, you would upload the file to your server/CDN
-      // and get a URL back. For this demo, we'll use a local object URL.
       dispatch(setSavingStatus('saving'));
       
-      // Simulate upload delay
-      setTimeout(() => {
-        const imageUrl = URL.createObjectURL(file);
-        callback(imageUrl);
-        dispatch(setSavingStatus('saved'));
+      try {
+        // Create form data
+        const formData = new FormData();
+        formData.append('image', file);
+
+        // Upload image using the API
+        const response = await fetch(api.uploadImage, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          },
+          body: formData
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          callback(publishedPortfolioUrl+data.imageUrl);
+          dispatch(setSavingStatus('saved'));
+          setTimeout(() => dispatch(setSavingStatus('')), 2000);
+        } else {
+          throw new Error(data.message || 'Failed to upload image');
+        }
+      } catch (error) {
+        console.error('Error uploading image:', error);
+        dispatch(setSavingStatus('error'));
         setTimeout(() => dispatch(setSavingStatus('')), 2000);
-      }, 1500);
+      }
     };
     
     // Trigger the file selection dialog

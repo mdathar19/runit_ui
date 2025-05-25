@@ -4,7 +4,7 @@ const getBaseUrl = () => {
       if (window.location.hostname === 'localhost') {
         return 'http://localhost:3000';
       } else {
-        return 'https://website.runit.in'; // Empty base URL, use relative path in production
+        return 'https://api.runit.in'; // Empty base URL, use relative path in production
       }
     } else {
       // Running in server-side rendering (optional handling)
@@ -40,6 +40,9 @@ export const publishedPortfolioUrl = `${getBaseUrl()}`;
     publishPortfolio: `${baseUrl}/v1/publish-portfolio`,
     getUserPortfolios: `${baseUrl}/v1/user-portfolios`,
     checkWebsiteName: `${baseUrl}/v1/check-website-name`,
+    extractResume: `${baseUrl}/v1/parse-resume`,
+    enhanceHtml: `${baseUrl}/v1/enhance-html`,
+    uploadImage: `${baseUrl}/v1/upload-image`,
   };
   
   export default apis;

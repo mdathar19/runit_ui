@@ -453,3 +453,136 @@ export const getSavingStatusIndicator = (savingStatus) => {
         return null;
     }
   };
+
+// Helper function to create a temporary DOM from HTML string
+export const createTempDOM = (htmlString) => {
+  const parser = new DOMParser();
+  return parser.parseFromString(htmlString, 'text/html');
+};
+
+// Helper function to update node content without losing event listeners
+export const updateNodeContent = (targetNode, sourceNode) => {
+  // Skip if nodes are the same type and have same content
+  if (targetNode.tagName === sourceNode.tagName && 
+      targetNode.innerHTML === sourceNode.innerHTML) {
+    return;
+  }
+
+  // Update text content for text nodes
+  if (sourceNode.nodeType === Node.TEXT_NODE) {
+    if (targetNode.textContent !== sourceNode.textContent) {
+      targetNode.textContent = sourceNode.textContent;
+    }
+    return;
+  }
+
+  // Update element attributes
+  if (sourceNode.attributes) {
+    Array.from(sourceNode.attributes).forEach(attr => {
+      if (targetNode.getAttribute(attr.name) !== attr.value) {
+        targetNode.setAttribute(attr.name, attr.value);
+      }
+    });
+
+    // Remove attributes that don't exist in source
+    Array.from(targetNode.attributes).forEach(attr => {
+      if (!sourceNode.hasAttribute(attr.name) && 
+          !attr.name.startsWith('data-editable')) { // Preserve editor attributes
+        targetNode.removeAttribute(attr.name);
+      }
+    });
+  }
+
+  // Update innerHTML only if it's different and not an editable element
+  if (!targetNode.hasAttribute('data-editable') && 
+      targetNode.innerHTML !== sourceNode.innerHTML) {
+    targetNode.innerHTML = sourceNode.innerHTML;
+  }
+};
+
+// Smart DOM update function
+export const updateIframeDOM = (newHtmlString, iframeRef) => {
+  if (!iframeRef.current) return newHtmlString;
+  
+  try {
+    // Create temporary DOM from new HTML
+    const tempDoc = createTempDOM(newHtmlString);
+    
+    // Update title if changed
+    if (tempDoc.title) {
+      tempDoc.title = tempDoc.title;
+    }
+
+    // Get the current iframe document to preserve editor styles
+    const iframe = iframeRef.current;
+    const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+    
+    if (iframeDocument) {
+      // Preserve editor styles and FontAwesome
+      const editorStyles = iframeDocument.querySelector('style');
+      const fontAwesomeLink = iframeDocument.querySelector('link[href*="font-awesome"]');
+      
+      if (editorStyles) {
+        const newStyle = tempDoc.createElement('style');
+        newStyle.textContent = editorStyles.textContent;
+        tempDoc.head.appendChild(newStyle);
+      }
+      
+      if (fontAwesomeLink) {
+        const newLink = tempDoc.createElement('link');
+        newLink.rel = 'stylesheet';
+        newLink.href = fontAwesomeLink.href;
+        tempDoc.head.appendChild(newLink);
+      }
+
+      // Preserve editable elements and their attributes
+      const editableElements = iframeDocument.querySelectorAll('[data-editable]');
+      editableElements.forEach(el => {
+        const xpath = getElementXPath(el);
+        const matchingEl = getElementByXPath(xpath, tempDoc);
+        if (matchingEl) {
+          matchingEl.setAttribute('data-editable', el.getAttribute('data-editable'));
+          matchingEl.setAttribute('data-editable-type', el.getAttribute('data-editable-type'));
+          if (el.classList.contains('selected')) {
+            matchingEl.classList.add('selected');
+          }
+        }
+      });
+    }
+
+    // Return the complete updated HTML
+    const serializer = new XMLSerializer();
+    const htmlString = serializer.serializeToString(tempDoc);
+    return htmlString;
+  } catch (error) {
+    console.error('Error updating iframe DOM:', error);
+    return newHtmlString;
+  }
+};
+
+// Helper function to get XPath of an element
+const getElementXPath = (element) => {
+  if (!element) return '';
+  
+  let xpath = '';
+  for (; element && element.nodeType == 1; element = element.parentNode) {
+    let idx = 1;
+    for (let sibling = element.previousSibling; sibling; sibling = sibling.previousSibling) {
+      if (sibling.nodeType == 1 && sibling.tagName == element.tagName) idx++;
+    }
+    const xname = element.tagName.toLowerCase();
+    if (idx > 1) xpath = '/' + xname + '[' + idx + ']' + xpath;
+    else xpath = '/' + xname + xpath;
+  }
+  return xpath;
+};
+
+// Helper function to find element by XPath
+const getElementByXPath = (xpath, doc) => {
+  try {
+    return doc.evaluate(xpath, doc, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+  } catch (e) {
+    console.error('Error finding element by XPath:', e);
+    return null;
+  }
+};

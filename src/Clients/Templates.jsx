@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { FaEdit, FaEye, FaCode } from 'react-icons/fa';
 import GradientButton from '@/components/global/GradientButton';
+import ResumeUploader from '@/components/global/ResumeUploader';
 
 // Template data structure
 const availableTemplates = [
@@ -19,6 +20,15 @@ const availableTemplates = [
     tags: ['portfolio', 'developer', 'professional']
   },
   {
+    id: 'engineer-template2',
+    name: 'Engineer Portfolio 2',
+    category: 'professional',
+    thumbnail: '/assets/portfolio-sample2.png', // Create a preview image for the template
+    path: '/templates/engineer/template-2',
+    description: 'A clean, modern portfolio template for engineers and developers',
+    tags: ['portfolio', 'developer', 'professional']
+  },
+  {
     id: 'eventmanagement-athar',
     name: 'Event Management',
     category: 'portfolio',
@@ -26,7 +36,8 @@ const availableTemplates = [
     path: '/templates/eventmanagement/athar',
     description: 'Sleek dark-themed portfolio with minimalist design',
     tags: ['minimal', 'dark', 'creative']
-  }
+  },
+  
 ];
 
 // Categories for filtering
