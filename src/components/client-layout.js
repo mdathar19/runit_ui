@@ -4,6 +4,7 @@ import { Suspense, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import NextTopLoader from 'nextjs-toploader';
 import MessagePopup from './JsCompiler/MessagePopup';
+import PaymentAlert from './global/PaymentAlert';
 // Loading fallback component
 const LoadingFallback = () => (
   <div className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-blue-500 animate-pulse"></div>
@@ -60,6 +61,7 @@ function ClientLayout({ children }) {
       />
         <Suspense fallback={<LoadingFallback />}>
           <MessagePopup />
+          <PaymentAlert />
           {children}
         </Suspense>
     </>

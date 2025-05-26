@@ -59,7 +59,6 @@ export const createOrder = createAsyncThunk(
       });
       
       const data = await response.json();
-      console.log("data",data);
       
       if (!data.success) {
         return rejectWithValue(data.message || 'Failed to create order');

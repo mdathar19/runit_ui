@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import LuxuryButton from '@/components/global/LuxuryButton';
 import useCurrencyConverter from '@/hooks/useCurrencyConverter';
+import { setPopupConfig } from '@/redux/slices/messagePopSlice';
 
 function Plans() {
   const dispatch = useDispatch();
@@ -68,9 +69,16 @@ function Plans() {
       const result = await dispatch(createOrder({ planId: plan._id })).unwrap();
       if (result.success) {
         initializeRazorpay(result);
+      }else{
+        dispatch(setPopupConfig({
+          message: result.message
+        }));
       }
     } catch (error) {
-      console.error('Error creating order:', error);
+      dispatch(setPopupConfig({
+        message: error
+      }));
+      /* console.error('Error creating order:', error); */
     } finally {
       setIsProcessing(false);
     }

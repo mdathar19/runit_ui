@@ -645,7 +645,6 @@ function Editor({ templateId: propTemplateId }) {
         </div>
       </div>
       <HtmlEnhancementProgress />
-      <PaymentAlert />
     </div>
   );
 }

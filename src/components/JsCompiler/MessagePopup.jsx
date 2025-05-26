@@ -23,9 +23,9 @@ const MessagePopup = ({
   // Determine whether to use local props or global state
   const popupConfig = useLocalState ? {
     message: message || "Check out our latest features!",
-    imageUrl: imageUrl || "/api/placeholder/80/80",
-    linkText: linkText || "Learn More",
-    linkUrl: linkUrl || "#",
+    imageUrl: imageUrl || "/favicon_io/android-chrome-192x192.png",
+    linkText: linkText,
+    linkUrl: linkUrl,
     duration: duration !== undefined ? duration : 7000,
     show: show !== undefined ? show : true
   } : globalPopupState;
