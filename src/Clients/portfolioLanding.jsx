@@ -161,11 +161,11 @@ const PortfolioLanding = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
             >
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
+              <h1 className="font-luxury text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
                 Create your <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">professional portfolio</span> in minutes
               </h1>
               <p className="text-xl text-gray-300 mb-8">
-                Choose a beautiful design, fill in your details, and publish your portfolio instantly. No coding required.
+                Choose a beautiful design, Upload your resume, and publish your portfolio instantly. No coding required.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <GradientButton
@@ -315,7 +315,7 @@ const PortfolioLanding = () => {
               </div>
               <h3 className="text-xl font-semibold mb-4">Add Your Content</h3>
               <p className="text-gray-400">
-                Fill in your information, upload your work, and customize colors and fonts to match your personal brand
+                Upload your Resume, and customize colors and fonts to match your personal brand
               </p>
             </motion.div>
             

@@ -5,6 +5,12 @@ import { ArrowRight, Play } from 'lucide-react';
 
 
 const CtaSection = () => {
+    const handleCodingFree = (href) => {
+        window.open(href, '_blank');
+      };
+    const handleViewSamples = (href) => {
+        window.open(href, '_blank');
+      };
     return (
         <section className="py-20 bg-gradient-to-r from-purple-900/20 to-pink-900/20 relative overflow-hidden">
         <div className="absolute inset-0" style={{
@@ -15,7 +21,7 @@ const CtaSection = () => {
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
             <motion.h2 
-              className="text-3xl md:text-5xl font-bold mb-6"
+              className="font-elegant text-3xl md:text-5xl font-bold mb-6"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -40,16 +46,18 @@ const CtaSection = () => {
               transition={{ duration: 0.6, delay: 0.4 }}
             >
               <motion.button
-                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-4 px-8 rounded-lg transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-xl"
+                className="cursor-pointer bg-gradient-to-r from-purple-600 to-violet-800 hover:from-purple-700 hover:to-violet-900 text-white font-semibold py-4 px-8 rounded-lg transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-xl"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => handleCodingFree('/portfolio/templates-list')}
               >
                 Start Building Now <ArrowRight className="ml-2 h-5 w-5" />
               </motion.button>
               <motion.button
-                className="border border-gray-600 hover:border-gray-500 text-white font-semibold py-4 px-8 rounded-lg transition-all duration-300 flex items-center justify-center backdrop-blur-sm bg-gray-800/20"
+                className="cursor-pointer border border-gray-600 hover:border-gray-500 text-white font-semibold py-4 px-8 rounded-lg transition-all duration-300 flex items-center justify-center backdrop-blur-sm bg-gray-800/20"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => handleViewSamples('/templates/eventmanagement/athar/index.html')}
               >
                 <Play className="mr-2 h-5 w-5" /> Watch Demo
               </motion.button>

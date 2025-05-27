@@ -10,7 +10,7 @@ const HowItWorks = () => {
     <section className="py-20 bg-black/40">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">From Idea to Deployment in <span className="text-purple-400">3 Steps</span></h2>
+            <h2 className="font-elegant text-3xl md:text-4xl font-bold mb-4">From Idea to Deployment in <span className="text-purple-400">3 Steps</span></h2>
             <p className="text-xl text-gray-300">See how easy it is to go from concept to live project</p>
           </div>
           
@@ -39,7 +39,7 @@ const HowItWorks = () => {
               }
             ].map((step, index) => (
               <motion.div
-                key={index}
+                key={"step_"+index}
                 className="relative"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -51,7 +51,7 @@ const HowItWorks = () => {
                     {React.cloneElement(step.icon, { className: "h-8 w-8 text-white" })}
                   </div>
                   <div className="text-4xl font-bold text-purple-400 mb-4">{step.step}</div>
-                  <h3 className="text-xl font-semibold mb-4">{step.title}</h3>
+                  <h3 className="font-elegant text-xl font-semibold mb-4">{step.title}</h3>
                   <p className="text-gray-400">{step.description}</p>
                 </div>
                 

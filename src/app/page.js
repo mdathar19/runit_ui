@@ -1,31 +1,24 @@
 import RunItLanding from "@/Clients/RunItLanding";
-import MadeByAthar from "@/components/global/MadeByAthar";
-
+import Navigation from "@/components/landing/Naviation";
 // SEO metadata
 export const metadata = {
-  title: 'RunIt - AI-Powered Online Code Editor & Snippet Creator',
+  title: 'RunIt - Online Compiler | AI Code Assistant, Snippet & Portfolio Creator',
   description:
-    'RunIt is a fast, lightweight, and beautiful online code editor that supports multiple programming languages, instant AI code suggestions, and stunning snippet creation with themes.',
+    'RunIt is your all-in-one online Compiler that lets you write and compile code in 7 languages, generate AI-assisted code, create beautiful code snippets, and Create professional portfolios in minutes.',
   keywords:
-    'online code editor, code snippet generator, AI code assistant, multi-language compiler, JavaScript compiler, Python compiler, code formatter, beautiful code snippets, runit editor',
+    'online Compiler, AI code assistant, code snippet generator, portfolio creator, multi-language compiler, online code editor, JavaScript compiler, Python compiler, code sharing, developer portfolio, runit',
 
   openGraph: {
-    title: 'RunIt - AI-Powered Online Code Editor & Snippet Creator',
+    title: 'RunIt – Online Compiler | AI Code Assistant, Snippet & Portfolio Creator',
     description:
-      'RunIt is a fast, lightweight, and beautiful online code editor that supports multiple programming languages, instant AI code suggestions, and stunning snippet creation with themes.',
+      'Write and compile code in 7 languages, use AI to generate code, create and share beautiful snippets, and Create professional portfolios in minutes.',
     images: [
       {
-        url: '/runit-home1.png',
-        width: 1200,
-        height: 630,
+        url: '/runIt-SEO.png',
+        width: 600,
+        height: 400,
         alt: 'RunIt Code AI-assist Preview',
-      },
-      {
-        url: '/runit-home2.png',
-        width: 1200,
-        height: 630,
-        alt: 'RunIt Code snippet Preview',
-      },
+      }
     ],
     type: 'website',
     url: 'https://runit.in',
@@ -33,10 +26,10 @@ export const metadata = {
 
   twitter: {
     card: 'summary_large_image',
-    title: 'RunIt - AI-Powered Online Code Editor & Snippet Creator',
+    title: 'RunIt – Online Compiler | AI Code Assistant, Snippet & Portfolio Creator',
     description:
-      'Write and compile code in multiple languages. Generate beautiful, shareable snippets effortlessly with RunIt.',
-    images: ['/runit-home1.png'],
+      'Experience coding like never before with RunIt: an online Compiler for 7 languages, AI-assisted coding, snippet creation, and Create professional portfolios in minutes.',
+    images: ['/runIt-SEO.png'],
   },
 
   alternates: {
@@ -45,10 +38,12 @@ export const metadata = {
 };
 
 
+
 export default function Home() {
   return (
     <>
     {/* <MadeByAthar /> */}
+    <Navigation />
     <RunItLanding/>
     </>
   );

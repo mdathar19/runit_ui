@@ -7,15 +7,14 @@ import HeroSection from '@/components/landing/HeroSection';
 import Footer from '@/components/landing/Footer';
 import Features from '@/components/landing/Features';
 import Navigation from '@/components/landing/Naviation';
+import FeaturesShowcase from '@/components/landing/FeaturesShowcase';
 
 const RunItLanding = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-black to-gray-900 text-white overflow-hidden">
-      <Navigation />
       {/* Hero Section */}
       <HeroSection />
-
       {/* Stats Section */}
       <StatsSection />
 
@@ -29,7 +28,7 @@ const RunItLanding = () => {
      <Testimonial />
 
       {/* Pricing */}
-      <Pricing />
+      {/* <Pricing /> */}
 
       {/* CTA Section */}
       <CtaSection />

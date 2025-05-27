@@ -13,19 +13,35 @@ const HeroSection = () => {
     
     // Typing animation effect
     useEffect(() => {
-      setIsVisible(true);
-      const text = "write a function to find duplicates in an array";
-      let index = 0;
-      const timer = setInterval(() => {
-        if (index <= text.length) {
-          setTypedText(text.slice(0, index));
-          index++;
-        } else {
-          clearInterval(timer);
-        }
-      }, 100);
-      return () => clearInterval(timer);
-    }, []);
+        setIsVisible(true);
+      
+        const contents = [
+          "find duplicates",
+          "bubble_sort example",
+          "factorial function",
+        ];
+      
+        let contentIndex = 0;
+        let charIndex = 0;
+        let currentText = contents[contentIndex];
+      
+        const typeInterval = setInterval(() => {
+          if (charIndex <= currentText.length) {
+            setTypedText(currentText.slice(0, charIndex));
+            charIndex++;
+          } else {
+            // Wait 1 second before switching to the next content
+            setTimeout(() => {
+              contentIndex = (contentIndex + 1) % contents.length;
+              currentText = contents[contentIndex];
+              charIndex = 0;
+            }, 2000);
+          }
+        }, 100);
+      
+        return () => clearInterval(typeInterval);
+      }, []);
+      
   
     // Auto-rotate features
     useEffect(() => {
@@ -34,6 +50,12 @@ const HeroSection = () => {
       }, 4000);
       return () => clearInterval(interval);
     }, [features.length]);
+    const handleCodingFree = (href) => {
+        window.open(href, '_blank');
+      };
+    const handleViewSamples = (href) => {
+        window.open(href, '_blank');
+      };
   return (
     <div>
       <motion.section 
@@ -65,7 +87,7 @@ const HeroSection = () => {
                 </span>
               </div>
               
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
+              <h1 className="font-elegant text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
                 Code, Create, and 
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-500 to-cyan-400"> Deploy</span> in Minutes
               </h1>
@@ -76,7 +98,8 @@ const HeroSection = () => {
               
               <div className="flex flex-col sm:flex-row gap-4 mb-8">
                 <motion.button
-                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-xl"
+                  onClick={() => handleCodingFree('/compiler/python')}
+                  className="cursor-pointer bg-gradient-to-r from-purple-600 to-violet-800 hover:from-purple-700 hover:to-violet-900 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-xl"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -84,7 +107,8 @@ const HeroSection = () => {
                 </motion.button>
                 
                 <motion.button
-                  className="border border-gray-600 hover:border-gray-500 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300 flex items-center justify-center backdrop-blur-sm bg-gray-800/20"
+                  onClick={() => handleViewSamples('/templates/eventmanagement/athar/index.html')}
+                  className="cursor-pointer border border-gray-600 hover:border-gray-500 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300 flex items-center justify-center backdrop-blur-sm bg-gray-800/20"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >

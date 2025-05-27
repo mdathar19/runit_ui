@@ -176,18 +176,18 @@ export const codeExamples = [
   
   export const landingNnavigationItems = [
     {
-      name: 'Snippet Creator',
+      name: 'Create Snippet',
       href: '/create-snippet',
       icon: <Code className="h-4 w-4" />,
       gradient: 'from-purple-500 to-pink-500',
       description: 'Create beautiful code snippets'
     },
     {
-      name: 'Portfolio Builder',
+      name: 'Host Portfolio',
       href: '/portfolio/create',
       icon: <Palette className="h-4 w-4" />,
       gradient: 'from-blue-500 to-cyan-500',
-      description: 'Build stunning portfolios'
+      description: 'Host stunning portfolios'
     },
     {
       name: 'Online Compiler',
