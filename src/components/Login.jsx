@@ -24,22 +24,13 @@ const Login = ({ isOpen, onClose, onLoginSuccess, nextAction }) => {
     token 
   } = useSelector(state => state.auth);
 
-  // Setup react-hook-form with validation
-  const { 
-    register, 
-    handleSubmit, 
-    formState: { errors }, 
-    setFocus,
-    reset,
-    watch
-  } = useForm({
-    defaultValues: {
-      email: '',
-      password: '',
-      otp: ''
-    }
-  });
-
+const { register, handleSubmit, formState: { errors }, setFocus, reset, watch, setValue } = useForm({
+  defaultValues: {
+    email: '',
+    password: '',
+    otp: ''
+  }
+});
   // Reset form when modal is opened
   useEffect(() => {
     if (isOpen) {
@@ -73,6 +64,7 @@ const Login = ({ isOpen, onClose, onLoginSuccess, nextAction }) => {
     } else if (step === 'password') {
       dispatch(loginUser({ email: data.email, password: data.password }));
     } else if (step === 'otp') {
+      console.log({ email: data.email, otp: data.otp })
       dispatch(verifyOtp({ email: data.email, otp: data.otp }));
     }
   };
@@ -250,7 +242,7 @@ const Login = ({ isOpen, onClose, onLoginSuccess, nextAction }) => {
                     } rounded-lg py-3 px-4 text-white text-center text-xl tracking-widest font-mono focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent`}
                     placeholder="000000"
                     maxLength={6}
-                    {...register('otp', { 
+                    {...register('otp', {
                       required: 'OTP is required',
                       pattern: {
                         value: /^[0-9]{6}$/,
@@ -258,9 +250,8 @@ const Login = ({ isOpen, onClose, onLoginSuccess, nextAction }) => {
                       }
                     })}
                     onChange={(e) => {
-                      const value = e.target.value;
-                      // Only allow numbers
-                      e.target.value = value.replace(/[^0-9]/g, '');
+                      const value = e.target.value.replace(/[^0-9]/g, '');
+                      setValue('otp', value);
                     }}
                   />
                   {errors.otp && (
@@ -274,8 +265,8 @@ const Login = ({ isOpen, onClose, onLoginSuccess, nextAction }) => {
                 className={`w-full flex items-center justify-center bg-gradient-to-r from-purple-600 to-violet-800 hover:from-purple-700 hover:to-violet-900 text-white font-medium py-3 px-4 rounded-lg transition-colors ${
                   isLoading || 
                   (step === 'email' && (!email || errors.email)) ||
-                  (step === 'password' && (!password || errors.password)) ||
-                  (step === 'otp' && (!otp || errors.otp))
+                  (step === 'password' && (!password)) ||
+                  (step === 'otp' && (!otp))
                     ? 'opacity-70 cursor-not-allowed'
                     : ''
                 }`}
