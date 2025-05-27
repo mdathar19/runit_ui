@@ -47,6 +47,7 @@ function Plans() {
   }, [dispatch]);
 
   const handlePlanSelect = async (plan) => {
+    return alert('We are working on it...');
     if (!isAuthenticated) {
       router.push('/login');
       return;
