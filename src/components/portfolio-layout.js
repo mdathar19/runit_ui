@@ -3,24 +3,21 @@
 import { Suspense, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import NextTopLoader from 'nextjs-toploader';
-import MessagePopup from './JsCompiler/MessagePopup';
-import PaymentAlert from './global/PaymentAlert';
 // Loading fallback component
 const LoadingFallback = () => (
   <div className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-blue-500 animate-pulse"></div>
 );
 
 // Client-side layout component with navigation optimizations
-function ClientLayout({ children }) {
+function PortfolioLayout({ children }) {
   const pathname = usePathname();
   // Add prefetching for common routes
   useEffect(() => {
     // Prefetch critical pages that users might navigate to
     const prefetchLinks = [
-      '/',
-      '/python', 
-      '/create-snippet',
-      '/portfolio/create'
+        '/portfolio/templates-list',
+        '/portfolio/plans',
+        '/portfolio/editor/[templateId]'
     ];
     
     const link = document.createElement('link');
@@ -54,12 +51,10 @@ function ClientLayout({ children }) {
         speed={200} 
       />
         <Suspense fallback={<LoadingFallback />}>
-          <MessagePopup />
-          <PaymentAlert />
           {children}
         </Suspense>
     </>
   );
 }
 
-export default ClientLayout
+export default PortfolioLayout

@@ -1,16 +1,15 @@
-import RunItLanding from "@/Clients/RunItLanding";
-import MadeByAthar from "@/components/global/MadeByAthar";
+import PrivacyPolicy from "@/Clients/PrivacyPolicy";
 
 // SEO metadata
 export const metadata = {
-  title: 'RunIt - AI-Powered Online Code Editor & Snippet Creator',
+  title: 'RunIt - AI-Powered Online Portfolio Builder, Code Editor & Snippet Creator',
   description:
     'RunIt is a fast, lightweight, and beautiful online code editor that supports multiple programming languages, instant AI code suggestions, and stunning snippet creation with themes.',
   keywords:
-    'online code editor, code snippet generator, AI code assistant, multi-language compiler, JavaScript compiler, Python compiler, code formatter, beautiful code snippets, runit editor',
+    'online Portfolio Builder, code editor, code snippet generator, AI code assistant, multi-language compiler, JavaScript compiler, Python compiler, code formatter, beautiful code snippets, runit editor',
 
   openGraph: {
-    title: 'RunIt - AI-Powered Online Code Editor & Snippet Creator',
+    title: 'RunIt - AI-Powered Online Portfolio Builder, Code Editor & Snippet Creator',
     description:
       'RunIt is a fast, lightweight, and beautiful online code editor that supports multiple programming languages, instant AI code suggestions, and stunning snippet creation with themes.',
     images: [
@@ -49,7 +48,7 @@ export default function Home() {
   return (
     <>
     {/* <MadeByAthar /> */}
-    <RunItLanding/>
+    <PrivacyPolicy   />
     </>
   );
 }

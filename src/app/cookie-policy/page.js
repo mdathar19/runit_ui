@@ -1,5 +1,4 @@
-import RunItLanding from "@/Clients/RunItLanding";
-import MadeByAthar from "@/components/global/MadeByAthar";
+import CookiePolicy from "@/Clients/CookiePolicy";
 
 // SEO metadata
 export const metadata = {
@@ -49,7 +48,7 @@ export default function Home() {
   return (
     <>
     {/* <MadeByAthar /> */}
-    <RunItLanding/>
+    <CookiePolicy   />
     </>
   );
 }
