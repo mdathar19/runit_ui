@@ -5,11 +5,11 @@ import LoadingComponent from '@/components/global/Loading';
 // Define metadata for SEO
 export const metadata = {
   title: 'Create Your Professional Portfolio in Minutes | RunIt',
-  description: 'Build a stunning professional portfolio website in just 5 minutes. Choose a beautiful design, fill in your details, and publish your portfolio instantly.',
+  description: 'Build a stunning professional portfolio website in just 5 minutes. Choose a beautiful design, Upload your resume, and publish your portfolio instantly.',
   keywords: 'portfolio creator, web portfolio, professional website, developer portfolio, quick portfolio',
   openGraph: {
     title: 'Create Your Professional Portfolio in Minutes | RunIt',
-    description: 'Build a stunning professional portfolio website in just 5 minutes. Choose a design, fill your details, and publish.',
+    description: 'Build a stunning professional portfolio website in just 5 minutes. Choose a design, Upload your resume, and publish.',
     images: [
       {
         url: '/portfolio-image.png', // Make sure this image exists or replace with an actual preview image

@@ -11,6 +11,7 @@ import {
   selectEnhancementError,
   selectEnhancementComplete
 } from '@/redux/slices/resumeSlice';
+import Link from 'next/link';
 
 const HtmlEnhancementProgress = () => {
   const inProgress = useSelector(selectEnhancementInProgress);
@@ -45,11 +46,6 @@ const HtmlEnhancementProgress = () => {
     setIsVisible(false);
   };
 
-  if (!isVisible || (!inProgress && !isComplete && !error)) {
-    return null;
-  }
-
-  console.log("error", error);
 
   const getStatusConfig = () => {
     if (error) {
@@ -60,6 +56,11 @@ const HtmlEnhancementProgress = () => {
           </svg>
         ),
         title: "Enhancement Failed",
+        navigateButton: (
+          <Link href="/portfolio/plans" target="_blank" className="text-red-500 hover:text-red-600">
+            See Plans
+          </Link>
+        ),
         message: error,
         borderColor: "#ef4444",
         textColor: "text-red-300",
@@ -97,7 +98,12 @@ const HtmlEnhancementProgress = () => {
   };
 
   const statusConfig = getStatusConfig();
- 
+  useEffect(() => {
+    setIsVisible(true);
+  }, [error]);
+  if (!isVisible || (!inProgress && !isComplete && !error)) {
+    return null;
+  }
   return (
     <AnimatePresence>
       {isVisible && (
@@ -123,6 +129,9 @@ const HtmlEnhancementProgress = () => {
                 </h3>
                 <p className={`text-sm ${statusConfig.textColor} mt-1`}>
                   {statusConfig.message}
+                </p>
+                <p className="text-sm text-gray-400 mt-1">
+                  {statusConfig.navigateButton}
                 </p>
               </div>
               <button

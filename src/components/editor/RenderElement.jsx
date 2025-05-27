@@ -168,6 +168,34 @@ const RenderElementEditor = ({ iframeRef }) => {
             value={selectedElement.content}
             onChange={(e) => handleUpdateElementContent(e.target.value)}
           />
+          <div className="mt-4 flex justify-end">
+              <button 
+                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center"
+                onClick={() => {
+                  const iframe = iframeRef?.current;
+                  if (!iframe || !selectedElement) return;
+                  
+                  const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+                  const element = iframeDocument.querySelector(`[data-editable="${selectedElement.id}"]`);
+                  
+                  if (element) {
+                    element.style.display = 'none';
+                    
+                    // Dispatch delete action
+                    dispatch(deleteSelectedElement());
+                    
+                    // Show feedback
+                    dispatch(setSavingStatus('saving'));
+                    setTimeout(() => {
+                      dispatch(setSavingStatus('saved'));
+                      setTimeout(() => dispatch(setSavingStatus('')), 2000);
+                    }, 1000);
+                  }
+                }}
+              >
+                <FaLayerGroup className="mr-2" /> Delete Text
+              </button>
+          </div>
         </div>
       );
     
@@ -224,6 +252,34 @@ const RenderElementEditor = ({ iframeRef }) => {
               }}
             />
           </div>
+          <div className="mt-4 flex justify-end">
+              <button 
+                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center"
+                onClick={() => {
+                  const iframe = iframeRef?.current;
+                  if (!iframe || !selectedElement) return;
+                  
+                  const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+                  const element = iframeDocument.querySelector(`[data-editable="${selectedElement.id}"]`);
+                  
+                  if (element) {
+                    element.style.display = 'none';
+                    
+                    // Dispatch delete action
+                    dispatch(deleteSelectedElement());
+                    
+                    // Show feedback
+                    dispatch(setSavingStatus('saving'));
+                    setTimeout(() => {
+                      dispatch(setSavingStatus('saved'));
+                      setTimeout(() => dispatch(setSavingStatus('')), 2000);
+                    }, 1000);
+                  }
+                }}
+              >
+                <FaLayerGroup className="mr-2" /> Delete Form Input
+              </button>
+            </div>
         </div>
       );
     
@@ -310,6 +366,34 @@ const RenderElementEditor = ({ iframeRef }) => {
               <option value="delete">DELETE</option>
             </select>
           </div>
+          <div className="mt-4 flex justify-end">
+              <button 
+                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center"
+                onClick={() => {
+                  const iframe = iframeRef?.current;
+                  if (!iframe || !selectedElement) return;
+                  
+                  const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+                  const element = iframeDocument.querySelector(`[data-editable="${selectedElement.id}"]`);
+                  
+                  if (element) {
+                    element.style.display = 'none';
+                    
+                    // Dispatch delete action
+                    dispatch(deleteSelectedElement());
+                    
+                    // Show feedback
+                    dispatch(setSavingStatus('saving'));
+                    setTimeout(() => {
+                      dispatch(setSavingStatus('saved'));
+                      setTimeout(() => dispatch(setSavingStatus('')), 2000);
+                    }, 1000);
+                  }
+                }}
+              >
+                <FaLayerGroup className="mr-2" /> Delete Form Input
+              </button>
+            </div>
         </div>
       );
     
@@ -407,6 +491,34 @@ const RenderElementEditor = ({ iframeRef }) => {
               <label htmlFor="new-tab" className="text-gray-300">Open link in new tab</label>
             </div>
           </div>
+          <div className="mt-4 flex justify-end">
+              <button 
+                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center"
+                onClick={() => {
+                  const iframe = iframeRef?.current;
+                  if (!iframe || !selectedElement) return;
+                  
+                  const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+                  const element = iframeDocument.querySelector(`[data-editable="${selectedElement.id}"]`);
+                  
+                  if (element) {
+                    element.style.display = 'none';
+                    
+                    // Dispatch delete action
+                    dispatch(deleteSelectedElement());
+                    
+                    // Show feedback
+                    dispatch(setSavingStatus('saving'));
+                    setTimeout(() => {
+                      dispatch(setSavingStatus('saved'));
+                      setTimeout(() => dispatch(setSavingStatus('')), 2000);
+                    }, 1000);
+                  }
+                }}
+              >
+                <FaLayerGroup className="mr-2" /> Delete Link
+              </button>
+            </div>
         </div>
       );
     

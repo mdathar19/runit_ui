@@ -9,11 +9,13 @@ import socketMiddleware from './middleware/socketMiddleware';
 import portfolioReducer from './slices/portfolioSlice';
 import messagePopReducer from './slices/messagePopSlice';
 import resumeReducer from './slices/resumeSlice';
-
+import paymentReducer from './slices/paymentSlice';
+import usageReducer from './slices/usageSlice';
+import paymentAlertReducer from './slices/paymentAlertSlice';
 const persistConfig = {
   key: 'root',
   storage: customStorage,
-  whitelist: ['code', 'deviceInfo', 'activeTab', 'editor', 'auth'],
+  whitelist: ['code', 'deviceInfo', 'activeTab', 'editor', 'auth', 'payment', 'usage'],
 };
 
 const rootReducer = combineReducers({
@@ -22,7 +24,10 @@ const rootReducer = combineReducers({
   auth: authReducer,
   portfolio: portfolioReducer,
   messagePop: messagePopReducer,
-  resume: resumeReducer
+  resume: resumeReducer,
+  payment: paymentReducer,
+  usage: usageReducer,
+  paymentAlert: paymentAlertReducer
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

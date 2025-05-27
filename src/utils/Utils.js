@@ -2,6 +2,9 @@
  * Utils.js - Utility functions and constants for JsCompiler component
  */
 
+
+import { Play } from "next/font/google";
+
 // Default code to display in the editor on load
 export const DEFAULT_CODE = '// Write your JavaScript code here\nconsole.log("Hello, World!");';
 
@@ -311,13 +314,13 @@ return (
 
   // Language options with their display names and route paths
 export const languageOptions = [
-    { id: 'javascript', name: 'JavaScript', path: '/' },
-    { id: 'typescript', name: 'TypeScript', path: '/typescript' },
-    { id: 'python', name: 'Python', path: '/python' },
-    { id: 'c', name: 'C', path: '/c' },
-    { id: 'c++', name: 'C++', path: '/cpp' },
-    { id: 'go', name: 'Go', path: '/go' },
-    { id: 'java', name: 'Java', path: '/java' }
+    { id: 'javascript', name: 'JavaScript', path: '/compiler/javascript' },
+    { id: 'typescript', name: 'TypeScript', path: '/compiler/typescript' },
+    { id: 'python', name: 'Python', path: '/compiler/python' },
+    { id: 'c', name: 'C', path: '/compiler/c' },
+    { id: 'c++', name: 'C++', path: '/compiler/cpp' },
+    { id: 'go', name: 'Go', path: '/compiler/go' },
+    { id: 'java', name: 'Java', path: '/compiler/java' }
   ];
   // Map URL params to language IDs in our application
 export const languagePathMap = {
@@ -586,3 +589,4 @@ const getElementByXPath = (xpath, doc) => {
     return null;
   }
 };
+

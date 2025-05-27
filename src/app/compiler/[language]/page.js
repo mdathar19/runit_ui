@@ -2,7 +2,6 @@ import { languagePathMap } from "@/utils/Utils";
 import dynamic from "next/dynamic";
 import LoadingComponent from '@/components/global/Loading';
 import MadeByAthar from "@/components/global/MadeByAthar";
-
 // This function runs on the server during build time
 export async function generateStaticParams() {
   // Generate routes for all supported languages
@@ -18,7 +17,7 @@ export async function generateStaticParams() {
 
 // Import the client component with dynamic import for better performance
 const JsCompiler = dynamic(
-  () => import('../../Clients/JsCompiler'),
+  () => import('@/Clients/JsCompiler'),
   { 
     ssr: true, // Disable server-side rendering for this component
     loading: LoadingComponent // Show a loading component while loading

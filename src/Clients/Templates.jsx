@@ -93,7 +93,7 @@ function Templates() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black to-gray-900 text-white px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-b from-black to-gray-900 text-white px-4 py-20">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
