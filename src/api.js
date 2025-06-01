@@ -2,7 +2,7 @@ const getBaseUrl = () => {
     if (typeof window !== 'undefined') {
       // Running in browser
       if (window.location.hostname === 'localhost') {
-        return 'https://api.runit.in';
+        return 'http://localhost:3000';
       } else {
         return 'https://api.runit.in'; // Empty base URL, use relative path in production
       }
@@ -41,6 +41,7 @@ const apis = {
   extractResume: `${baseUrl}/v1/parse-resume`,
   enhanceHtml: `${baseUrl}/v1/enhance-html`,
   uploadImage: `${baseUrl}/v1/upload-image`,
+  templateList: `${baseUrl}/template-list`,
 
   // Payment endpoints
   getAllPlans: `${baseUrl}/payment-plans`,
