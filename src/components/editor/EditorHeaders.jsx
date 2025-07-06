@@ -288,7 +288,7 @@ function EditorHeaders({
             message: "Your portfolio has been published successfully!",
             imageUrl: "/favicon_io/android-chrome-192x192.png",
             linkText: "View Portfolio",
-            linkUrl: publishedPortfolioUrl+'/'+websiteName,
+            linkUrl: `https://${websiteName}.runit.in`,
             duration: 5000,
             }));
         } else {
