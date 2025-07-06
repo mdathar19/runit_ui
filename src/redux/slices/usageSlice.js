@@ -1,6 +1,33 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import apis from '@/api';
 import { encryptRequest, decryptResponse } from '@/cryptoUtils';
+import { get } from 'lodash';
+
+// fetch portfolio credit info
+export const fetchPortfolioCreditInfo = createAsyncThunk(
+  'usage/fetchPortfolioCreditInfo',
+  async (_, { rejectWithValue, getState }) => {
+    try {
+      const { auth } = getState();
+      const token = auth.token;
+      const response = await fetch(apis.getCreditInfo, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const data = await response.json();
+      /* console.log("fetchPortfolioCreditInfo_data",data); */
+
+      if (!data.success) {
+        return rejectWithValue(data.message || 'Failed to fetch portfolio credit info');
+      }
+
+      return data;
+    } catch (error) {
+      return rejectWithValue('Network error, please try again');
+    }
+  }
+);
 
 // Fetch user usage
 export const fetchUserUsage = createAsyncThunk(
@@ -109,6 +136,11 @@ export const exportUsageData = createAsyncThunk(
 const initialState = {
   userUsage: null,
   allUsageStats: null,
+  portfolioCreditInfo: {
+      creditsUsed: 0,
+      remainingCredits: 0,
+      processingTime: 0
+    },
   dashboardStats: {
     today: null,
     month: null,
@@ -132,6 +164,12 @@ const usageSlice = createSlice({
     clearUsageState: (state) => {
       state.userUsage = null;
       state.allUsageStats = null;
+      // Reset to initial structure instead of null to prevent undefined errors
+      state.portfolioCreditInfo = {
+        creditsUsed: 0,
+        remainingCredits: 0,
+        processingTime: 0
+      };
       state.dashboardStats = {
         today: null,
         month: null,
@@ -147,9 +185,35 @@ const usageSlice = createSlice({
       state.exportLoading = false;
       state.exportError = null;
     },
+    setPortfolioCreditInfo: (state, action) => {
+      state.portfolioCreditInfo = action.payload;
+    }
   },
   extraReducers: (builder) => {
     builder
+      // Fetch portfolio credit info
+      .addCase(fetchPortfolioCreditInfo.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchPortfolioCreditInfo.fulfilled, (state, action) => {
+        state.loading = false;
+        // Ensure portfolioCreditInfo exists before setting properties
+        if (!state.portfolioCreditInfo) {
+          state.portfolioCreditInfo = {
+            creditsUsed: 0,
+            remainingCredits: 0,
+            processingTime: 0
+          };
+        }
+        
+        state.portfolioCreditInfo.remainingCredits = action.payload.credits;
+        state.message = action.payload.message || '';
+      })
+      .addCase(fetchPortfolioCreditInfo.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || 'Failed to fetch portfolio credit info';
+      })
       // Fetch user usage
       .addCase(fetchUserUsage.pending, (state) => {
         state.loading = true;
@@ -209,6 +273,7 @@ const usageSlice = createSlice({
   },
 });
 
-export const { clearUsageState } = usageSlice.actions;
+export const { clearUsageState, setPortfolioCreditInfo } = usageSlice.actions;
+export const getPortfolioCreditInfo = (state) => state.usage.portfolioCreditInfo;
 
 export default usageSlice.reducer;

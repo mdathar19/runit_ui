@@ -73,9 +73,9 @@ const ResumeUploader = ({ isOpen, onClose, onUploadSuccess }) => {
     
     // Store file name and upload
     dispatch(setFileName(file.name));
-    if(publishedPortfolioUrl !== 'http://localhost:3000'){
-      dispatch(parseResume(file));
-    }
+    dispatch(parseResume(file));
+    /* if(publishedPortfolioUrl !== 'http://localhost:3000'){
+    } */
   };
 
   // Handle click on upload button
