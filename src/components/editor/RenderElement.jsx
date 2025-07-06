@@ -60,7 +60,55 @@ const RenderElementEditor = ({ iframeRef }) => {
     // Trigger the file selection dialog
     fileInput.click();
   };
+  
+  // Handle file upload (for any file type)
+  const handleFileUpload = (callback) => {
+    // Create a file input element
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '*/*'; // Accept all file types
+    // You can also specify specific types like: fileInput.accept = '.pdf,.doc,.docx,.txt,.zip';
 
+    // When a file is selected
+    fileInput.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      
+      dispatch(setSavingStatus('uploading file...'));
+      
+      try {
+        // Create form data
+        const formData = new FormData();
+        formData.append('image', file); // Note: keeping 'image' as the key since your API expects this
+        // If your API has a separate endpoint for files, you might want to use a different key
+
+        // Upload file using the same API endpoint
+        const response = await fetch(api.uploadImage, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          },
+          body: formData
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          callback(data.imageUrl); // This will be the file URL
+          dispatch(setSavingStatus('file uploaded'));
+          setTimeout(() => dispatch(setSavingStatus('')), 2000);
+        } else {
+          throw new Error(data.message || 'Failed to upload file');
+        }
+      } catch (error) {
+        console.error('Error uploading file:', error);
+        dispatch(setSavingStatus('upload failed'));
+        setTimeout(() => dispatch(setSavingStatus('')), 2000);
+      }
+    };
+    
+    // Trigger the file selection dialog
+    fileInput.click();
+  };
   // Update element content with Redux
   const handleUpdateElementContent = (value) => {
     dispatch(updateElementContent(value));
@@ -164,7 +212,7 @@ const RenderElementEditor = ({ iframeRef }) => {
         <div className="p-4">
           <h3 className="font-medium text-white mb-3">Edit Text</h3>
           <textarea
-            className="w-full bg-gray-800 border border-gray-700 rounded-lg py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 min-h-[120px]"
+            className="w-full bg-gray-800 border border-gray-700 rounded-lg py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 min-h-[300px]"
             value={selectedElement.content}
             onChange={(e) => handleUpdateElementContent(e.target.value)}
           />
@@ -429,98 +477,121 @@ const RenderElementEditor = ({ iframeRef }) => {
       );
     
     case ELEMENT_TYPES.LINK:
-      return (
-        <div className="p-4">
-          <h3 className="font-medium text-white mb-3">Edit Link</h3>
-          <div className="mb-4">
-            <label className="block text-sm text-gray-400 mb-1">Text</label>
-            <input
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-              placeholder="Link text"
-              value={(typeof selectedElement.content === 'object' ? selectedElement.content.text : '') || ''}
-              onChange={(e) => {
-                const currentContent = typeof selectedElement.content === 'object' ? 
-                  { ...selectedElement.content, text: e.target.value } : 
-                  { text: e.target.value, href: '#' };
-                
-                handleUpdateElementContent(currentContent);
-              }}
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-sm text-gray-400 mb-1">URL</label>
-            <input
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-              placeholder="Link URL (https://...)"
-              value={(typeof selectedElement.content === 'object' ? selectedElement.content.href : '#') || '#'}
-              onChange={(e) => {
-                const currentContent = typeof selectedElement.content === 'object' ? 
-                  { ...selectedElement.content, href: e.target.value } : 
-                  { href: e.target.value, text: '' };
-                
-                handleUpdateElementContent(currentContent);
-              }}
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-sm text-gray-400 mb-1">Open in new tab</label>
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="new-tab"
-                className="mr-2"
-                defaultChecked={false}
-                onChange={(e) => {
-                  const iframe = iframeRef?.current;
-                  if (!iframe || !selectedElement) return;
-                  
-                  const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
-                  const element = iframeDocument.querySelector(`[data-editable="${selectedElement.id}"]`);
-                  
-                  if (element) {
-                    if (e.target.checked) {
-                      element.setAttribute('target', '_blank');
-                      element.setAttribute('rel', 'noopener noreferrer');
-                    } else {
-                      element.removeAttribute('target');
-                      element.removeAttribute('rel');
-                    }
-                  }
-                }}
-              />
-              <label htmlFor="new-tab" className="text-gray-300">Open link in new tab</label>
-            </div>
-          </div>
-          <div className="mt-4 flex justify-end">
-              <button 
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center"
-                onClick={() => {
-                  const iframe = iframeRef?.current;
-                  if (!iframe || !selectedElement) return;
-                  
-                  const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
-                  const element = iframeDocument.querySelector(`[data-editable="${selectedElement.id}"]`);
-                  
-                  if (element) {
-                    element.style.display = 'none';
-                    
-                    // Dispatch delete action
-                    dispatch(deleteSelectedElement());
-                    
-                    // Show feedback
-                    dispatch(setSavingStatus('saving'));
-                    setTimeout(() => {
-                      dispatch(setSavingStatus('saved'));
-                      setTimeout(() => dispatch(setSavingStatus('')), 2000);
-                    }, 1000);
-                  }
-                }}
-              >
-                <FaLayerGroup className="mr-2" /> Delete Link
-              </button>
-            </div>
+    return (
+      <div className="p-4">
+        <h3 className="font-medium text-white mb-3">Edit Link</h3>
+        <div className="mb-4">
+          <label className="block text-sm text-gray-400 mb-1">Text</label>
+          <input
+            className="w-full bg-gray-800 border border-gray-700 rounded-lg py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+            placeholder="Link text"
+            value={(typeof selectedElement.content === 'object' ? selectedElement.content.text : '') || ''}
+            onChange={(e) => {
+              const currentContent = typeof selectedElement.content === 'object' ? 
+                { ...selectedElement.content, text: e.target.value } : 
+                { text: e.target.value, href: '#' };
+              
+              handleUpdateElementContent(currentContent);
+            }}
+          />
         </div>
-      );
+        <div className="mb-4">
+          <label className="block text-sm text-gray-400 mb-1">URL</label>
+          <input
+            className="w-full bg-gray-800 border border-gray-700 rounded-lg py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+            placeholder="Link URL (https://...)"
+            value={(typeof selectedElement.content === 'object' ? selectedElement.content.href : '#') || '#'}
+            onChange={(e) => {
+              const currentContent = typeof selectedElement.content === 'object' ? 
+                { ...selectedElement.content, href: e.target.value } : 
+                { href: e.target.value, text: '' };
+              
+              handleUpdateElementContent(currentContent);
+            }}
+          />
+        </div>
+        
+        {/* File Upload Section */}
+        <div className="mb-4">
+          <label className="block text-sm text-gray-400 mb-1">Or Upload File</label>
+          <div className="bg-gray-800 rounded-lg p-3 border border-gray-700">
+            <p className="text-gray-400 text-sm mb-3">
+              Upload a file (CV, document, etc.) to get a direct download link
+            </p>
+            <GradientButton
+              onClick={() => handleFileUpload(url => {
+                const currentContent = typeof selectedElement.content === 'object' ? 
+                  { ...selectedElement.content, href: url } : 
+                  { href: url, text: selectedElement.content?.text || 'Download File' };
+                
+                handleUpdateElementContent(currentContent);
+              })}
+              className="w-full flex items-center justify-center"
+            >
+              <FaLayerGroup className="mr-2" /> Upload File & Get Link
+            </GradientButton>
+          </div>
+        </div>
+        
+        <div className="mb-4">
+          <label className="block text-sm text-gray-400 mb-1">Open in new tab</label>
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="new-tab"
+              className="mr-2"
+              defaultChecked={false}
+              onChange={(e) => {
+                const iframe = iframeRef?.current;
+                if (!iframe || !selectedElement) return;
+                
+                const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+                const element = iframeDocument.querySelector(`[data-editable="${selectedElement.id}"]`);
+                
+                if (element) {
+                  if (e.target.checked) {
+                    element.setAttribute('target', '_blank');
+                    element.setAttribute('rel', 'noopener noreferrer');
+                  } else {
+                    element.removeAttribute('target');
+                    element.removeAttribute('rel');
+                  }
+                }
+              }}
+            />
+            <label htmlFor="new-tab" className="text-gray-300">Open link in new tab</label>
+          </div>
+        </div>
+        <div className="mt-4 flex justify-end">
+            <button 
+              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center"
+              onClick={() => {
+                const iframe = iframeRef?.current;
+                if (!iframe || !selectedElement) return;
+                
+                const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+                const element = iframeDocument.querySelector(`[data-editable="${selectedElement.id}"]`);
+                
+                if (element) {
+                  element.style.display = 'none';
+                  
+                  // Dispatch delete action
+                  dispatch(deleteSelectedElement());
+                  
+                  // Show feedback
+                  dispatch(setSavingStatus('saving'));
+                  setTimeout(() => {
+                    dispatch(setSavingStatus('saved'));
+                    setTimeout(() => dispatch(setSavingStatus('')), 2000);
+                  }, 1000);
+                }
+              }}
+            >
+              <FaLayerGroup className="mr-2" /> Delete Link
+            </button>
+          </div>
+      </div>
+    );
     
     case ELEMENT_TYPES.PROGRESS:
       return (
