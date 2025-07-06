@@ -7,7 +7,6 @@ export const signupUser = createAsyncThunk(
   async (email, { rejectWithValue }) => {
     try {
         const encryptedPayload = encryptRequest({email});
-        console.log(encryptedPayload);
         const response = await fetch(apis.signup, {
             method: 'POST',
             headers: {

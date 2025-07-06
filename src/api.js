@@ -2,7 +2,7 @@ const getBaseUrl = () => {
     if (typeof window !== 'undefined') {
       // Running in browser
       if (window.location.hostname === 'localhost') {
-        return 'https://api.runit.in';
+        return 'http://localhost:3000';
       } else {
         return 'https://api.runit.in'; // Empty base URL, use relative path in production
       }
@@ -41,18 +41,20 @@ const apis = {
   extractResume: `${baseUrl}/v1/parse-resume`,
   enhanceHtml: `${baseUrl}/v1/enhance-html`,
   uploadImage: `${baseUrl}/v1/upload-image`,
+  templateList: `${baseUrl}/template-list`,
+
+  // credits endpoints
+  getCreditInfo: `${baseUrl}/v1/credits/info`,
+  getMyCredits: `${baseUrl}/v1/credits/my-credits`,
+  createCreditOrder: `${baseUrl}/v1/credits/create-order`,
+  verifyCreditPayment: `${baseUrl}/v1/credits/verify-payment`,
+  getCreditPackages: `${baseUrl}/v1/credits/packages`,
 
   // Payment endpoints
   getAllPlans: `${baseUrl}/payment-plans`,
   getPlanById: (planId) => `${baseUrl}/payment-plans/${planId}`,
   createOrder: `${baseUrl}/create-order`,
   verifyPayment: `${baseUrl}/verify-payment`,
-  subscribeFree: `${baseUrl}/subscribe-free`,
-  getMySubscriptions: `${baseUrl}/my-subscriptions`,
-  getPaymentHistory: `${baseUrl}/payment-history`,
-  getPaymentStatus: (paymentId) => `${baseUrl}/payment-status/${paymentId}`,
-  initiateRefund: `${baseUrl}/refund`,
-  getSubscriptionStatus: `${baseUrl}/subscription-status`,
 
   // Usage endpoints
   getMyUsage: `${baseUrl}/my-usage`,

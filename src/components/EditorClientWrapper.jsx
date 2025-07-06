@@ -1,37 +1,36 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
+import { useState, useEffect } from 'react';
 import LoadingComponent from '@/components/global/Loading';
 import useReduxStore from '@/hooks/useReduxStore';
 
-// Client component wrapper for the Editor
+const EditorComponent = dynamic(
+  () => import('../Clients/Editor'),
+  {
+    ssr: false,
+    loading: () => <LoadingComponent />,
+  }
+);
+
 function EditorClientWrapper({ templateId: propTemplateId }) {
   const params = useParams();
-  const [EditorComponent, setEditorComponent] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  
-  // Use provided templateId from props or fall back to params
+  const [canRender, setCanRender] = useState(false);
   const templateId = propTemplateId || params?.templateId;
 
   useEffect(() => {
-    // Dynamically import the Editor component with ssr: false
-    const loadEditor = async () => {
-      const EditorModule = await import('../Clients/Editor');
-      setEditorComponent(() => EditorModule.default);
-      setIsLoading(false);
-    };
-
-    loadEditor();
+    // Ensure we're in browser and document is accessible
+    if (typeof window !== 'undefined' && window.document) {
+      setCanRender(true);
+    }
   }, []);
 
-  if (isLoading) {
+  if (!canRender) {
     return <LoadingComponent />;
   }
 
-  // Render the Editor component once loaded
-  return EditorComponent ? <EditorComponent templateId={templateId} /> : null;
-} 
+  return <EditorComponent templateId={templateId} />;
+}
 
 export default useReduxStore(EditorClientWrapper);

@@ -32,48 +32,137 @@ import EditorHeaders from '@/components/editor/EditorHeaders';
 import HtmlEnhancementProgress from '@/components/editor/HtmlEnhancementProgress';
 import { updateIframeDOM } from '@/utils/Utils';
 import PaymentAlert from '@/components/global/PaymentAlert';
+
 function Editor({ templateId: propTemplateId }) {
   const params = useParams();
   const dispatch = useDispatch();
+  const router = useRouter();
   
-  // Get state from Redux
+  // Add error state
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  
   const {
-    activeTab,
-    previewMode,
+    templates
+  } = useSelector(state => state.templates || {});
+  
+  // Get state from Redux with fallbacks
+  const {
+    activeTab = TABS.ELEMENTS,
+    previewMode = PREVIEW_MODES.DESKTOP,
     selectedElement,
-    editorHistory,
-    historyIndex,
-    templateHtml,
-    iframeLoaded,
-    savingStatus,
+    editorHistory = [],
+    historyIndex = 0,
+    templateHtml = '',
+    iframeLoaded = false,
+    savingStatus = '',
     templateId
-  } = useSelector((state) => state.editor);
+  } = useSelector((state) => state.editor || {});
   
-  // Get auth state from Redux
+  // Get auth state from Redux with fallbacks
   const {
-    isAuthenticated,
-    token,
-    isSessionChecked
-  } = useSelector((state) => state.auth);
+    isAuthenticated = false,
+    token = null,
+    isSessionChecked = false
+  } = useSelector((state) => state.auth || {});
   
   const iframeRef = useRef(null);
   const [isIframeInitialized, setIsIframeInitialized] = useState(false);
   const [lastTemplateHtml, setLastTemplateHtml] = useState('');
+  const [isTemplateUrl, setIsTemplateUrl] = useState(false);
+  const [fetchedHtml, setFetchedHtml] = useState('');
   const updateTimeoutRef = useRef(null);
-  // Template path based on ID
-  const templatePath = `/templates/${templateId?.split('-').join('/')}` || '';
-  
+
+  // Add error boundary
+  useEffect(() => {
+    const handleError = (error) => {
+      console.error('Editor Error:', error);
+      setError(error.message);
+    };
+
+    window.addEventListener('error', handleError);
+    window.addEventListener('unhandledrejection', (event) => {
+      handleError(new Error(event.reason));
+    });
+
+    return () => {
+      window.removeEventListener('error', handleError);
+      window.removeEventListener('unhandledrejection', handleError);
+    };
+  }, []);
+
+  // Function to fetch HTML content from URL
+  const fetchTemplateHtml = async (url) => {
+    try {
+      dispatch(setSavingStatus('loading'));
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch template: ${response.status}`);
+      }
+      const html = await response.text();
+      setFetchedHtml(html);
+      dispatch(setTemplateHtml(html));
+      dispatch(setSavingStatus(''));
+    } catch (error) {
+      console.error('Error fetching template HTML:', error);
+      dispatch(setSavingStatus('error'));
+      setError(`Failed to load template: ${error.message}`);
+    }
+  };
+
+  // Check if templateHtml is a URL or actual HTML content
+  useEffect(() => {
+    if (templateHtml) {
+      const isUrl = templateHtml.startsWith('http://') || templateHtml.startsWith('https://');
+      setIsTemplateUrl(isUrl);
+      
+      if (isUrl) {
+        fetchTemplateHtml(templateHtml);
+      } else {
+        setFetchedHtml(templateHtml);
+      }
+    } else {
+      // Handle case where templateHtml is empty
+      setIsLoading(false);
+    }
+  }, [templateHtml]);
+
+  // Safe function to check if iframe content is accessible
+  const canAccessIframeContent = (iframe) => {
+    try {
+      if (!iframe) return false;
+      // This will throw an error if cross-origin
+      const doc = iframe.contentDocument || iframe.contentWindow?.document;
+      if (!doc) return false;
+      // Try to access a property to trigger security check
+      doc.body;
+      return true;
+    } catch (error) {
+      console.log('Cannot access iframe content due to cross-origin restrictions');
+      return false;
+    }
+  };
 
   // Handle iframe load
   const handleIframeLoad = () => {
-    dispatch(setIframeLoaded(true));
-    
     try {
-      // Access iframe content
+      dispatch(setIframeLoaded(true));
+      setIsLoading(false);
+      
+      if (typeof window === 'undefined' || !window.document) return;
+      
       const iframe = iframeRef.current;
       if (!iframe) return;
-      
+
+      // Check if we can access iframe content
+      if (!canAccessIframeContent(iframe)) {
+        console.log('Template loaded from cross-origin URL - editing features disabled');
+        return;
+      }
+
+      // Access iframe content (only if not cross-origin)
       const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+      if (!iframeDocument) return;
       
       // Add editor styles to iframe
       const style = iframeDocument.createElement('style');
@@ -232,40 +321,7 @@ function Editor({ templateId: propTemplateId }) {
       allEditableElements.forEach(({ el, type }, index) => {
         el.setAttribute('data-editable', `element-${index}`);
         el.setAttribute('data-editable-type', type);
-        /* 
-        // Create and append delete button
-        const deleteBtn = document.createElement('div');
-        deleteBtn.className = type === ELEMENT_TYPES.SECTION ? 'section-delete-btn' : 'element-delete-btn';
-        deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
         
-        if (type !== ELEMENT_TYPES.SECTION) {
-          // Style for regular element delete buttons
-          deleteBtn.style.position = 'absolute';
-          deleteBtn.style.top = '-20px';
-          deleteBtn.style.right = '0';
-          deleteBtn.style.backgroundColor = '#e11d48';
-          deleteBtn.style.color = 'white';
-          deleteBtn.style.width = '20px';
-          deleteBtn.style.height = '20px';
-          deleteBtn.style.borderRadius = '50%';
-          deleteBtn.style.display = 'flex';
-          deleteBtn.style.alignItems = 'center';
-          deleteBtn.style.justifyContent = 'center';
-          deleteBtn.style.fontSize = '10px';
-          deleteBtn.style.cursor = 'pointer';
-          deleteBtn.style.opacity = '0';
-          deleteBtn.style.zIndex = '1000';
-          deleteBtn.style.transition = 'opacity 0.2s, background-color 0.2s';
-        }
-        
-        // Make sure element has position relative
-        const computedStyle = getComputedStyle(el);
-        if (computedStyle.position === 'static') {
-          el.style.position = 'relative';
-        }
-        
-        el.appendChild(deleteBtn);
-         */
         // If it's a form element, prevent default submission
         if (el.tagName.toLowerCase() === 'form') {
           el.addEventListener('submit', (e) => {
@@ -290,26 +346,6 @@ function Editor({ templateId: propTemplateId }) {
             e.stopPropagation();
           });
         }
-        
-        /* // Add click event for delete button
-        deleteBtn.addEventListener('click', (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          
-          // Only hide the element visually, don't remove it from DOM 
-          // so it can be restored with undo
-          el.style.display = 'none';
-          
-          // Dispatch delete action
-          dispatch(deleteSelectedElement());
-          
-          // Show feedback
-          dispatch(setSavingStatus('saving'));
-          setTimeout(() => {
-            dispatch(setSavingStatus('saved'));
-            setTimeout(() => dispatch(setSavingStatus('')), 2000);
-          }, 1000);
-        }); */
         
         // Add click event to make element editable
         el.addEventListener('click', (e) => {
@@ -423,11 +459,15 @@ function Editor({ templateId: propTemplateId }) {
         };
       });
       
-      dispatch(setEditableElements(elementsData));
+      if (dispatch && setEditableElements) {
+        dispatch(setEditableElements(elementsData));
+      }
     } catch (error) {
-      console.error('Error accessing iframe content:', error);
+      console.error('Error in handleIframeLoad:', error);
+      setError(`Editor initialization failed: ${error.message}`);
     }
   };
+
   // Get preview mode dimensions
   const getPreviewDimensions = () => {
     switch(previewMode) {
@@ -442,122 +482,155 @@ function Editor({ templateId: propTemplateId }) {
     }
   };
 
-    // If template ID is not set, show loading
-    if (!templateId) {
-      return (
-        <div className="h-screen w-full flex items-center justify-center bg-gray-900">
-          <div className="text-center">
-            <div className="w-12 h-12 border-4 border-gray-400 border-t-purple-500 rounded-full animate-spin mb-4 mx-auto"></div>
-            <p className="text-white">Loading editor...</p>
-          </div>
-        </div>
-      );
-    }
-    updateIframeDOM(templateHtml, iframeRef);
-    
-    // Load template
-    useEffect(() => {
-      const fetchTemplate = async () => {
-        try {
-          // In a real implementation, you would fetch the template HTML from your server
-          dispatch(setTemplateHtml(`${templatePath}/index.html`));
-        } catch (error) {
-          console.error('Error loading template:', error);
-        }
-      };
-      
-      if (templateId) {
-        fetchTemplate();
-      }
-    }, [templatePath, templateId, dispatch]);
-    // Main useEffect for handling template updates
-    useEffect(() => {
+  // Main useEffect for handling template updates when we have HTML content (not URL)
+  useEffect(() => {
+    try {
+      if (isTemplateUrl || !fetchedHtml) return;
+
       // Clear any pending updates
       if (updateTimeoutRef.current) {
         clearTimeout(updateTimeoutRef.current);
       }
 
       // Only proceed if we have valid HTML content
-      if (!templateHtml || templateHtml.length < 50) return;
+      if (fetchedHtml.length < 50) return;
       
       // If iframe isn't initialized yet, do initial load
       if (!isIframeInitialized && iframeRef.current) {
         const iframe = iframeRef.current;
-        const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
         
-        if (iframeDocument) {
-          // Initial load
-          iframeDocument.open();
-          iframeDocument.write(templateHtml);
-          iframeDocument.close();
+        // Check if we can safely access iframe content
+        if (canAccessIframeContent(iframe)) {
+          const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
           
-          setLastTemplateHtml(templateHtml);
-          setIsIframeInitialized(true);
-          
-          // Initialize editor after a short delay
-          setTimeout(() => {
-            handleIframeLoad();
-          }, 200);
+          if (iframeDocument) {
+            // Initial load
+            iframeDocument.open();
+            iframeDocument.write(fetchedHtml);
+            iframeDocument.close();
+            
+            setLastTemplateHtml(fetchedHtml);
+            setIsIframeInitialized(true);
+            
+            // Initialize editor after a short delay
+            setTimeout(() => {
+              handleIframeLoad();
+            }, 200);
+          }
         }
         return;
       }
 
       // For subsequent updates, use DOM diffing
-      if (isIframeInitialized && templateHtml !== lastTemplateHtml) {
+      if (isIframeInitialized && fetchedHtml !== lastTemplateHtml) {
         // Debounce updates to avoid too frequent DOM manipulations
         updateTimeoutRef.current = setTimeout(() => {
-          const updatedHtml = updateIframeDOM(templateHtml, iframeRef);
           const iframe = iframeRef.current;
-          const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
           
-          if (iframeDocument) {
-            iframeDocument.open();
-            iframeDocument.write(updatedHtml);
-            iframeDocument.close();
-            setLastTemplateHtml(updatedHtml);
+          if (canAccessIframeContent(iframe)) {
+            const updatedHtml = updateIframeDOM ? updateIframeDOM(fetchedHtml, iframeRef) : fetchedHtml;
+            const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
             
-            // Initialize editor after update
-            setTimeout(() => {
-              handleIframeLoad();
-            }, 200);
+            if (iframeDocument) {
+              iframeDocument.open();
+              iframeDocument.write(updatedHtml);
+              iframeDocument.close();
+              setLastTemplateHtml(updatedHtml);
+              
+              // Initialize editor after update
+              setTimeout(() => {
+                handleIframeLoad();
+              }, 200);
+            }
           }
         }, 100); // 100ms debounce
       }
-    }, [templateHtml, isIframeInitialized]);
+    } catch (error) {
+      console.error('Error in template update effect:', error);
+      setError(`Template update failed: ${error.message}`);
+    }
+  }, [fetchedHtml, isIframeInitialized, isTemplateUrl]);
 
-    // Cleanup timeout on unmount
-    useEffect(() => {
-      return () => {
-        if (updateTimeoutRef.current) {
-          clearTimeout(updateTimeoutRef.current);
-        }
-      };
-    }, []);
-    // Check if user is authenticated on mount
-    useEffect(() => {
-      dispatch(checkSession());
-    }, [dispatch]);
-  
-    // Fetch user portfolios on mount if authenticated
-    useEffect(() => {
-      if (isAuthenticated && token) {
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (updateTimeoutRef.current) {
+        clearTimeout(updateTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Check if user is authenticated on mount
+  useEffect(() => {
+    try {
+      if (dispatch && checkSession) {
+        dispatch(checkSession());
+      }
+    } catch (error) {
+      console.error('Error checking session:', error);
+    }
+  }, [dispatch]);
+
+  // Fetch user portfolios on mount if authenticated
+  useEffect(() => {
+    try {
+      if (isAuthenticated && token && dispatch && getUserPortfolios) {
         dispatch(getUserPortfolios());
       }
-    }, [isAuthenticated, token, dispatch]);
-  
-    // Set template ID on mount
-    useEffect(() => {
-      if (propTemplateId || params?.templateId) {
-        const id = propTemplateId || params?.templateId || 'engineer-atif';
-        dispatch(setTemplateId(id));
-      }
-    }, [propTemplateId, params, dispatch]);
-  
+    } catch (error) {
+      console.error('Error fetching portfolios:', error);
+    }
+  }, [isAuthenticated, token, dispatch]);
+
+  // Early return for error state
+  if (error) {
+    return (
+      <div className="h-screen w-full flex items-center justify-center bg-gray-900">
+        <div className="text-center p-8 bg-red-900 bg-opacity-20 rounded-lg border border-red-500">
+          <div className="text-red-400 text-xl mb-4">⚠️ Editor Error</div>
+          <p className="text-white mb-4">{error}</p>
+          <button 
+            onClick={() => {
+              setError(null);
+              window.location.reload();
+            }}
+            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+          >
+            Reload Editor
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // If template ID is not set, show loading
+  if (!templateId) {
+    return (
+      <div className="h-screen w-full flex items-center justify-center bg-gray-900">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-gray-400 border-t-purple-500 rounded-full animate-spin mb-4 mx-auto"></div>
+          <p className="text-white">Loading editor...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show loading state while initializing
+  if (isLoading && !fetchedHtml) {
+    return (
+      <div className="h-screen w-full flex items-center justify-center bg-gray-900">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-gray-400 border-t-purple-500 rounded-full animate-spin mb-4 mx-auto"></div>
+          <p className="text-white">Loading template...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen w-full bg-gray-900 flex flex-col">
       {/* Editor Toolbar */}
-      <EditorHeaders iframeRef={iframeRef}/>
+      {EditorHeaders && <EditorHeaders iframeRef={iframeRef}/>}
 
       {/* Editor Main Content */}
       <div className="flex-1 flex">
@@ -573,7 +646,19 @@ function Editor({ templateId: propTemplateId }) {
                 maxHeight: 'calc(100vh - 120px)'
               }}
             >
-              {templateHtml?.length > 50 ? (
+              {/* Conditional iframe rendering based on content type */}
+              {isTemplateUrl ? (
+                // For URL-based templates (no editing capabilities due to CORS)
+                <iframe
+                  ref={iframeRef}
+                  src={templateHtml}
+                  className="w-full h-full border-0"
+                  onLoad={handleIframeLoad}
+                  title="Template Preview"
+                  sandbox="allow-scripts allow-same-origin"
+                />
+              ) : fetchedHtml?.length > 50 ? (
+                // For HTML content-based templates (full editing capabilities)
                 <iframe
                   ref={iframeRef}
                   className="w-full h-full border-0"
@@ -582,9 +667,10 @@ function Editor({ templateId: propTemplateId }) {
                   // No src or srcdoc - content will be injected via DOM
                 />
               ) : (
+                // Fallback for any other case
                 <iframe
                   ref={iframeRef}
-                  src={templateHtml} // Keep src for URLs
+                  src={templateHtml}
                   className="w-full h-full border-0"
                   onLoad={handleIframeLoad}
                   title="Template Preview"
@@ -592,7 +678,7 @@ function Editor({ templateId: propTemplateId }) {
                 />
               )}
               
-              {!iframeLoaded && (
+              {(!iframeLoaded || isLoading) && (
                 <div className="absolute inset-0 flex items-center justify-center bg-gray-900 bg-opacity-75">
                   <div className="text-center">
                     <div className="w-12 h-12 border-4 border-gray-400 border-t-purple-500 rounded-full animate-spin mb-4 mx-auto"></div>
@@ -606,10 +692,10 @@ function Editor({ templateId: propTemplateId }) {
           {/* Status Bar */}
           <div className="h-8 bg-gray-900 border-t border-gray-800 px-4 py-1 flex justify-between items-center text-xs">
             <div className="text-gray-400">
-              Template ID: {templateId}
+              Template ID: {templateId} {isTemplateUrl && "(Preview Only - Limited Editing)"}
             </div>
             <div>
-              {getSavingStatusIndicator(savingStatus)}
+              {getSavingStatusIndicator && getSavingStatusIndicator(savingStatus)}
             </div>
           </div>
         </div>
@@ -620,19 +706,19 @@ function Editor({ templateId: propTemplateId }) {
           <div className="flex border-b border-gray-800">
             <button
               className={`flex-1 py-3 text-sm font-medium text-center ${activeTab === TABS.ELEMENTS ? 'text-purple-400 border-b-2 border-purple-400' : 'text-gray-400 hover:text-white'}`}
-              onClick={() => dispatch(setActiveTab(TABS.ELEMENTS))}
+              onClick={() => dispatch && setActiveTab && dispatch(setActiveTab(TABS.ELEMENTS))}
             >
               <FaLayerGroup className="inline-block mr-1.5" /> Elements
             </button>
             <button
               className={`flex-1 py-3 text-sm font-medium text-center ${activeTab === TABS.STYLE ? 'text-purple-400 border-b-2 border-purple-400' : 'text-gray-400 hover:text-white'}`}
-              onClick={() => dispatch(setActiveTab(TABS.STYLE))}
+              onClick={() => dispatch && setActiveTab && dispatch(setActiveTab(TABS.STYLE))}
             >
               <FaFont className="inline-block mr-1.5" /> Style
             </button>
             <button
               className={`flex-1 py-3 text-sm font-medium text-center ${activeTab === TABS.SETTINGS ? 'text-purple-400 border-b-2 border-purple-400' : 'text-gray-400 hover:text-white'}`}
-              onClick={() => dispatch(setActiveTab(TABS.SETTINGS))}
+              onClick={() => dispatch && setActiveTab && dispatch(setActiveTab(TABS.SETTINGS))}
             >
               <FaCog className="inline-block mr-1.5" /> Settings
             </button>
@@ -640,11 +726,11 @@ function Editor({ templateId: propTemplateId }) {
           
           {/* Editor Content */}
           <div className="flex-1 overflow-hidden">
-            <RenderTab iframeRef={iframeRef} />
+            {RenderTab && <RenderTab iframeRef={iframeRef} />}
           </div>
         </div>
       </div>
-      <HtmlEnhancementProgress />
+      {HtmlEnhancementProgress && <HtmlEnhancementProgress />}
     </div>
   );
 }

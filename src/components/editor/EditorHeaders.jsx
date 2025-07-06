@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation';
-import { FaDesktop, FaTabletAlt, FaMobileAlt, FaUndo, FaRedo, FaCode, FaEye, FaSave, FaUpload } from 'react-icons/fa';
+import { FaDesktop, FaTabletAlt, FaMobileAlt, FaUndo, FaRedo, FaCode, FaEye, FaSave, FaUpload, FaCoins, FaCreditCard } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectPreviewMode, setPreviewMode, selectHistoryIndex, selectEditorHistory, setSavingStatus, undo, redo } from '@/redux/slices/editorSlice';
 import GradientButton from '@/components/global/GradientButton';
@@ -11,11 +11,12 @@ import useReduxStore from '@/hooks/useReduxStore';
 import CheckWebsite from './CheckWebsite';
 import { publishPortfolio } from '@/redux/slices/portfolioSlice';
 import { setPopupConfig } from '@/redux/slices/messagePopSlice';
-import { publishedPortfolioUrl } from '@/api';
+import apis, { publishedPortfolioUrl } from '@/api';
 import Login from '../Login';
 import ResumeUploader from '../global/ResumeUploader';
 import { enhanceHtml } from '@/redux/slices/resumeSlice';
 import { selectSocketId } from '@/redux/slices/compilerSlice';
+import CreditRechargeModal from './CreditRechargeModal ';
 
 function EditorHeaders({ 
     iframeRef
@@ -33,7 +34,8 @@ function EditorHeaders({
         templateId
     } = useSelector((state) => state.editor);
   const {
-        isAuthenticated
+        isAuthenticated,
+        token
     } = useSelector((state) => state.auth);
     const {
       data
@@ -45,6 +47,42 @@ function EditorHeaders({
     const [isLoading, setIsLoading] = useState(false);
     const [showResumeUploaderModal, setShowResumeUploaderModal] = useState(false);
     const [nextAction, setNextAction] = useState(null);
+    
+    // Credit system states
+    const [credits, setCredits] = useState(0);
+    const [showCreditModal, setShowCreditModal] = useState(false);
+    const [creditLoading, setCreditLoading] = useState(false);
+
+    // Fetch user credits
+    const fetchUserCredits = async () => {
+      if (!isAuthenticated) return;
+      
+      try {
+        setCreditLoading(true);
+        const response = await fetch(apis.getCreditInfo, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          setCredits(data.credits);
+        }
+      } catch (error) {
+        console.error('Error fetching credits:', error);
+      } finally {
+        setCreditLoading(false);
+      }
+    };
+
+    // Fetch credits when component mounts and when user authenticates
+    useEffect(() => {
+      if (isAuthenticated) {
+        fetchUserCredits();
+      }
+    }, [isAuthenticated]);
 
     // Handle export/publish template as ZIP
     const handleExport = async () => {
@@ -451,15 +489,23 @@ function EditorHeaders({
         setTemplateZipBlob(null);
         }
     };
+
     const handleAIEnhance = () => {
-      if(isAuthenticated) {
-        setShowResumeUploaderModal(true);
-      } else {
+      if (!isAuthenticated) {
         setNextAction('Enhance with AI');
         setShowLoginModal(true);
         return;
       }
+      
+      // Check if user has credits
+      if (credits < 1) {
+        setShowCreditModal(true);
+        return;
+      }
+      
+      setShowResumeUploaderModal(true);
     };
+
     // Handle successful login
     const handleLoginSuccess = (token) => {
         setShowLoginModal(false);
@@ -475,7 +521,6 @@ function EditorHeaders({
     };
 
     const handleResumeUploaded = (resume) => {
-      console.log('resume--->', resume);
       const previewContent = extractHtmlContent();
       if (previewContent && resume && socketId) {
         setShowResumeUploaderModal(false)
@@ -486,21 +531,31 @@ function EditorHeaders({
           useSocketProgress: true // Flag to use Socket.IO for progress
         }));
       }
-    }; 
-  /*   useEffect(() => {
-      const previewContent = extractHtmlContent();
-      dispatch(enhanceHtml({
-        resumeJson: data,
-        templateHtml: previewContent.outerHTML
-      }))
-      .unwrap() // This will help catch any errors
-      .then((result) => {
-        console.log('Enhancement successful:', result);
-      })
-      .catch((error) => {
-        console.error('Enhancement failed:', error);
-      });
-    }, []); */
+    };
+
+    // Handle credit purchase success
+    const handleCreditPurchaseSuccess = () => {
+      setShowCreditModal(false);
+      // Refresh credits
+      fetchUserCredits();
+      // Show success message
+      dispatch(setPopupConfig({
+        message: "Credits purchased successfully!",
+        imageUrl: "/favicon_io/android-chrome-192x192.png",
+        duration: 3000,
+      }));
+    };
+
+    // Handle opening credit modal
+    const handleOpenCreditModal = () => {
+      if (!isAuthenticated) {
+        setNextAction('Recharge Credits');
+        setShowLoginModal(true);
+        return;
+      }
+      setShowCreditModal(true);
+    };
+
   return (
         <header className="bg-gray-900 border-b border-gray-800 px-4 py-2">
         <div className="flex items-center justify-between">
@@ -560,14 +615,35 @@ function EditorHeaders({
               </button>
             </div>
             
+            {/* Credit Display and Recharge */}
+            {isAuthenticated && (
+              <div className="flex items-center space-x-2 bg-gray-800 rounded-lg px-3 py-1.5">
+                <div className="flex items-center space-x-2">
+                  <FaCoins className="text-yellow-400" />
+                  <span className="text-white font-medium">
+                    {creditLoading ? '...' : credits}
+                  </span>
+                  <span className="text-gray-400 text-sm">credits</span>
+                </div>
+                <button
+                  onClick={handleOpenCreditModal}
+                  className="text-blue-400 hover:text-blue-300 transition-colors p-1"
+                  title="Recharge Credits"
+                >
+                  <FaCreditCard />
+                </button>
+              </div>
+            )}
+            
             <div className="flex items-center space-x-2">
-            <GradientButton
+              <GradientButton
                 className="flex items-center"
                 onClick={handleAIEnhance}
                 disabled={!socketId}
                 colors={['from-red-600', 'to-purple-500']}
               >
-                <FaCode className="mr-1.5" /> Enhance with AI
+                <FaCode className="mr-1.5" /> 
+                {credits < 1 ? 'Enhance with AI (No Credits)' : 'Enhance with AI'}
               </GradientButton>
               <button 
                 className="bg-gray-800 hover:bg-gray-700 text-white rounded-md px-3 py-1.5 text-sm flex items-center"
@@ -591,6 +667,7 @@ function EditorHeaders({
             </div>
           </div>
         </div>
+        
         {/* Website Name Check Modal */}
         {showWebsiteNameModal && (
             <CheckWebsite
@@ -598,6 +675,7 @@ function EditorHeaders({
             onWebsiteNameConfirmed={handleWebsiteNameConfirmed}
         />
         )}
+        
         {/* Login Modal */}
         <Login
             isOpen={showLoginModal}
@@ -605,11 +683,20 @@ function EditorHeaders({
             onLoginSuccess={handleLoginSuccess}
             nextAction={nextAction}
         />
+        
         {/* Enhance with AI Modal */}
         <ResumeUploader
             isOpen={showResumeUploaderModal}
             onClose={() => setShowResumeUploaderModal(false)}
             onUploadSuccess={handleResumeUploaded}
+        />
+        
+        {/* Credit Recharge Modal */}
+        <CreditRechargeModal
+            isOpen={showCreditModal}
+            onClose={() => setShowCreditModal(false)}
+            onSuccess={handleCreditPurchaseSuccess}
+            currentCredits={credits}
         />
         </header>
   )

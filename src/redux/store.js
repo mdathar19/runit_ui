@@ -12,10 +12,11 @@ import resumeReducer from './slices/resumeSlice';
 import paymentReducer from './slices/paymentSlice';
 import usageReducer from './slices/usageSlice';
 import paymentAlertReducer from './slices/paymentAlertSlice';
+import templateReducer from './slices/templateReducer';
 const persistConfig = {
   key: 'root',
   storage: customStorage,
-  whitelist: ['code', 'deviceInfo', 'activeTab', 'editor', 'auth', 'payment', 'usage'],
+  whitelist: ['code', 'deviceInfo', 'activeTab', 'editor', 'auth', 'payment', 'usage', 'templates'],
 };
 
 const rootReducer = combineReducers({
@@ -27,7 +28,8 @@ const rootReducer = combineReducers({
   resume: resumeReducer,
   payment: paymentReducer,
   usage: usageReducer,
-  paymentAlert: paymentAlertReducer
+  paymentAlert: paymentAlertReducer,
+  templates: templateReducer
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
