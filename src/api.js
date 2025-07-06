@@ -43,17 +43,18 @@ const apis = {
   uploadImage: `${baseUrl}/v1/upload-image`,
   templateList: `${baseUrl}/template-list`,
 
+  // credits endpoints
+  getCreditInfo: `${baseUrl}/v1/credits/info`,
+  getMyCredits: `${baseUrl}/v1/credits/my-credits`,
+  createCreditOrder: `${baseUrl}/v1/credits/create-order`,
+  verifyCreditPayment: `${baseUrl}/v1/credits/verify-payment`,
+  getCreditPackages: `${baseUrl}/v1/credits/packages`,
+
   // Payment endpoints
   getAllPlans: `${baseUrl}/payment-plans`,
   getPlanById: (planId) => `${baseUrl}/payment-plans/${planId}`,
   createOrder: `${baseUrl}/create-order`,
   verifyPayment: `${baseUrl}/verify-payment`,
-  subscribeFree: `${baseUrl}/subscribe-free`,
-  getMySubscriptions: `${baseUrl}/my-subscriptions`,
-  getPaymentHistory: `${baseUrl}/payment-history`,
-  getPaymentStatus: (paymentId) => `${baseUrl}/payment-status/${paymentId}`,
-  initiateRefund: `${baseUrl}/refund`,
-  getSubscriptionStatus: `${baseUrl}/subscription-status`,
 
   // Usage endpoints
   getMyUsage: `${baseUrl}/my-usage`,
