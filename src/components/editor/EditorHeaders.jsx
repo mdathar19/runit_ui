@@ -17,6 +17,7 @@ import ResumeUploader from '../global/ResumeUploader';
 import { enhanceHtml } from '@/redux/slices/resumeSlice';
 import { selectSocketId } from '@/redux/slices/compilerSlice';
 import CreditRechargeModal from './CreditRechargeModal ';
+import { fetchPortfolioCreditInfo, getPortfolioCreditInfo } from '@/redux/slices/usageSlice';
 
 function EditorHeaders({ 
     iframeRef
@@ -24,6 +25,8 @@ function EditorHeaders({
   const router = useRouter();
   const dispatch = useDispatch();
     // Get portfolio state from Redux
+    const portfolioCreditInfo = useSelector(getPortfolioCreditInfo);
+    const credits = portfolioCreditInfo?.remainingCredits || 0;
     const {
         portfolios
       } = useSelector((state) => state.portfolio);
@@ -49,38 +52,15 @@ function EditorHeaders({
     const [nextAction, setNextAction] = useState(null);
     
     // Credit system states
-    const [credits, setCredits] = useState(0);
     const [showCreditModal, setShowCreditModal] = useState(false);
     const [creditLoading, setCreditLoading] = useState(false);
 
-    // Fetch user credits
-    const fetchUserCredits = async () => {
-      if (!isAuthenticated) return;
-      
-      try {
-        setCreditLoading(true);
-        const response = await fetch(apis.getCreditInfo, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          setCredits(data.credits);
-        }
-      } catch (error) {
-        console.error('Error fetching credits:', error);
-      } finally {
-        setCreditLoading(false);
-      }
-    };
+  
 
     // Fetch credits when component mounts and when user authenticates
     useEffect(() => {
       if (isAuthenticated) {
-        fetchUserCredits();
+        dispatch(fetchPortfolioCreditInfo());
       }
     }, [isAuthenticated]);
 

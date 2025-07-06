@@ -26,7 +26,7 @@ const RenderElementEditor = ({ iframeRef }) => {
       const file = e.target.files[0];
       if (!file) return;
       
-      dispatch(setSavingStatus('saving'));
+      dispatch(setSavingStatus('saving...'));
       
       try {
         // Create form data
@@ -44,7 +44,7 @@ const RenderElementEditor = ({ iframeRef }) => {
 
         const data = await response.json();
         if (data.success) {
-          callback(publishedPortfolioUrl+data.imageUrl);
+          callback(data.imageUrl);
           dispatch(setSavingStatus('saved'));
           setTimeout(() => dispatch(setSavingStatus('')), 2000);
         } else {

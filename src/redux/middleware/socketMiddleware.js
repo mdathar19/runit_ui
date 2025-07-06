@@ -14,6 +14,7 @@ import {
   handlePaymentDispute
 } from "../slices/paymentAlertSlice";
 import { publishedPortfolioUrl } from "@/api";
+import { setPortfolioCreditInfo } from "../slices/usageSlice";
 
 // Socket.io middleware for Redux
 const socketMiddleware = () => {
@@ -101,12 +102,16 @@ const socketMiddleware = () => {
 
       // Final completion
       socket.on("html-enhancement-complete", (data) => {
-        console.log("HTML Enhancement completed successfully");
+        /* console.log("HTML Enhancement completed successfully"); */
         store.dispatch(setHtmlEnhancementComplete());
         
+        if(data.usageInfo){
+          // If usage info is provided, dispatch it to the store
+          store.dispatch(setPortfolioCreditInfo(data.usageInfo));
+        }
         // Ensure final HTML is set
-        if (data.finalHtml) {
-          store.dispatch(setTemplateHtml(data.finalHtml));
+        if (data.enhancedHtml) {
+          store.dispatch(setTemplateHtml(data.enhancedHtml));
         }
       });
 
