@@ -19,6 +19,7 @@ import Image from 'next/image';
 import { useDispatch, useSelector } from 'react-redux';
 import GlobalDropdown, { DropdownItem, DropdownDivider, DropdownHeader } from '../global/DropDown';
 import Login from '../Login';
+import ChangePasswordModal from '../ChangePasswordModal';
 import useReduxStore from '@/hooks/useReduxStore';
 import { landingNnavigationItems } from '@/utils/landing';
 import { logout } from '@/redux/slices/authSlice';
@@ -27,6 +28,7 @@ const Navigation = () => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isLoginOpen, setIsLoginOpen] = useState(false);
+    const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   // Get auth state from Redux (assuming you have this set up)
   const { isAuthenticated, user, token } = useSelector(state => state.auth || {
     isAuthenticated: false,
@@ -74,14 +76,13 @@ const Navigation = () => {
   };
 
   const handleChangePassword = () => {
-    console.log('Change password clicked');
-    // Open change password modal or navigate to change password page
+    setIsChangePasswordOpen(true);
   };
 
-  const handleSettings = () => {
+  /* const handleSettings = () => {
     console.log('Settings clicked');
     // Navigate to settings page
-  };
+  }; */
 
   // User Avatar Component
   const UserAvatar = ({ user, size = 'sm' }) => {
@@ -224,13 +225,13 @@ const Navigation = () => {
                   
                   <DropdownDivider theme="dark" />
                   
-                  <DropdownItem
+                  {/* <DropdownItem
                     icon={<Settings className="h-4 w-4" />}
                     onClick={handleSettings}
                     theme="dark"
                   >
                     Account Settings
-                  </DropdownItem>
+                  </DropdownItem> */}
                   
                   <DropdownItem
                     icon={<Key className="h-4 w-4" />}
@@ -322,7 +323,7 @@ const Navigation = () => {
                             </div>
                           </div>
                           
-                          <button
+                          {/* <button
                             onClick={() => {
                               handleSettings();
                               setIsMobileMenuOpen(false);
@@ -331,7 +332,7 @@ const Navigation = () => {
                           >
                             <Settings className="h-4 w-4" />
                             <span>Account Settings</span>
-                          </button>
+                          </button> */}
                           
                           <button
                             onClick={() => {
@@ -371,6 +372,12 @@ const Navigation = () => {
         onClose={() => setIsLoginOpen(false)}
         onLoginSuccess={handleLoginSuccess}
         nextAction="RunIt Platform"
+      />
+      {/* Change Password Modal */}
+      <ChangePasswordModal
+        isOpen={isChangePasswordOpen}
+        onClose={() => setIsChangePasswordOpen(false)}
+        userEmail={currentUser?.email || ''}
       />
     </>
   );
