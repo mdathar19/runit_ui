@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { FaLayerGroup, FaImage } from 'react-icons/fa';
 import { ELEMENT_TYPES } from '@/utils/Utils';
@@ -14,6 +14,8 @@ const RenderElementEditor = ({ iframeRef }) => {
   const {
     token
   } = useSelector((state) => state.auth);
+  // Add local state for upload spinner
+  const [isUploading, setIsUploading] = useState(false);
   // Handle image upload
   const handleImageUpload = (callback) => {
     // Create a file input element
@@ -27,7 +29,7 @@ const RenderElementEditor = ({ iframeRef }) => {
       if (!file) return;
       
       dispatch(setSavingStatus('saving...'));
-      
+      setIsUploading(true);
       try {
         // Create form data
         const formData = new FormData();
@@ -54,6 +56,8 @@ const RenderElementEditor = ({ iframeRef }) => {
         console.error('Error uploading image:', error);
         dispatch(setSavingStatus('error'));
         setTimeout(() => dispatch(setSavingStatus('')), 2000);
+      } finally {
+        setIsUploading(false);
       }
     };
     
@@ -75,7 +79,7 @@ const RenderElementEditor = ({ iframeRef }) => {
       if (!file) return;
       
       dispatch(setSavingStatus('uploading file...'));
-      
+      setIsUploading(true);
       try {
         // Create form data
         const formData = new FormData();
@@ -103,6 +107,8 @@ const RenderElementEditor = ({ iframeRef }) => {
         console.error('Error uploading file:', error);
         dispatch(setSavingStatus('upload failed'));
         setTimeout(() => dispatch(setSavingStatus('')), 2000);
+      } finally {
+        setIsUploading(false);
       }
     };
     
@@ -469,8 +475,14 @@ const RenderElementEditor = ({ iframeRef }) => {
             <GradientButton
               onClick={() => handleImageUpload(url => handleUpdateElementContent(url))}
               className="w-full flex items-center justify-center"
+              disabled={isUploading}
             >
-              <FaImage className="mr-2" /> Upload New Image
+              {isUploading ? (
+                <span className="animate-spin mr-2 w-4 h-4 border-2 border-white border-t-transparent rounded-full inline-block"></span>
+              ) : (
+                <FaImage className="mr-2" />
+              )}
+              {isUploading ? 'Uploading...' : 'Upload New Image'}
             </GradientButton>
           </div>
         </div>
@@ -523,12 +535,17 @@ const RenderElementEditor = ({ iframeRef }) => {
                 const currentContent = typeof selectedElement.content === 'object' ? 
                   { ...selectedElement.content, href: url } : 
                   { href: url, text: selectedElement.content?.text || 'Download File' };
-                
                 handleUpdateElementContent(currentContent);
               })}
               className="w-full flex items-center justify-center"
+              disabled={isUploading}
             >
-              <FaLayerGroup className="mr-2" /> Upload File & Get Link
+              {isUploading ? (
+                <span className="animate-spin mr-2 w-4 h-4 border-2 border-white border-t-transparent rounded-full inline-block"></span>
+              ) : (
+                <FaLayerGroup className="mr-2" />
+              )}
+              {isUploading ? 'Uploading...' : 'Upload File & Get Link'}
             </GradientButton>
           </div>
         </div>
@@ -652,8 +669,14 @@ const RenderElementEditor = ({ iframeRef }) => {
             <GradientButton
               onClick={() => handleImageUpload(url => handleUpdateElementContent(url))}
               className="w-full flex items-center justify-center"
+              disabled={isUploading}
             >
-              <FaImage className="mr-2" /> Upload New Background
+              {isUploading ? (
+                <span className="animate-spin mr-2 w-4 h-4 border-2 border-white border-t-transparent rounded-full inline-block"></span>
+              ) : (
+                <FaImage className="mr-2" />
+              )}
+              {isUploading ? 'Uploading...' : 'Upload New Background'}
             </GradientButton>
           </div>
         </div>

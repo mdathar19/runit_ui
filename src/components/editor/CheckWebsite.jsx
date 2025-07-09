@@ -3,10 +3,10 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { checkWebsiteName, clearNameCheckResult } from '@/redux/slices/portfolioSlice';
-import { FaCheck, FaSpinner, FaTimes, FaInfoCircle } from 'react-icons/fa';
+import { FaCheck, FaSpinner, FaTimes, FaInfoCircle, FaTimesCircle } from 'react-icons/fa';
 
-const CheckWebsite = ({ onWebsiteNameConfirmed, initialName }) => {
-  const [websiteName, setWebsiteName] = useState(initialName || '');
+const CheckWebsite = ({ setShowWebsiteNameModal, onWebsiteNameConfirmed, initialName }) => {
+  const [websiteName, setWebsiteName] = useState('my-portfolio');
   const [nameValid, setNameValid] = useState(false);
   const [inputTouched, setInputTouched] = useState(false);
   const [showNewNameInput, setShowNewNameInput] = useState(false);
@@ -95,17 +95,27 @@ const CheckWebsite = ({ onWebsiteNameConfirmed, initialName }) => {
     }
   };
   
+  // Helper to determine if user can add a new portfolio
+  const canAddNewPortfolio = portfolios && portfolios.length < 5;
+  
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
       <div className="max-w-lg w-full">
-        <div className="bg-gray-900 rounded-lg p-6 shadow-lg max-w-md mx-auto">
+        <div className="bg-gray-900 rounded-lg p-6 shadow-lg max-w-md mx-auto relative">
+          {/* Close (X) icon */}
+          <button
+            className="absolute top-3 right-3 text-gray-400 hover:text-white text-xl focus:outline-none"
+            onClick={() => setShowWebsiteNameModal(false)}
+            aria-label="Close"
+          >
+            <FaTimesCircle />
+          </button>
           <h2 className="text-xl font-semibold text-white mb-4">Choose a Website Name</h2>
-          
           <form onSubmit={handleSubmit}>
             {portfolios && portfolios.length > 0 && (
               <div className="mb-6">
                 <label htmlFor="existingPortfolio" className="block text-sm font-medium text-gray-300 mb-1">
-                  Select Existing Portfolio or Create New
+                  Select Existing Portfolio{canAddNewPortfolio ? ' or Create New' : ''}
                 </label>
                 <select
                   id="existingPortfolio"
@@ -119,8 +129,8 @@ const CheckWebsite = ({ onWebsiteNameConfirmed, initialName }) => {
                       {portfolio.name}
                     </option>
                   ))}
+                  {canAddNewPortfolio && <option value="new">Go with new one +</option>}
                 </select>
-                
                 {selectedPortfolio && selectedPortfolio !== 'new' && (
                   <div className="mt-2 text-sm text-green-400 flex items-start gap-2">
                     <FaInfoCircle className="mt-0.5 flex-shrink-0" />
@@ -129,8 +139,8 @@ const CheckWebsite = ({ onWebsiteNameConfirmed, initialName }) => {
                 )}
               </div>
             )}
-            
-            {(showNewNameInput || !portfolios || portfolios.length === 0) && (
+            {/* Show new name input if user chose new or if there are no portfolios */}
+            {((showNewNameInput && canAddNewPortfolio) || !portfolios || portfolios.length === 0) && (
               <div className="mb-4">
                 <label htmlFor="websiteName" className="block text-sm font-medium text-gray-300 mb-1">
                   {portfolios && portfolios.length > 0 ? 'New Portfolio Name' : 'Website Name'}
@@ -145,7 +155,6 @@ const CheckWebsite = ({ onWebsiteNameConfirmed, initialName }) => {
                     onChange={handleNameChange}
                     autoComplete="off"
                   />
-                  
                   {inputTouched && (
                     <div className="absolute right-3 top-1/2 -translate-y-1/2">
                       {checkNameStatus === 'loading' && (
@@ -160,28 +169,20 @@ const CheckWebsite = ({ onWebsiteNameConfirmed, initialName }) => {
                     </div>
                   )}
                 </div>
-                
-                {/* Input guidance */}
                 <p className="mt-1 text-sm text-gray-400">
                   Use only lowercase letters, numbers, and hyphens. Minimum 3 characters.
                 </p>
-                
-                {/* Validation message */}
                 {inputTouched && !nameValid && (
                   <p className="mt-1 text-sm text-red-400">
                     Please use only lowercase letters, numbers, and hyphens (minimum 3 characters).
                   </p>
                 )}
-                
-                {/* Availability message */}
                 {checkNameStatus === 'succeeded' && (
                   <div className={`mt-2 text-sm ${nameCheckResult?.available ? 'text-green-400' : 'text-yellow-400'} flex items-start gap-2`}>
                     <FaInfoCircle className="mt-0.5 flex-shrink-0" />
                     <span>{nameCheckResult?.message}</span>
                   </div>
                 )}
-                
-                {/* Suggested name */}
                 {checkNameStatus === 'succeeded' && !nameCheckResult?.available && nameCheckResult?.suggestedName && (
                   <div className="mt-3">
                     <p className="text-sm text-gray-300">Suggested name:</p>
@@ -197,27 +198,31 @@ const CheckWebsite = ({ onWebsiteNameConfirmed, initialName }) => {
                     </div>
                   </div>
                 )}
-                
-                {/* Error message */}
+                {checkNameStatus === 'succeeded' && !nameCheckResult?.available && nameCheckResult?.takenBy && (
+                  <div className="mt-1 text-sm text-red-300 flex items-center gap-2">
+                    <FaInfoCircle className="flex-shrink-0" />
+                    <span>
+                      This name is already taken by <span className="font-semibold text-white">{nameCheckResult.takenBy}</span>.
+                    </span>
+                  </div>
+                )}
                 {checkNameStatus === 'failed' && (
                   <p className="mt-2 text-sm text-red-400">{error || 'Failed to check website name availability.'}</p>
                 )}
               </div>
             )}
-            
-            <div className="flex justify-between gap-4 mt-6">
+            <div className="flex justify-end gap-4 mt-6">
               <button
                 type="button"
                 className="flex-1 py-2 px-4 bg-gray-700 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500"
-                onClick={() => onWebsiteNameConfirmed(null)}
+                onClick={() => setShowWebsiteNameModal(false)}
               >
-                Skip
+                Cancel
               </button>
-              
               <button
                 type="submit"
                 className="flex-1 py-2 px-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-md hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={(showNewNameInput && !nameValid) || (checkNameStatus === 'loading') || (!selectedPortfolio && portfolios && portfolios.length > 0 && !showNewNameInput)}
+                disabled={((showNewNameInput && !nameValid) || (checkNameStatus === 'loading') || (!selectedPortfolio && portfolios && portfolios.length > 0 && !showNewNameInput))}
               >
                 {checkNameStatus === 'loading' ? 'Checking...' : 'Confirm'}
               </button>
