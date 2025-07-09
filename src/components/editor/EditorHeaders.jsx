@@ -485,6 +485,7 @@ function EditorHeaders({
         {/* Website Name Check Modal */}
         {showWebsiteNameModal && (
             <CheckWebsite
+            setShowWebsiteNameModal={setShowWebsiteNameModal}
             initialName={templateId?.split('-').join('-')}
             onWebsiteNameConfirmed={handleWebsiteNameConfirmed}
         />
