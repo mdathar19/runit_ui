@@ -14,6 +14,7 @@ const CreditRechargeModal = ({ isOpen, onClose, onSuccess, currentCredits }) => 
         isAuthenticated,
         token
     } = useSelector((state) => state.auth);
+    
     // Load credit packages from API
     const loadCreditPackages = async () => {
         setLoadingPackages(true);
@@ -24,12 +25,12 @@ const CreditRechargeModal = ({ isOpen, onClose, onSuccess, currentCredits }) => 
         if (data.success) {
             setCreditPackages(data.packages);
         } else {
-            // Fallback to hardcoded packages
+            // Fallback to hardcoded packages with new pricing
             setCreditPackages([
             { 
                 id: 1, 
                 credits: 1, 
-                price: 99, 
+                price: 199, 
                 popular: false,
                 description: 'Perfect for trying out',
                 savings: 0
@@ -37,37 +38,37 @@ const CreditRechargeModal = ({ isOpen, onClose, onSuccess, currentCredits }) => 
             { 
                 id: 2, 
                 credits: 5, 
-                price: 449, 
+                price: 899, 
                 popular: true, 
-                savings: 20,
+                savings: 10,
                 description: 'Most popular choice'
             },
             { 
                 id: 3, 
                 credits: 10, 
-                price: 799, 
+                price: 1699, 
                 popular: false, 
-                savings: 19,
+                savings: 15,
                 description: 'Great for regular use'
             },
             { 
                 id: 4, 
                 credits: 25, 
-                price: 1899, 
+                price: 3999, 
                 popular: false, 
-                savings: 23,
+                savings: 20,
                 description: 'Best value for power users'
             },
             ]);
         }
         } catch (error) {
         console.error('Error loading credit packages:', error);
-        // Use fallback packages
+        // Use fallback packages with new pricing
         setCreditPackages([
             { 
             id: 1, 
             credits: 1, 
-            price: 99, 
+            price: 199, 
             popular: false,
             description: 'Perfect for trying out',
             savings: 0
@@ -75,25 +76,25 @@ const CreditRechargeModal = ({ isOpen, onClose, onSuccess, currentCredits }) => 
             { 
             id: 2, 
             credits: 5, 
-            price: 449, 
+            price: 899, 
             popular: true, 
-            savings: 20,
+            savings: 10,
             description: 'Most popular choice'
             },
             { 
             id: 3, 
             credits: 10, 
-            price: 799, 
+            price: 1699, 
             popular: false, 
-            savings: 19,
+            savings: 15,
             description: 'Great for regular use'
             },
             { 
             id: 4, 
             credits: 25, 
-            price: 1899, 
+            price: 3999, 
             popular: false, 
-            savings: 23,
+            savings: 20,
             description: 'Best value for power users'
             },
         ]);

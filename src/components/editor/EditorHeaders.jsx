@@ -351,7 +351,7 @@ function EditorHeaders({
     const handleCreditPurchaseSuccess = () => {
       setShowCreditModal(false);
       // Refresh credits
-      fetchUserCredits();
+      dispatch(fetchPortfolioCreditInfo());
       // Show success message
       dispatch(setPopupConfig({
         message: "Credits purchased successfully!",
