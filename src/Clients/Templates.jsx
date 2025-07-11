@@ -16,13 +16,14 @@ import {
 } from '@/redux/slices/templateReducer';
 import useReduxStore from '@/hooks/useReduxStore';
 import { setTemplateHtml } from '@/redux/slices/editorSlice';
+import { getUIBaseUrl } from '@/api';
 
 // Categories for filtering
 const categories = [
   { id: 'all', name: 'All Templates' },
   { id: 'portfolio', name: 'Portfolio' },
-  { id: 'business', name: 'Business' },
-  { id: 'agency', name: 'Agency' },
+/*   { id: 'business', name: 'Business' },
+  { id: 'agency', name: 'Agency' }, */
   { id: 'professional', name: 'Professional' },
 ];
 
@@ -214,7 +215,7 @@ function Templates() {
 
         {/* Loading Skeleton */}
         {isLoading && templates.length === 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
             {[...Array(6)].map((_, index) => (
               <div key={index} className="bg-gray-800 rounded-xl overflow-hidden border border-gray-700 animate-pulse">
                 <div className="h-60 bg-gray-700"></div>
@@ -239,7 +240,7 @@ function Templates() {
         {/* Templates Grid */}
         {!isLoading || templates.length > 0 ? (
           <motion.div 
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
@@ -248,7 +249,7 @@ function Templates() {
               templates.map(template => (
                 <motion.div 
                   key={template._id}
-                  className="bg-gray-800 rounded-xl overflow-hidden border border-gray-700 hover:border-purple-500 transition-all duration-300 hover:shadow-lg hover:shadow-purple-900/20"
+                  className="bg-gray-800 rounded-xl overflow-hidden border border-gray-700 hover:border-purple-500 transition-all duration-300 hover:shadow-lg hover:shadow-purple-900/20 h-full flex flex-col"
                   variants={itemVariants}
                 >
                   {/* Template Preview */}
@@ -263,7 +264,7 @@ function Templates() {
                       style={{ objectFit: 'cover' }}
                       className="transition-transform duration-500 hover:scale-105"
                       onError={(e) => {
-                        e.target.src = '/assets/default-template.png'; // Fallback image
+                        e.target.src = getUIBaseUrl()+'/portfolio-image.png';
                       }}
                     />
                     <div className="absolute bottom-4 left-4 right-4 z-20">
@@ -275,42 +276,46 @@ function Templates() {
                   </div>
 
                   {/* Template Details */}
-                  <div className="p-4">
-                    <p className="text-gray-300 text-sm mb-4">{template.description}</p>
-                    
-                    {/* Tags */}
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {template.tags.map(tag => (
-                        <span key={`${template._id}-${tag}`} className="text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded-md">
-                          {tag}
-                        </span>
-                      ))}
+                  <div className="p-4 flex flex-col justify-between flex-1">
+                    <div>
+                      <p className="text-gray-300 text-sm mb-4">{template.description}</p>
+
+                      {/* Tags */}
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {template.tags.map(tag => (
+                          <span key={`${template._id}-${tag}`} className="text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded-md">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
                     </div>
-                    
-                    {/* Usage Count */}
-                    <div className="flex items-center justify-between mb-4 text-xs text-gray-400">
-                      <span>Used {template.usageCount} times</span>
-                      <span>★ {template.rating.average.toFixed(1)} ({template.rating.count})</span>
-                    </div>
-                    
-                    {/* Actions */}
-                    <div className="flex gap-2">
-                      <GradientButton
-                        className="flex-1 text-sm py-1.5"
-                        onClick={() => handleSelectTemplate(template.name)}
-                      >
-                        <FaEdit className="mr-1.5" /> Edit
-                      </GradientButton>
-                      <button 
-                        className="bg-gray-700 hover:bg-gray-600 text-white p-2 rounded-md transition-colors"
-                        onClick={() => handlePreviewTemplate(template.templateUrl)}
-                        title="Preview"
-                      >
-                        <FaEye />
-                      </button>
+
+                    {/* Bottom: Usage, Ratings, Actions */}
+                    <div className="mt-auto">
+                      <div className="flex items-center justify-between mb-4 text-xs text-gray-400">
+                        <span>Used {template.usageCount} times</span>
+                        <span>★ {template.rating.average.toFixed(1)} ({template.rating.count})</span>
+                      </div>
+
+                      <div className="flex gap-2">
+                        <GradientButton
+                          className="flex-1 text-sm py-1.5"
+                          onClick={() => handleSelectTemplate(template.name)}
+                        >
+                          <FaEdit className="mr-1.5" /> Edit
+                        </GradientButton>
+                        <button 
+                          className="bg-gray-700 hover:bg-gray-600 text-white p-2 rounded-md transition-colors"
+                          onClick={() => handlePreviewTemplate(template.templateUrl)}
+                          title="Preview"
+                        >
+                          <FaEye />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </motion.div>
+
               ))
             ) : !isLoading && (
               <div className="col-span-3 py-12 text-center">

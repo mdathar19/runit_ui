@@ -205,7 +205,7 @@ const PortfolioLanding = () => {
                       {/* Template image with gradient overlay */}
                       <div className={`relative h-64 md:h-80 rounded-t-lg overflow-hidden`}>
                         {/* Background gradient */}
-                        <div className={`absolute inset-0 bg-gradient-to-r ${portfolioTemplates[activeTemplate].color} opacity-70 z-10`}></div>
+                        <div className={`absolute inset-0 opacity-70 z-10`}></div>
                         
                         {/* Template image */}
                         <div className="relative w-full h-full">

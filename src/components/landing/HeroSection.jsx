@@ -98,12 +98,12 @@ const HeroSection = () => {
               
               <div className="flex flex-col sm:flex-row gap-4 mb-8">
                 <motion.button
-                  onClick={() => handleCodingFree('/compiler/python')}
+                  onClick={() => handleCodingFree('/portfolio/templates-list')}
                   className="cursor-pointer bg-gradient-to-r from-purple-600 to-violet-800 hover:from-purple-700 hover:to-violet-900 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-xl"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  Start Coding Free <ArrowRight className="ml-2 h-5 w-5" />
+                  Host Portfolio Free<ArrowRight className="ml-2 h-5 w-5" />
                 </motion.button>
                 
                 <motion.button

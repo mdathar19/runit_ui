@@ -199,7 +199,7 @@ const downloadAsImage = async () => {
 };
 
   return (
-    <>
+    <div className='mt-15'>
       <h1 className="text-3xl font-bold mb-6 flex items-center"><FaCode className="mr-2" />Create Code Snippet</h1>
       <div>
         <p className="text-gray-300 mb-6">
@@ -323,7 +323,7 @@ const downloadAsImage = async () => {
           selectedTheme={selectedTheme}
         />
       </div>
-    </>
+    </div>
   );
 };
 
