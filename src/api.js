@@ -11,7 +11,7 @@ const getBaseUrl = () => {
       return '';
     }
   };
-  const getUIBaseUrl = () => {
+export const getUIBaseUrl = () => {
     if (typeof window !== 'undefined') {
       // Running in browser
       if (window.location.hostname === 'localhost') {

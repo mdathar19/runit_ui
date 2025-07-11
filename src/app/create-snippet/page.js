@@ -54,7 +54,6 @@ export default async function CreateSnippetPage() {
 
   return (
     <>
-    <MadeByAthar />
       <div className="min-h-screen bg-gray-950 text-white p-2 sm:p-4">
         <div className="container mx-auto">
           <CreateSnippetClient themes={snippetThemes} />

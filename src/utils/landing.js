@@ -184,7 +184,7 @@ export const codeExamples = [
     },
     {
       name: 'Host Portfolio',
-      href: '/portfolio/create',
+      href: '/portfolio/templates-list',
       icon: <Palette className="h-4 w-4" />,
       gradient: 'from-blue-500 to-cyan-500',
       description: 'Host stunning portfolios'
