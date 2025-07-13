@@ -150,7 +150,7 @@ const CreatePortfolioModal = ({ isOpen, onClose }) => {
     };
 
     // Effect to handle enhancement completion
-    useEffect(() => {
+/*     useEffect(() => {
         if (enhancementCompleted) {
             dispatch(getUserPortfolios());
             dispatch(fetchPortfolioStats());
@@ -158,7 +158,7 @@ const CreatePortfolioModal = ({ isOpen, onClose }) => {
             onClose();
             dispatch(toggleFeedback(true))
         }
-    }, [enhancementCompleted]);
+    }, [enhancementCompleted]); */
 
     // Effect to sync uploaded resume with redux state
     useEffect(() => {
