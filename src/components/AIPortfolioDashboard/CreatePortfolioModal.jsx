@@ -38,7 +38,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { selectEnhancementComplete, setFileName, parseResume, clearResumeData, selectEnhancementInProgress, selectEnhancementMessage } from '@/redux/slices/resumeSlice';
 import { getPortfolioCreditInfo } from '@/redux/slices/usageSlice';
 import { engines, styles, steps } from '@/utils/Utils';
-import { selectSocketId } from '@/redux/slices/compilerSlice';
+import { selectSocketId, toggleFeedback } from '@/redux/slices/compilerSlice';
 
 
 // Create Portfolio Modal Component
@@ -156,6 +156,7 @@ const CreatePortfolioModal = ({ isOpen, onClose }) => {
             dispatch(fetchPortfolioStats());
             setIsGenerating(false);
             onClose();
+            dispatch(toggleFeedback(true))
         }
     }, [enhancementCompleted, dispatch, onClose]);
 
@@ -269,7 +270,7 @@ const CreatePortfolioModal = ({ isOpen, onClose }) => {
                         {/* Step 1: Engine Selection */}
                         <div className="space-y-4">
                             <div className='flex gap-2 items-center'>
-                                <h3 className="text-lg font-semibold text-white">1. Choose AI Engine</h3>
+                                <h3 className="text-lg font-semibold text-white">1. Choose AI Agent</h3>
                                 {(!credits || credits==0) && <div className="bg-red-800 text-white px-2 py-1 rounded-full text-xs font-bold">
                                     No Credit left
                                 </div>}

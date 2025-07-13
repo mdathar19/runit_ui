@@ -32,6 +32,9 @@ import EditorHeaders from '@/components/editor/EditorHeaders';
 import HtmlEnhancementProgress from '@/components/editor/HtmlEnhancementProgress';
 import { updateIframeDOM } from '@/utils/Utils';
 import PaymentAlert from '@/components/global/PaymentAlert';
+import { selectEnhancementComplete } from '@/redux/slices/resumeSlice';
+import { toggleFeedback } from '@/redux/slices/compilerSlice';
+import FeedbackForm from '@/components/JsCompiler/FeedbackForm';
 
 function Editor({ templateId: propTemplateId }) {
   const params = useParams();
@@ -72,7 +75,7 @@ function Editor({ templateId: propTemplateId }) {
   const [isTemplateUrl, setIsTemplateUrl] = useState(false);
   const [fetchedHtml, setFetchedHtml] = useState('');
   const updateTimeoutRef = useRef(null);
-
+  const enhancementCompleted = useSelector(selectEnhancementComplete);
   // Add error boundary
   useEffect(() => {
     const handleError = (error) => {
@@ -549,7 +552,7 @@ function Editor({ templateId: propTemplateId }) {
       console.error('Error in template update effect:', error);
       setError(`Template update failed: ${error.message}`);
     }
-  }, [fetchedHtml, isIframeInitialized, isTemplateUrl]);
+  }, [fetchedHtml,enhancementCompleted, isIframeInitialized, isTemplateUrl]);
 
   // Cleanup timeout on unmount
   useEffect(() => {
@@ -581,7 +584,11 @@ function Editor({ templateId: propTemplateId }) {
       console.error('Error fetching portfolios:', error);
     }
   }, [isAuthenticated, token, dispatch]);
-
+  useEffect(() => {
+    if (enhancementCompleted) {
+        dispatch(toggleFeedback(true))
+    }
+    }, [enhancementCompleted]);
   // Early return for error state
   if (error) {
     return (
@@ -731,6 +738,7 @@ function Editor({ templateId: propTemplateId }) {
         </div>
       </div>
       {HtmlEnhancementProgress && <HtmlEnhancementProgress />}
+       <FeedbackForm handleClose={() => dispatch(toggleFeedback(false))} />
     </div>
   );
 }

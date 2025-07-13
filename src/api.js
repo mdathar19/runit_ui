@@ -2,7 +2,7 @@ const getBaseUrl = () => {
     if (typeof window !== 'undefined') {
       // Running in browser
       if (window.location.hostname === 'localhost') {
-        return 'https://api.runit.in';
+        return 'http://localhost:3000';
       } else {
         return 'https://api.runit.in'; // Empty base URL, use relative path in production
       }
@@ -24,6 +24,7 @@ export const getUIBaseUrl = () => {
       return '';
     }
   };
+export const assetUrl = 'https://assets.runit.in'
 export const portfolioUrl = `${getUIBaseUrl()}/portfolio/create`;
 export const publishedPortfolioUrl = `${getBaseUrl()}`;
 const baseUrl = getBaseUrl();

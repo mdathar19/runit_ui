@@ -20,6 +20,8 @@ import useReduxStore from '@/hooks/useReduxStore';
 import { setSavingStatus, setTemplateHtml } from '@/redux/slices/editorSlice';
 import CheckWebsite from '../editor/CheckWebsite';
 import { setPopupConfig } from '@/redux/slices/messagePopSlice';
+import FeedbackForm from '../JsCompiler/FeedbackForm';
+import { toggleFeedback } from '@/redux/slices/compilerSlice';
 
 function PortfolioList({searchTerm, filterType}) {
     const portfolios = useSelector(selectPortfolios);
@@ -356,6 +358,7 @@ function PortfolioList({searchTerm, filterType}) {
                 onWebsiteNameConfirmed={handleWebsiteNameConfirmed}
                 />
             )}
+            <FeedbackForm handleClose={() => dispatch(toggleFeedback(false))} />
         </div>
     );
 }
