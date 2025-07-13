@@ -200,7 +200,7 @@ const Navigation = () => {
             <div className="hidden md:flex items-center">
               {!isUserLoggedIn ? (
                 <motion.button
-                  className="flex items-center px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl"
+                  className="cursor-pointer flex items-center px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setIsLoginOpen(true)}
@@ -298,7 +298,7 @@ const Navigation = () => {
                     <div className="pt-4 border-t border-gray-800">
                       {!isUserLoggedIn ? (
                         <motion.button
-                          className="w-full px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold rounded-lg transition-all duration-300"
+                          className="cursor-pointer  w-full px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold rounded-lg transition-all duration-300"
                           onClick={() => {
                             setIsLoginOpen(true);
                             setIsMobileMenuOpen(false);

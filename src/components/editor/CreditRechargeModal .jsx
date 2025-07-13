@@ -2,6 +2,7 @@ import apis from '@/api';
 import React, { useState, useEffect } from 'react';
 import { FaTimes, FaCoins, FaCreditCard, FaSpinner, FaCheck, FaStar } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
+import Login from '../Login';
 
 const CreditRechargeModal = ({ isOpen, onClose, onSuccess, currentCredits }) => {
     const [selectedPackage, setSelectedPackage] = useState(null);
@@ -10,8 +11,8 @@ const CreditRechargeModal = ({ isOpen, onClose, onSuccess, currentCredits }) => 
     const [razorpayLoaded, setRazorpayLoaded] = useState(false);
     const [creditPackages, setCreditPackages] = useState([]);
     const [loadingPackages, setLoadingPackages] = useState(false);
+    const [nextAction] = useState('Recharge Credit');
     const {
-        isAuthenticated,
         token
     } = useSelector((state) => state.auth);
     
@@ -122,7 +123,9 @@ const CreditRechargeModal = ({ isOpen, onClose, onSuccess, currentCredits }) => 
         document.body.appendChild(script);
         });
     };
-
+    const handleLoginSuccess = (token) => {
+        onClose()
+    };
     // Initialize when modal opens
     useEffect(() => {
         if (isOpen) {
@@ -246,9 +249,13 @@ const CreditRechargeModal = ({ isOpen, onClose, onSuccess, currentCredits }) => 
         setIsLoading(false);
         }
     };
-
   if (!isOpen) return null;
-
+  if (!token) return <Login
+          isOpen={true}
+          onClose={onClose}
+          onLoginSuccess={handleLoginSuccess}
+          nextAction={nextAction}
+        />;
   return (
     <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">

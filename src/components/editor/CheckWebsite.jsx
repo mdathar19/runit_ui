@@ -14,7 +14,7 @@ const CheckWebsite = ({ setShowWebsiteNameModal, onWebsiteNameConfirmed, initial
   
   const dispatch = useDispatch();
   const { checkNameStatus, nameCheckResult, error, portfolios } = useSelector(state => state.portfolio);
-  
+  const activePortfolio = portfolios?.filter(i=>i.isPublic)
   useEffect(() => {
     // Clear previous checks when component mounts or unmounts
     return () => {
@@ -96,7 +96,7 @@ const CheckWebsite = ({ setShowWebsiteNameModal, onWebsiteNameConfirmed, initial
   };
   
   // Helper to determine if user can add a new portfolio
-  const canAddNewPortfolio = portfolios && portfolios.length < 5;
+  const canAddNewPortfolio = activePortfolio && activePortfolio.length < 5;
   
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
@@ -112,7 +112,7 @@ const CheckWebsite = ({ setShowWebsiteNameModal, onWebsiteNameConfirmed, initial
           </button>
           <h2 className="text-xl font-semibold text-white mb-4">Choose a Website Name</h2>
           <form onSubmit={handleSubmit}>
-            {portfolios && portfolios.length > 0 && (
+            {activePortfolio && activePortfolio.length > 0 && (
               <div className="mb-6">
                 <label htmlFor="existingPortfolio" className="block text-sm font-medium text-gray-300 mb-1">
                   Select Existing Portfolio{canAddNewPortfolio ? ' or Create New' : ''}
@@ -124,7 +124,7 @@ const CheckWebsite = ({ setShowWebsiteNameModal, onWebsiteNameConfirmed, initial
                   onChange={handlePortfolioSelect}
                 >
                   <option value="">-- Select a portfolio --</option>
-                  {portfolios.map(portfolio => (
+                  {activePortfolio.map(portfolio => (
                     <option key={portfolio._id} value={portfolio.name}>
                       {portfolio.name}
                     </option>
@@ -139,11 +139,11 @@ const CheckWebsite = ({ setShowWebsiteNameModal, onWebsiteNameConfirmed, initial
                 )}
               </div>
             )}
-            {/* Show new name input if user chose new or if there are no portfolios */}
-            {((showNewNameInput && canAddNewPortfolio) || !portfolios || portfolios.length === 0) && (
+            {/* Show new name input if user chose new or if there are no activePortfolio */}
+            {((showNewNameInput && canAddNewPortfolio) || !activePortfolio || activePortfolio.length === 0) && (
               <div className="mb-4">
                 <label htmlFor="websiteName" className="block text-sm font-medium text-gray-300 mb-1">
-                  {portfolios && portfolios.length > 0 ? 'New Portfolio Name' : 'Website Name'}
+                  {activePortfolio && activePortfolio.length > 0 ? 'New Portfolio Name' : 'Website Name'}
                 </label>
                 <div className="relative">
                   <input
@@ -222,7 +222,7 @@ const CheckWebsite = ({ setShowWebsiteNameModal, onWebsiteNameConfirmed, initial
               <button
                 type="submit"
                 className="flex-1 py-2 px-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-md hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={((showNewNameInput && !nameValid) || (checkNameStatus === 'loading') || (!selectedPortfolio && portfolios && portfolios.length > 0 && !showNewNameInput))}
+                disabled={((showNewNameInput && !nameValid) || (checkNameStatus === 'loading') || (!selectedPortfolio && activePortfolio && activePortfolio.length > 0 && !showNewNameInput))}
               >
                 {checkNameStatus === 'loading' ? 'Checking...' : 'Confirm'}
               </button>
