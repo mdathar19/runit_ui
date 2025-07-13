@@ -2,22 +2,22 @@ import RunItLanding from "@/Clients/RunItLanding";
 import Navigation from "@/components/landing/Naviation";
 // SEO metadata
 export const metadata = {
-  title: 'RunIt - Online Compiler | AI Code Assistant, Snippet & Portfolio Creator',
+  title: 'RunIt - AI Portfolio Generator, Code Agent & Online Compiler',
   description:
-    'RunIt is your all-in-one online Compiler that lets you write and compile code in 7 languages, generate AI-assisted code, create beautiful code snippets, and Create professional portfolios in minutes.',
+    'RunIt is your all-in-one AI platform to instantly generate professional portfolios, build with intelligent AI code agents, and compile code in 7 languages – all in the browser.',
   keywords:
-    'online Compiler, AI code assistant, code snippet generator, portfolio creator, multi-language compiler, online code editor, JavaScript compiler, Python compiler, code sharing, developer portfolio, runit',
+    'portfolio generator, AI code agent, online compiler, AI code assistant, code snippet maker, multi-language compiler, online code editor, code sharing, developer portfolio, runit',
 
   openGraph: {
-    title: 'RunIt – Online Compiler | AI Code Assistant, Snippet & Portfolio Creator',
+    title: 'RunIt - AI Portfolio Generator, Code Agent & Online Compiler',
     description:
-      'Write and compile code in 7 languages, use AI to generate code, create and share beautiful snippets, and Create professional portfolios in minutes.',
+      'Create stunning developer portfolios in 1 minute, build with AI code agents, and compile in 7 languages – all from your browser. No setup needed.',
     images: [
       {
         url: '/runIt-SEO.png',
         width: 600,
         height: 400,
-        alt: 'RunIt Code AI-assist Preview',
+        alt: 'RunIt AI Portfolio Generator Preview',
       }
     ],
     type: 'website',
@@ -26,9 +26,9 @@ export const metadata = {
 
   twitter: {
     card: 'summary_large_image',
-    title: 'RunIt – Online Compiler | AI Code Assistant, Snippet & Portfolio Creator',
+    title: 'RunIt - AI Portfolio Generator, Code Agent & Online Compiler',
     description:
-      'Experience coding like never before with RunIt: an online Compiler for 7 languages, AI-assisted coding, snippet creation, and Create professional portfolios in minutes.',
+      'Instant portfolio generation, smart AI code agents, real-time compilation, and beautiful snippets – everything a developer needs. Try RunIt now.',
     images: ['/runIt-SEO.png'],
   },
 
@@ -36,6 +36,7 @@ export const metadata = {
     canonical: 'https://runit.in',
   },
 };
+
 
 
 
