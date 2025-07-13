@@ -69,6 +69,8 @@ const HeroSection = () => {
       if(!isAuthenticated){
         setShowLoginModal(true);
         setNextAction('Create by AI Agents')
+      }else{
+        window.open('/AI-agent/portfolio-generator', '_blank');
       }
   }
    const handleLoginSuccess = (token) => {
