@@ -16,7 +16,7 @@ import {
 } from '@/redux/slices/templateReducer';
 import useReduxStore from '@/hooks/useReduxStore';
 import { setTemplateHtml } from '@/redux/slices/editorSlice';
-import { getUIBaseUrl } from '@/api';
+import { assetUrl, getUIBaseUrl } from '@/api';
 
 // Categories for filtering
 const categories = [
@@ -248,73 +248,95 @@ function Templates() {
             {templates.length > 0 ? (
               templates.map(template => (
                 <motion.div 
-                  key={template._id}
-                  className="bg-gray-800 rounded-xl overflow-hidden border border-gray-700 hover:border-purple-500 transition-all duration-300 hover:shadow-lg hover:shadow-purple-900/20 h-full flex flex-col"
-                  variants={itemVariants}
-                >
-                  {/* Template Preview */}
-                  <div className="relative h-60 overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent z-10"></div>
-                    <Image
-                      src={template.coverImageUrl || template.coverImage}
-                      alt={template.displayName}
-                      fill
-                      unoptimized
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      style={{ objectFit: 'cover' }}
-                      className="transition-transform duration-500 hover:scale-105"
-                      onError={(e) => {
-                        e.target.src = getUIBaseUrl()+'/portfolio-image.png';
-                      }}
-                    />
-                    <div className="absolute bottom-4 left-4 right-4 z-20">
-                      <h3 className="text-xl font-bold text-white">{template.displayName}</h3>
-                      <p className="text-sm text-gray-300 mt-1">
-                        {template.category.charAt(0).toUpperCase() + template.category.slice(1)}
-                      </p>
+                    key={template._id}
+                    className="bg-gray-800 rounded-xl overflow-hidden border border-gray-700 hover:border-purple-500 transition-all duration-300 hover:shadow-lg hover:shadow-purple-900/20 h-full flex flex-col group"
+                    variants={itemVariants}
+                  >
+                    {/* Template Preview - Larger and more prominent */}
+                    <div className="relative h-72 overflow-hidden">
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10"></div>
+                      <div className="relative w-full h-full overflow-hidden">
+                        <iframe
+                          src={template.templateUrl}
+                          className="absolute inset-0 w-full h-full object-cover pointer-events-none transform group-hover:scale-105 transition-transform duration-300"
+                          scrolling="no"
+                          style={{ border: 'none' }}
+                          onError={() => template.coverImage}
+                        />
+                      </div>
+                      
+                      {/* Overlay Content */}
+                      <div className="absolute inset-0 z-20 flex flex-col justify-between p-4">
+                        {/* Top: Category Badge */}
+                        <div className="flex justify-end items-start">
+                          <span className="bg-purple-600/80 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full">
+                            {template.category.charAt(0).toUpperCase() + template.category.slice(1)}
+                          </span>
+                          <div className="flex items-center gap-1 bg-black/50 backdrop-blur-sm rounded-full px-2 py-1">
+                            <span className="text-yellow-400 text-xs">★</span>
+                            {/* <span className="text-white text-xs">{template.rating.average.toFixed(1)}</span> */}
+                            <span className="text-white text-xs">{5.0}</span>
+                          </div>
+                        </div>
+                        
+                        {/* Bottom: Title */}
+                        {/* <div>
+                          <h3 className="text-xl font-bold text-white mb-1">{template.displayName}</h3>
+                          <p className="text-sm text-gray-300">
+                            Used {template.usageCount} times • {template.rating.count} reviews
+                          </p>
+                        </div> */}
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Template Details */}
-                  <div className="p-4 flex flex-col justify-between flex-1">
-                    <div>
-                      <p className="text-gray-300 text-sm mb-4">{template.description}</p>
+                    {/* Compact Details Section */}
+                    <div className="p-4 flex flex-col flex-1">
+                      {/* Description - Fixed height with ellipsis */}
+                      <div className="mb-3">
+                        <p className="text-gray-300 text-sm leading-relaxed h-10 overflow-hidden">
+                          <span className="line-clamp-2">
+                            {template.description}
+                          </span>
+                        </p>
+                      </div>
 
-                      {/* Tags */}
+                      {/* Tags - Limited to 3 with overflow indicator */}
                       <div className="flex flex-wrap gap-2 mb-4">
-                        {template.tags.map(tag => (
-                          <span key={`${template._id}-${tag}`} className="text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded-md">
+                        {template.tags.slice(0, 3).map(tag => (
+                          <span 
+                            key={`${template._id}-${tag}`} 
+                            className="text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded-md"
+                          >
                             {tag}
                           </span>
                         ))}
-                      </div>
-                    </div>
-
-                    {/* Bottom: Usage, Ratings, Actions */}
-                    <div className="mt-auto">
-                      <div className="flex items-center justify-between mb-4 text-xs text-gray-400">
-                        <span>Used {template.usageCount} times</span>
-                        <span>★ {template.rating.average.toFixed(1)} ({template.rating.count})</span>
+                        {template.tags.length > 3 && (
+                          <span className="text-xs bg-gray-600 text-gray-400 px-2 py-1 rounded-md">
+                            +{template.tags.length - 3} more
+                          </span>
+                        )}
                       </div>
 
-                      <div className="flex gap-2">
-                        <GradientButton
-                          className="flex-1 text-sm py-1.5"
-                          onClick={() => handleSelectTemplate(template.name)}
-                        >
-                          <FaEdit className="mr-1.5" /> Edit
-                        </GradientButton>
-                        <button 
-                          className="bg-gray-700 hover:bg-gray-600 text-white p-2 rounded-md transition-colors"
-                          onClick={() => handlePreviewTemplate(template.templateUrl)}
-                          title="Preview"
-                        >
-                          <FaEye />
-                        </button>
+                      {/* Actions */}
+                      <div className="mt-auto">
+                        <div className="flex gap-2">
+                          <GradientButton
+                            className="flex-1 text-sm py-2.5 font-medium"
+                            onClick={() => handleSelectTemplate(template.name)}
+                          >
+                            <FaEdit className="mr-2" /> Edit Template
+                          </GradientButton>
+                          <button 
+                            className="bg-gray-700 hover:bg-gray-600 text-white p-2.5 rounded-md transition-all duration-200 hover:scale-105"
+                            onClick={() => handlePreviewTemplate(template.templateUrl)}
+                            title="Preview Template"
+                          >
+                            <FaEye />
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </motion.div>
+                  </motion.div>
 
               ))
             ) : !isLoading && (

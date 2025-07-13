@@ -29,7 +29,7 @@ const CreditRechargeModal = ({ isOpen, onClose, onSuccess, currentCredits }) => 
             // Fallback to hardcoded packages with new pricing
             setCreditPackages([
             { 
-                id: 1, 
+                _id: 1, 
                 credits: 1, 
                 price: 199, 
                 popular: false,
@@ -37,7 +37,7 @@ const CreditRechargeModal = ({ isOpen, onClose, onSuccess, currentCredits }) => 
                 savings: 0
             },
             { 
-                id: 2, 
+                _id: 2, 
                 credits: 5, 
                 price: 899, 
                 popular: true, 
@@ -45,7 +45,7 @@ const CreditRechargeModal = ({ isOpen, onClose, onSuccess, currentCredits }) => 
                 description: 'Most popular choice'
             },
             { 
-                id: 3, 
+                _id: 3, 
                 credits: 10, 
                 price: 1699, 
                 popular: false, 
@@ -53,7 +53,7 @@ const CreditRechargeModal = ({ isOpen, onClose, onSuccess, currentCredits }) => 
                 description: 'Great for regular use'
             },
             { 
-                id: 4, 
+                _id: 4, 
                 credits: 25, 
                 price: 3999, 
                 popular: false, 
@@ -67,7 +67,7 @@ const CreditRechargeModal = ({ isOpen, onClose, onSuccess, currentCredits }) => 
         // Use fallback packages with new pricing
         setCreditPackages([
             { 
-            id: 1, 
+            _id: 1, 
             credits: 1, 
             price: 199, 
             popular: false,
@@ -75,7 +75,7 @@ const CreditRechargeModal = ({ isOpen, onClose, onSuccess, currentCredits }) => 
             savings: 0
             },
             { 
-            id: 2, 
+            _id: 2, 
             credits: 5, 
             price: 899, 
             popular: true, 
@@ -83,7 +83,7 @@ const CreditRechargeModal = ({ isOpen, onClose, onSuccess, currentCredits }) => 
             description: 'Most popular choice'
             },
             { 
-            id: 3, 
+            _id: 3, 
             credits: 10, 
             price: 1699, 
             popular: false, 
@@ -91,7 +91,7 @@ const CreditRechargeModal = ({ isOpen, onClose, onSuccess, currentCredits }) => 
             description: 'Great for regular use'
             },
             { 
-            id: 4, 
+            _id: 4, 
             credits: 25, 
             price: 3999, 
             popular: false, 
@@ -288,7 +288,7 @@ const CreditRechargeModal = ({ isOpen, onClose, onSuccess, currentCredits }) => 
                 <FaCreditCard className="text-purple-600" />
               </div>
               <div>
-                <h3 className="font-semibold text-gray-900 mb-1">AI Enhancement Credits</h3>
+                <h3 className="font-semibold text-gray-900 mb-1">AI Usage Credits</h3>
                 <p className="text-gray-600 text-sm">
                   Each credit allows you to enhance your portfolio with AI. Our AI analyzes your resume and 
                   automatically fills in your portfolio template with relevant information.
@@ -310,10 +310,10 @@ const CreditRechargeModal = ({ isOpen, onClose, onSuccess, currentCredits }) => 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {creditPackages.map((pkg) => (
                   <div
-                    key={pkg.id}
+                    key={pkg._id}
                     onClick={() => handlePackageSelect(pkg)}
                     className={`relative cursor-pointer rounded-lg border-2 transition-all duration-200 ${
-                      selectedPackage?.id === pkg.id
+                      selectedPackage?._id === pkg._id
                         ? 'border-purple-500 bg-purple-50 shadow-lg'
                         : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
                     }`}
@@ -353,7 +353,7 @@ const CreditRechargeModal = ({ isOpen, onClose, onSuccess, currentCredits }) => 
                       </div>
                     </div>
                     
-                    {selectedPackage?.id === pkg.id && (
+                    {selectedPackage?._id === pkg._id && (
                       <div className="absolute top-2 right-2">
                         <div className="bg-purple-500 text-white rounded-full p-1">
                           <FaCheck className="text-xs" />

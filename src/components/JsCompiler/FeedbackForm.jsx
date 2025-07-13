@@ -83,14 +83,14 @@ const FeedbackForm = ({ handleClose }) => {
   if (!show) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-opacity-50 backdrop-blur-sm">
       <div className="bg-gray-800 w-full max-w-md rounded-lg shadow-xl overflow-hidden">
         {/* Modal Header */}
         <div className="bg-gradient-to-r from-purple-600 to-violet-900 px-4 py-3 flex justify-between items-center">
           <h3 className="text-lg font-medium text-white">Send Feedback</h3>
           <button 
             onClick={handleClose}
-            className="text-white hover:text-gray-200 focus:outline-none"
+            className="cursor-pointer text-white hover:text-gray-200 focus:outline-none"
           >
             <IoMdClose className="w-5 h-5" />
           </button>
@@ -165,7 +165,7 @@ const FeedbackForm = ({ handleClose }) => {
               <button 
                 type="button"
                 onClick={handleClose}
-                className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-md transition-colors"
+                className="cursor-pointer px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-md transition-colors"
               >
                 Cancel
               </button>
@@ -175,7 +175,7 @@ const FeedbackForm = ({ handleClose }) => {
                 className={`px-4 py-2 rounded-md flex items-center justify-center ${
                   isSubmitting || rating === 0 || !name || !comment
                     ? 'bg-purple-500 opacity-50 cursor-not-allowed'
-                    : 'bg-gradient-to-r from-purple-600 to-violet-900 hover:from-purple-700 hover:to-violet-800'
+                    : 'bg-gradient-to-r from-purple-600 cursor-pointer to-violet-900 hover:from-purple-700 hover:to-violet-800'
                 } text-white transition-colors`}
               >
                 {isSubmitting ? (

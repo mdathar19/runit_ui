@@ -154,7 +154,7 @@ const ResumeUploader = ({ isOpen, onClose, onUploadSuccess }) => {
           <div className="relative bg-gradient-to-r from-purple-800 to-violet-900 px-6 py-8 text-center">
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors"
+              className="cursor-pointer absolute top-4 right-4 text-white/70 hover:text-white transition-colors"
               aria-label="Close"
             >
               <FaTimes />
