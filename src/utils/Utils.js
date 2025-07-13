@@ -4,6 +4,7 @@
 
 
 import { Play } from "next/font/google";
+import { FaBolt, FaFire, FaPalette, FaRocket, FaUpload, FaUser } from "react-icons/fa";
 
 // Default code to display in the editor on load
 export const DEFAULT_CODE = '// Write your JavaScript code here\nconsole.log("Hello, World!");';
@@ -589,4 +590,47 @@ const getElementByXPath = (xpath, doc) => {
     return null;
   }
 };
+
+
+
+  // Engine options
+export const engines = [
+    {
+      id: 'extreme-3',
+      name: 'Extreme-3',
+      description: 'Fast generation for standard portfolios',
+      icon: <FaBolt className="h-5 w-5" />,
+      color: 'from-blue-500 to-cyan-500',
+      credits: 1,
+      features: ['Fast Generation', 'Standard Templates', 'Basic Customization'],
+      recommended: false
+    },
+    {
+      id: 'extreme-4',
+      name: 'Extreme-4',
+      description: 'Premium AI with advanced capabilities',
+      icon: <FaFire className="h-5 w-5" />,
+      color: 'from-purple-500 to-pink-500',
+      credits: 2,
+      features: ['Advanced AI', 'Premium Templates', 'Full Customization', 'Enhanced Design'],
+      recommended: true
+    }
+  ];
+
+  // Style options
+export const styles = [
+    { id: 'Professional', name: 'Professional', gradient: 'from-slate-600 to-slate-800', preview: '💼' },
+    { id: 'Creative', name: 'Creative', gradient: 'from-purple-600 to-pink-600', preview: '🎨' },
+    { id: 'Modern', name: 'Modern', gradient: 'from-blue-600 to-cyan-600', preview: '⚡' },
+    { id: 'Glassmorphism', name: 'Glassmorphism', gradient: 'from-indigo-600 to-purple-600', preview: '✨' },
+    { id: 'Minimal', name: 'Minimal', gradient: 'from-gray-600 to-gray-800', preview: '🎯' },
+    { id: 'Dark', name: 'Dark Theme', gradient: 'from-gray-800 to-black', preview: '🌙' }
+  ];
+
+export const steps = [
+        { id: 1, title: 'AI Engine', icon: <FaRocket /> },
+        { id: 2, title: 'Design Style', icon: <FaPalette /> },
+        { id: 3, title: 'Upload Resume', icon: <FaUpload /> },
+        { id: 4, title: 'Generate', icon: <FaUser /> }
+    ];
 

@@ -28,13 +28,13 @@ const socketMiddleware = () => {
       // Set socket ID when connected
       socket.on("connect", () => {
         store.dispatch(setSocketId(socket.id));
-        console.log("Socket connected with ID:", socket.id);
+        /* console.log("Socket connected with ID:", socket.id); */
 
         // Join user room if authenticated
         const state = store.getState();
         if (state.auth.isAuthenticated && state.auth.user?._id) {
           socket.emit('join_user_room', state.auth.user._id);
-          console.log(`Joined user room: user_${state.auth.user._id}`);
+          /* console.log(`Joined user room: user_${state.auth.user._id}`); */
         }
       });
       
@@ -80,7 +80,7 @@ const socketMiddleware = () => {
 
       // Sub-section progress for large sections
       socket.on("html-enhancement-subsection-progress", (data) => {
-        console.log(`Sub-section ${data.subSectionIndex}/${data.totalSubSections} completed for section ${data.sectionNumber}`);
+        /* console.log(`Sub-section ${data.subSectionIndex}/${data.totalSubSections} completed for section ${data.sectionNumber}`); */
         
         // Update template HTML with cumulative content including sub-sections
         if (data.cumulativeHtml) {
@@ -200,6 +200,26 @@ const socketMiddleware = () => {
           socket.emit('join_user_room', state.auth.user._id);
         }
       });
+
+      socket.on("template-generation-progress", (data) => {
+      if(data.progress==100){
+        store.dispatch(setHtmlEnhancementComplete())
+      }else{
+        store.dispatch(setHtmlEnhancementProgress({
+          status: data.status,
+          message: data.message,
+          progress: data.progress,
+          currentSection: data.currentSection || null,
+          totalSections: data.totalSections || null
+        }));
+      }
+      });
+      // Credit info
+      socket.on("user-credit-info", (data) => {
+      if(data.usageInfo){
+        store.dispatch(setPortfolioCreditInfo(data.usageInfo));
+      }
+      });
     }
     
     // Special actions for socket management
@@ -230,7 +250,7 @@ const socketMiddleware = () => {
         console.log('Left user room after logout');
       }
     }
-    
+   
     return next(action);
   };
 };

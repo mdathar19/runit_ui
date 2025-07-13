@@ -4,58 +4,83 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Code, ArrowRight, Play, CheckCircle, Bot } from 'lucide-react';
 import { codeExamples, features } from '@/utils/landing';
 import { useEffect, useState } from 'react';
+import { FaBolt } from 'react-icons/fa';
+import Login from '../Login';
+import { useSelector } from 'react-redux';
+import useReduxStore from '@/hooks/useReduxStore';
 
 
 const HeroSection = () => {
-    const [activeFeature, setActiveFeature] = useState(0);
-    const [isVisible, setIsVisible] = useState(false);
-    const [typedText, setTypedText] = useState('');
-    
+  const [activeFeature, setActiveFeature] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
+  const [typedText, setTypedText] = useState('');
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [nextAction, setNextAction] = useState(null);
+  const {
+      isAuthenticated,
+      token
+  } = useSelector((state) => state.auth);
     // Typing animation effect
-    useEffect(() => {
-        setIsVisible(true);
-      
-        const contents = [
-          "find duplicates",
-          "bubble_sort example",
-          "factorial function",
-        ];
-      
-        let contentIndex = 0;
-        let charIndex = 0;
-        let currentText = contents[contentIndex];
-      
-        const typeInterval = setInterval(() => {
-          if (charIndex <= currentText.length) {
-            setTypedText(currentText.slice(0, charIndex));
-            charIndex++;
-          } else {
-            // Wait 1 second before switching to the next content
-            setTimeout(() => {
-              contentIndex = (contentIndex + 1) % contents.length;
-              currentText = contents[contentIndex];
-              charIndex = 0;
-            }, 2000);
-          }
-        }, 100);
-      
-        return () => clearInterval(typeInterval);
-      }, []);
+  useEffect(() => {
+      setIsVisible(true);
+    
+      const contents = [
+        "find duplicates",
+        "bubble_sort example",
+        "factorial function",
+      ];
+    
+      let contentIndex = 0;
+      let charIndex = 0;
+      let currentText = contents[contentIndex];
+    
+      const typeInterval = setInterval(() => {
+        if (charIndex <= currentText.length) {
+          setTypedText(currentText.slice(0, charIndex));
+          charIndex++;
+        } else {
+          // Wait 1 second before switching to the next content
+          setTimeout(() => {
+            contentIndex = (contentIndex + 1) % contents.length;
+            currentText = contents[contentIndex];
+            charIndex = 0;
+          }, 2000);
+        }
+      }, 100);
+    
+      return () => clearInterval(typeInterval);
+    }, []);
       
   
     // Auto-rotate features
-    useEffect(() => {
-      const interval = setInterval(() => {
-        setActiveFeature((prev) => (prev + 1) % features.length);
-      }, 4000);
-      return () => clearInterval(interval);
-    }, [features.length]);
-    const handleCodingFree = (href) => {
-        window.open(href, '_blank');
-      };
-    const handleViewSamples = (href) => {
-        window.open(href, '_blank');
-      };
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveFeature((prev) => (prev + 1) % features.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [features.length]);
+  const handleCodingFree = (href) => {
+      window.open(href, '_blank');
+    };
+  const handleViewSamples = (href) => {
+      window.open(href, '_blank');
+    };
+  const handleCreateByAI = () => {
+      if(!isAuthenticated){
+        setShowLoginModal(true);
+        setNextAction('Create by AI Agents')
+      }
+  }
+   const handleLoginSuccess = (token) => {
+        setShowLoginModal(false);
+        // No need to manually set auth state as it's handled in the redux slice
+        // Continue with export if that's what user was trying to do
+        if (token) {
+          if(nextAction === 'Create by AI Agents') {
+              window.open('/AI-agent/portfolio-generator', '_blank');
+          }
+        }
+    };
   return (
     <div>
       <motion.section 
@@ -98,21 +123,21 @@ const HeroSection = () => {
               
               <div className="flex flex-col sm:flex-row gap-4 mb-8">
                 <motion.button
-                  onClick={() => handleCodingFree('/portfolio/templates-list')}
+                  onClick={() => handleCreateByAI()}
                   className="cursor-pointer bg-gradient-to-r from-purple-600 to-violet-800 hover:from-purple-700 hover:to-violet-900 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-xl"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  Host Portfolio Free<ArrowRight className="ml-2 h-5 w-5" />
+                  <FaBolt className="mr-2 h-5 w-5" /> Create by AI agents
                 </motion.button>
                 
                 <motion.button
-                  onClick={() => handleViewSamples('/templates/eventmanagement/athar/index.html')}
+                  onClick={() => handleCodingFree('/portfolio/templates-list')}
                   className="cursor-pointer border border-gray-600 hover:border-gray-500 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300 flex items-center justify-center backdrop-blur-sm bg-gray-800/20"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <Play className="mr-2 h-5 w-5" /> See Demo
+                  Host Portfolio Free<ArrowRight className="ml-2 h-5 w-5" />
                 </motion.button>
               </div>
               
@@ -208,8 +233,14 @@ const HeroSection = () => {
           </div>
         </div>
       </motion.section>
+      <Login
+          isOpen={showLoginModal}
+          onClose={() => setShowLoginModal(false)}
+          onLoginSuccess={handleLoginSuccess}
+          nextAction={nextAction}
+      />
     </div>
   )
 }
 
-export default HeroSection
+export default useReduxStore(HeroSection);

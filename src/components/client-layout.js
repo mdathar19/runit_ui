@@ -9,6 +9,7 @@ import Navigation from './landing/Naviation';
 
 // List of paths where navigation should be hidden
 const HIDE_NAV_PATHS = [
+  /^\/AI-agent\/[^\/]+$/,
   /^\/compiler\/[^\/]+$/,
   /^\/portfolio\/editor\/[^\/]+$/ // Regex to match dynamic paths like /portfolio/editor/[templateId]
 ];
