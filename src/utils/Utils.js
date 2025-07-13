@@ -619,13 +619,14 @@ export const engines = [
 
   // Style options
 export const styles = [
-    { id: 'Professional', name: 'Professional', gradient: 'from-slate-600 to-slate-800', preview: '💼' },
-    { id: 'Creative', name: 'Creative', gradient: 'from-purple-600 to-pink-600', preview: '🎨' },
-    { id: 'Modern', name: 'Modern', gradient: 'from-blue-600 to-cyan-600', preview: '⚡' },
-    { id: 'Glassmorphism', name: 'Glassmorphism', gradient: 'from-indigo-600 to-purple-600', preview: '✨' },
-    { id: 'Minimal', name: 'Minimal', gradient: 'from-gray-600 to-gray-800', preview: '🎯' },
-    { id: 'Dark', name: 'Dark Theme', gradient: 'from-gray-800 to-black', preview: '🌙' }
-  ];
+  { id: 'Professional', name: 'Professional', gradient: 'from-slate-600 to-slate-800', preview: '💼' },
+  { id: 'Creative', name: 'Creative', gradient: 'from-purple-600 to-pink-600', preview: '🎨' },
+  { id: 'Modern', name: 'Modern', gradient: 'from-blue-600 to-cyan-600', preview: '⚡' },
+  { id: 'Glassmorphism', name: 'Glassmorphism', gradient: 'from-indigo-600 to-purple-600', preview: '✨' },
+  { id: 'Minimal', name: 'Minimal', gradient: 'from-gray-600 to-gray-800', preview: '🎯' },
+  { id: 'Dark', name: 'Dark Theme', gradient: 'from-gray-800 to-black', preview: '🌙' },
+  { id: 'Luxury', name: 'Luxury', gradient: 'from-yellow-600 to-yellow-800', preview: '👑' }
+];
 
 export const steps = [
         { id: 1, title: 'AI Engine', icon: <FaRocket /> },
