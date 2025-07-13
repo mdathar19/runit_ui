@@ -158,7 +158,7 @@ const CreatePortfolioModal = ({ isOpen, onClose }) => {
             onClose();
             dispatch(toggleFeedback(true))
         }
-    }, [enhancementCompleted, dispatch, onClose]);
+    }, [enhancementCompleted]);
 
     // Effect to sync uploaded resume with redux state
     useEffect(() => {
