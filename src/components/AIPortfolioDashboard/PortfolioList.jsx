@@ -22,6 +22,7 @@ import CheckWebsite from '../editor/CheckWebsite';
 import { setPopupConfig } from '@/redux/slices/messagePopSlice';
 import FeedbackForm from '../JsCompiler/FeedbackForm';
 import { toggleFeedback } from '@/redux/slices/compilerSlice';
+import FeedbackButton from '../JsCompiler/FeedbackButton';
 
 function PortfolioList({searchTerm, filterType}) {
     const portfolios = useSelector(selectPortfolios);
@@ -358,6 +359,7 @@ function PortfolioList({searchTerm, filterType}) {
                 onWebsiteNameConfirmed={handleWebsiteNameConfirmed}
                 />
             )}
+            <FeedbackButton onClick={() => dispatch(toggleFeedback(true))} />
             <FeedbackForm handleClose={() => dispatch(toggleFeedback(false))} />
         </div>
     );

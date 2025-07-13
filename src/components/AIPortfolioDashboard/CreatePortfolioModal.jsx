@@ -35,7 +35,7 @@ import {
 } from 'react-icons/fa';
 import { fetchPortfolioStats, generatePortfolio, getUserPortfolios } from '@/redux/slices/portfolioSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectEnhancementComplete, setFileName, parseResume, clearResumeData, selectEnhancementInProgress, selectEnhancementMessage } from '@/redux/slices/resumeSlice';
+import { selectEnhancementComplete, setFileName, parseResume, clearResumeData, selectEnhancementInProgress, selectEnhancementMessage, resetEnhancementState } from '@/redux/slices/resumeSlice';
 import { getPortfolioCreditInfo } from '@/redux/slices/usageSlice';
 import { engines, styles, steps } from '@/utils/Utils';
 import { selectSocketId, toggleFeedback } from '@/redux/slices/compilerSlice';
@@ -150,15 +150,15 @@ const CreatePortfolioModal = ({ isOpen, onClose }) => {
     };
 
     // Effect to handle enhancement completion
-/*     useEffect(() => {
-        if (enhancementCompleted) {
+    useEffect(() => {
+        if (enhancementCompleted && isGenerating) {
             dispatch(getUserPortfolios());
             dispatch(fetchPortfolioStats());
             setIsGenerating(false);
             onClose();
-            dispatch(toggleFeedback(true))
+            dispatch(resetEnhancementState());
         }
-    }, [enhancementCompleted]); */
+    }, [enhancementCompleted,isGenerating]);
 
     // Effect to sync uploaded resume with redux state
     useEffect(() => {
