@@ -21,17 +21,18 @@ export const parseResume = createAsyncThunk(
             body: formData,
         });
         
+        if (!response.ok) {
+          return rejectWithValue(decrypted.message || 'Resume parsing failed');
+        }
         const data = await response.json();
         
         // Decrypt response if needed
         const decrypted = typeof decryptResponse === 'function' ? decryptResponse(data) : data;
-      if (!response.ok) {
-        return rejectWithValue(decrypted.message || 'Resume parsing failed');
-      }
       
       return decrypted;
     } catch (error) {
-      return rejectWithValue('Network error, please try again');
+      console.error('Resume parsing error:', error);
+      rejectWithValue('Network error, please try again');
     }
   }
 );
@@ -176,6 +177,7 @@ const resumeSlice = createSlice({
       })
       .addCase(parseResume.rejected, (state, action) => {
         state.isLoading = false;
+        state.data = null;
         state.error = action.payload || 'Failed to parse resume. Please try again.';
       })
       .addCase(enhanceHtml.pending, (state) => {
