@@ -277,18 +277,19 @@ const CreatePortfolioModal = ({ isOpen, onClose }) => {
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {engines.map((engine) => (
-                                    <div
+                                    <button
                                         key={engine.id}
                                         onClick={() => (credits || credits != 0) && setSelectedEngine(engine.id)}
-                                        className={`relative p-4 rounded-xl border-2 transition-all duration-300 ${
+                                        disabled={!credits || credits == 0}
+                                        className={`relative p-4 rounded-xl border-2 transition-all duration-300 text-left w-full ${
                                             selectedEngine === engine.id
                                                 ? 'border-purple-500 bg-purple-900/20'
                                                 : 'border-gray-700 hover:border-gray-600'
                                         } ${
                                             (!credits || credits == 0) 
-                                                ? 'cursor-not-allowed' 
-                                                : 'cursor-pointer'
-                                        }`}
+                                                ? 'cursor-not-allowed opacity-50' 
+                                                : 'cursor-pointer hover:border-gray-600'
+                                        } disabled:cursor-not-allowed disabled:opacity-50`}
                                     >
                                         {engine.recommended && (
                                             <div className="absolute -top-2 -right-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-2 py-1 rounded-full text-xs font-bold">
@@ -317,7 +318,7 @@ const CreatePortfolioModal = ({ isOpen, onClose }) => {
                                                 </div>
                                             ))}
                                         </div>
-                                    </div>
+                                    </button>
                                 ))}
                             </div>
                         </div>
@@ -327,32 +328,33 @@ const CreatePortfolioModal = ({ isOpen, onClose }) => {
                             <h3 className="text-lg font-semibold text-white">2. Select Design Style</h3>
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
                                 {styles.map((style) => (
-                                    <div
+                                    <button
                                         key={style.id}
-                                        onClick={() => (credits || credits != 0) &&  setSelectedStyle(style.id)}
+                                        onClick={() => (credits || credits != 0) ? setSelectedStyle(style.id) : console.log('No credits left')}
+                                        disabled={!credits || credits == 0}
                                         className={`p-3 rounded-xl border-2 transition-all duration-300 ${
                                             selectedStyle === style.id
                                                 ? 'border-purple-500 bg-purple-900/20'
                                                 : 'border-gray-700 hover:border-gray-600'
-                                        }${
+                                        } ${
                                             (!credits || credits == 0) 
-                                                ? ' cursor-not-allowed' 
-                                                : ' cursor-pointer'
-                                        }`}
+                                                ? ' cursor-not-allowed opacity-50' 
+                                                : ' cursor-pointer hover:border-gray-600'
+                                        } disabled:cursor-not-allowed disabled:opacity-50`}
                                     >
                                         <div className={`h-12 w-full rounded-lg bg-gradient-to-r ${style.gradient} mb-2 flex items-center justify-center text-xl`}>
                                             {style.preview}
                                         </div>
                                         <h4 className="text-xs font-medium text-white text-center">{style.name}</h4>
-                                    </div>
+                                    </button>
                                 ))}
                             </div>
                         </div>
 
                         {/* Step 3: Resume Upload */}
                         <div className="space-y-4">
-                            <h3 className="text-lg font-semibold text-white">3. Upload Your Resume</h3>
-                            
+                            <h3 className="text-lg font-semibold text-white">3. Upload Your Resume <span className="text-gray-400 text-sm">(Resume should not contains any pictures !)</span></h3>
+
                             {/* File Error Display */}
                             {fileError && (
                                 <div className="bg-red-900/20 border border-red-500/50 rounded-lg p-4">
@@ -398,15 +400,7 @@ const CreatePortfolioModal = ({ isOpen, onClose }) => {
 
                             {/* Upload Area */}
                             {!uploadedResume && !(fileName && resumeData) && !isLoading && (
-                                <div
-                                    onClick={() => (credits || credits != 0) &&  fileInputRef.current?.click()}
-                                    className={`border-2 border-dashed border-gray-600 rounded-lg p-8 text-center hover:border-gray-500 transition-colors 
-                                        ${
-                                            (!credits || credits == 0) 
-                                                ? ' cursor-not-allowed' 
-                                                : ' cursor-pointer'
-                                        }`}
-                                >
+                                <>
                                     <input
                                         type="file"
                                         ref={fileInputRef}
@@ -414,10 +408,21 @@ const CreatePortfolioModal = ({ isOpen, onClose }) => {
                                         accept=".pdf,.doc,.docx,.txt"
                                         onChange={handleFileChange}
                                     />
-                                    <FaUpload className="mx-auto h-12 w-12 text-gray-400 mb-3" />
-                                    <p className="text-white font-medium mb-1">Drop your resume here or click to browse</p>
-                                    <p className="text-gray-400 text-sm">Supports PDF, DOC, DOCX, TXT formats (max 5MB)</p>
-                                </div>
+                                    <button
+                                        onClick={() => (credits || credits != 0) && fileInputRef.current?.click()}
+                                        disabled={!credits || credits == 0}
+                                        className={`border-2 border-dashed border-gray-600 rounded-lg p-8 text-center hover:border-gray-500 transition-colors w-full ${
+                                            (!credits || credits == 0) 
+                                                ? 'cursor-not-allowed opacity-50' 
+                                                : 'cursor-pointer hover:border-gray-500'
+                                        } disabled:cursor-not-allowed disabled:opacity-50`}
+                                    >
+                                        <FaUpload className="mx-auto h-12 w-12 text-gray-400 mb-3" />
+                                        <p className="text-white font-medium mb-1">Drop your resume here or click to browse</p>
+                                        <p className="text-gray-400 text-sm">Resume should not contains any pictures !</p>
+                                        <p className="text-gray-400 text-sm">Supports PDF, DOC, DOCX, TXT formats (max 5MB)</p>
+                                    </button>
+                                </>
                             )}
                         </div>
 
