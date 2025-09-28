@@ -535,6 +535,7 @@ const SessionPanel = () => {
               onLoginSuccess={() => {
                 setShowLoginModal(false);
               }}
+              nextAction={'continue'}
             />
           </div>
         </div>
