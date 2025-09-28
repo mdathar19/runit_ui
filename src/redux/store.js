@@ -13,6 +13,7 @@ import paymentReducer from './slices/paymentSlice';
 import usageReducer from './slices/usageSlice';
 import paymentAlertReducer from './slices/paymentAlertSlice';
 import templateReducer from './slices/templateReducer';
+import collaborativeSessionReducer from './slices/collaborativeSessionSlice';
 const persistConfig = {
   key: 'root',
   storage: customStorage,
@@ -29,7 +30,8 @@ const rootReducer = combineReducers({
   payment: paymentReducer,
   usage: usageReducer,
   paymentAlert: paymentAlertReducer,
-  templates: templateReducer
+  templates: templateReducer,
+  collaborativeSession: collaborativeSessionReducer
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

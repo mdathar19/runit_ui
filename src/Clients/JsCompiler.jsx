@@ -1,8 +1,7 @@
 "use client"
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import MonacoEditor from "@monaco-editor/react";
 import Split from "react-split";
 import { CodeIcon, TerminalIcon } from "@heroicons/react/solid";
 import { HeartIcon } from "@heroicons/react/solid";
@@ -12,6 +11,8 @@ import EditorNavbar from "../components/JsCompiler/EditorNavbar";
 import QuestionAnswerBox from "../components/JsCompiler/QuestionAnswerBox";
 import FeedbackButton from "../components/JsCompiler/FeedbackButton";
 import FeedbackForm from "../components/JsCompiler/FeedbackForm";
+import CollaborativeEditor from "../components/JsCompiler/CollaborativeEditor";
+import AudioManager from "../components/JsCompiler/AudioManager";
 
 // Import from Redux slices and hooks
 import { 
@@ -25,6 +26,7 @@ import { getFileExtension, getMonacoLanguage } from "../utils/Utils";
 import useReduxStore from "@/hooks/useReduxStore";
 import { portfolioUrl } from "@/api";
 import { setPopupConfig } from "@/redux/slices/messagePopSlice";
+import { setRemoteOutput, sendOutputUpdate } from "@/redux/slices/collaborativeSessionSlice";
 
 const JsCompiler = ({ defaultLanguage = "javascript" }) => {
   // Set up hooks
@@ -38,6 +40,10 @@ const JsCompiler = ({ defaultLanguage = "javascript" }) => {
     activeTab,
     isMobileView
   } = useCompilerSelectors();
+
+  const { sessionCode, remoteOutput } = useSelector(state => state.collaborativeSession);
+  const isLocalOutputUpdate = useRef(false);
+
   // Set the language based on the URL route when component mounts
   useEffect(() => {
     dispatch(setSelectedLanguage(defaultLanguage));
@@ -48,13 +54,25 @@ const JsCompiler = ({ defaultLanguage = "javascript" }) => {
       linkUrl: portfolioUrl,
     }));
   }, [defaultLanguage, dispatch]);
-  
- 
+
+  useEffect(() => {
+    // Only send output updates if we're in a session and output has changed locally
+    if (sessionCode && output !== null && output !== undefined) {
+      // Mark that we're sending a local update
+      isLocalOutputUpdate.current = true;
+      dispatch(sendOutputUpdate(output));
+
+      // Reset flag after a short delay
+      setTimeout(() => {
+        isLocalOutputUpdate.current = false;
+      }, 100);
+    }
+  }, [output, sessionCode, dispatch]);
 
   const renderEditor = () => (
     <div className="w-full h-full">
       <div className="h-full">
-        <MonacoEditor
+        <CollaborativeEditor
           height="100vh"
           language={getMonacoLanguage(defaultLanguage)}
           theme="vs-dark"
@@ -82,30 +100,35 @@ const JsCompiler = ({ defaultLanguage = "javascript" }) => {
   );
 
   const renderOutput = () => (
-    <div className="w-full h-full">
-      <div className="h-full bg-gray-900 text-gray-100 rounded-lg shadow-xl overflow-hidden">
-        <pre 
-          className="p-4 h-full w-full max-h-full overflow-y-auto font-mono text-sm"
-        >
-          <h6 className="text-blue-400 mb-2 opacity-80 font-mono">// Output.{getFileExtension(defaultLanguage)}</h6>
-          {output}
-        </pre>
+    <div className="w-full h-full flex flex-col overflow-hidden">
+      <div className="h-full bg-gray-900 text-gray-100 rounded-lg shadow-xl flex flex-col overflow-hidden">
+        <h6 className="text-blue-400 px-4 pt-4 pb-2 opacity-80 font-mono flex-shrink-0 border-b border-gray-800">
+          // Output.{getFileExtension(defaultLanguage)}
+        </h6>
+        <div className="flex-1 min-h-0 overflow-y-auto scrollbar-thin">
+          <pre className="p-4 font-mono text-sm whitespace-pre-wrap break-words">
+            {sessionCode && remoteOutput !== null ? remoteOutput : output}
+          </pre>
+        </div>
       </div>
     </div>
   );
 
   return (
     <div className="flex flex-col h-screen w-full bg-gray-900 overflow-hidden">
+      {/* Audio Manager - stays mounted when session exists */}
+      {sessionCode && <AudioManager />}
+
       {/* Heading */}
 
       {/* Navbar */}
-      <div className="py-2">
+      <div className="py-2 flex-shrink-0">
         <EditorNavbar />
       </div>
       
       {/* Mobile Tabs Navigation */}
       {isMobileView && (
-        <div className="flex">
+        <div className="flex flex-shrink-0">
           <ul className="flex w-full text-sm font-medium rounded-lg overflow-hidden bg-gray-800 shadow-md">
             <li className="flex-1">
               <button 
@@ -138,11 +161,11 @@ const JsCompiler = ({ defaultLanguage = "javascript" }) => {
       )}
 
       {/* Editor and Output */}
-      <div className="flex-1">
+      <div className="flex-1 min-h-0 overflow-hidden">
         {isMobileView ? (
           <>
             {/* Mobile View: Show either editor or output based on active tab */}
-            <div 
+            <div
               className="relative h-full"
               style={{ display: activeTab !== 'editor' ? 'none' : 'block' }}
             >
@@ -150,8 +173,8 @@ const JsCompiler = ({ defaultLanguage = "javascript" }) => {
               <QuestionAnswerBox />
               {/* <SearchIcon /> */}
             </div>
-            <div 
-              className="h-full"
+            <div
+              className="h-full overflow-hidden"
               style={{ display: activeTab !== 'output' ? 'none' : 'block' }}
             >
               {renderOutput()}
@@ -159,7 +182,7 @@ const JsCompiler = ({ defaultLanguage = "javascript" }) => {
           </>
         ) : (
           /* Desktop View: Use Split panes for resizable interface */
-          <div className="h-full">
+          <div className="h-full overflow-hidden">
             <Split 
               className="flex h-full"
               sizes={[50, 50]} 
@@ -181,7 +204,7 @@ const JsCompiler = ({ defaultLanguage = "javascript" }) => {
                 <QuestionAnswerBox />
                 {/* <SearchIcon /> */}
               </div>
-              <div className="h-full">
+              <div className="h-full overflow-hidden">
                 {renderOutput()}
               </div>
             </Split>

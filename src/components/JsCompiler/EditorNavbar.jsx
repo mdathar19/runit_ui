@@ -16,6 +16,7 @@ import AppTooltip from '../global/AppTooltip';
 import IconButton from '../global/IconButton';
 import { FaExpand, FaImage, FaSearch } from 'react-icons/fa';
 import Link from 'next/link';
+import SessionPanel from './SessionPanel';
 
 const EditorNavbar = () => {
   // Redux hooks
@@ -170,11 +171,14 @@ const EditorNavbar = () => {
         
         {/* Action buttons */}
         <div className="flex items-center space-x-2">
+          {/* Unified Session Panel */}
+          <SessionPanel />
+
           {/* Snippet Creator Button */}
           <AppTooltip position="left" icon={true} text="Ask Question Ctrl+Space">
             <IconButton
               icon={<FaSearch />}
-              variant="dark" 
+              variant="dark"
               onClick={showQuestionBox}
               disabled={isDisabled}
             />
